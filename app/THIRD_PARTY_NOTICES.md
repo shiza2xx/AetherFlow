@@ -4,7 +4,7 @@ The interface includes hand-authored visual adaptations of the public examples b
 
 ## Bencho Eye Tracker
 
-Reference: [Bencho Eye Tracker](https://bencho.dev/?c=eye-tracker&theme=dark) by Lorenzo Cabra. Atelier recreates the soft rounded dark cube and slanted white capsule eyes with local CSS. It contains no Bencho logo, goat mark, photographs, or copied source code.
+Reference: [Bencho Eye Tracker](https://bencho.dev/?c=eye-tracker&theme=dark) by Lorenzo Cabra. AetherFlow recreates the soft rounded dark cube and slanted white capsule eyes with local CSS. It contains no Bencho logo, goat mark, photographs, or copied source code.
 
 MIT License
 
@@ -36,7 +36,7 @@ material keeps its own licence; see THIRD_PARTY.md.
 
 ## React Bits Specular Button
 
-Reference: [React Bits Specular Button](https://reactbits.dev/components/specular-button) by David Haz. Atelier uses a hand-authored glass-edge treatment and pointer-directed highlight, not the upstream component source or package.
+Reference: [React Bits Specular Button](https://reactbits.dev/components/specular-button) by David Haz. AetherFlow uses a hand-authored glass-edge treatment and pointer-directed highlight, not the upstream component source or package.
 
 MIT + Commons Clause License Condition v1.0
 

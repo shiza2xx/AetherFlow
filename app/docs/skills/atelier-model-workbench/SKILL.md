@@ -1,11 +1,11 @@
 ---
 name: atelier-model-workbench
-description: Read the current Project Atelier context, navigate the model workbench, inspect real models and create checkpointed corrections using the existing character Codex session.
+description: Read the current AetherFlow context, navigate the model workbench, inspect real models and create checkpointed corrections using the existing character Codex session.
 ---
 
-# Project Atelier model workbench
+# AetherFlow model workbench
 
-Use for inspection, additions and corrections in Atelier, including work outside a production stage. Read the common pipeline and relevant repair Skill. Keep the embedded terminal's bound character session/cwd.
+Use for inspection, additions and corrections in AetherFlow, including work outside a production stage. Read the common pipeline and relevant repair Skill. Keep the embedded terminal's bound character session/cwd.
 
 1. Read `ui_get_context` and `model_workbench_get_context`. Distinguish inspected step, persisted production step and independent working version. Resolve exact character/model/hash, rig status and canonical tasks.
 2. Open the character/workbench with `model_workbench_open` or `ui_navigate`; wait for real acknowledgement. Navigation never accepts a result or finishes a stage. Read actual tool schemas.

@@ -143,3 +143,8 @@
 /.release-signing/
 
 !/scripts/prepare-media-tools.mjs
+
+!/src/main/window-icon.test.ts
+!/src/shared/icon-codec.test.ts
+
+!/scripts/verify-brand-icons.ps1

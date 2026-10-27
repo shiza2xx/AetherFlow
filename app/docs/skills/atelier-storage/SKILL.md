@@ -5,7 +5,7 @@ description: Use when locating, preparing, or returning files in an AetherFlow w
 
 # AetherFlow workspace files
 
-Use the active workspace returned by Project Atelier tools. Keep each project's files inside its own workspace. Use the stable character or project ID as the storage owner; a selected UI card does not establish ownership.
+Use the active workspace returned by AetherFlow tools. Keep each project's files inside its own workspace. Use the stable character or project ID as the storage owner; a selected UI card does not establish ownership.
 
 For character work, keep the Codex working directory at `work/characters/<character-id>`. Put source reference copies under `references/`, depth maps under `depth/`, models under `models/<stage>/`, textures under `textures/<stage>/`, production results under `stages/<stage>/`, and delivery exports under `exports/`. Use readable sanitized filenames with a stable ID suffix or version. Preserve existing files when a name collides.
 

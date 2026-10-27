@@ -5,7 +5,7 @@ description: Prepare and verify manual Tripo website handoffs without automating
 
 # Manual Tripo handoff
 
-All Tripo website steps are user-performed in Atelier. This skill contains the complete handoff contract.
+All Tripo website steps are user-performed in AetherFlow. This skill contains the complete handoff contract.
 
 1. Checkpoint and fingerprint the authoritative source, including geometry, UVs, materials, skeleton, weights, rest pose and actions.
 2. Prepare a disposable mesh-only copy only when the saved request explicitly requires it. Keep the full source and dependency closure untouched.

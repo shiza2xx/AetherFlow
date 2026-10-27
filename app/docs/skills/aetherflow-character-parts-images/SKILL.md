@@ -1,11 +1,11 @@
 ---
 name: aetherflow-character-parts-images
-description: Create individual source-faithful character and garment reference images for Atelier's typed slots.
+description: Create individual source-faithful character and garment reference images for AetherFlow's typed slots.
 ---
 
 # Character parts images
 
-Use this skill for reference-image work. Its Atelier gates and local workflow are self-contained.
+Use this skill for reference-image work. Its AetherFlow gates and local workflow are self-contained.
 
 1. Read approved source art and create one image per requested view/part. Preserve silhouette, asymmetry and material construction. Follow the workflow's typed inventory; garments require front and back, accessories front only unless requested side views are explicit.
 2. Do not assume example names, sizes, color palettes, background or figure dimensions. Record uncertain source facts as questions.

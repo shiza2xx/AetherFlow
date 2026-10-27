@@ -14,6 +14,11 @@ files:
   - '!**/node_modules/**/__tests__{,/**/*}'
   - '!**/node_modules/**/test{,/**/*}'
 extraResources:
+  - from: build/icons
+    to: branding
+    filter:
+      - app-icon-light.ico
+      - app-icon-dark.ico
   - from: ../LICENSE
     to: LICENSE
   - from: tools/ffmpeg
@@ -61,7 +66,7 @@ win:
       arch:
         - x64
   icon: build/icon.ico
-  signAndEditExecutable: false
+  signAndEditExecutable: true
   requestedExecutionLevel: asInvoker
 nsis:
   oneClick: false

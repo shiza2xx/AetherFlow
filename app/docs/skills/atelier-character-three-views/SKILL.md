@@ -5,7 +5,7 @@ description: Produce separate orthographic character views that preserve the app
 
 # Three-view references
 
-This Atelier skill defines the complete three-view handoff. Follow its own user review gates and local workflow.
+This AetherFlow skill defines the complete three-view handoff. Follow its own user review gates and local workflow.
 
 1. Use workflow-selected slots. Head+Body needs independent front, left, right and back for head and body, plus full-body front, own-right and back balance views. Separate Parts uses its own typed reference inventory, including base-body back.
 2. Keep framing, pose, lighting and visual style consistent with the source art. Do not mirror away asymmetric details.

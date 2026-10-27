@@ -1,16 +1,16 @@
 {
   "name": "aetherflow",
   "productName": "AetherFlow",
-  "version": "1.0.12",
+  "version": "1.0.13",
   "description": "Local character production workspace",
   "main": "out/main/index.js",
   "scripts": {
     "mcp:stdio": "node scripts/mcp-stdio.mjs",
     "preview": "electron-vite preview",
-    "dev": "node scripts/prepare-codex-integration.mjs && electron-vite dev",
+    "dev": "node scripts/create-brand-icon.mjs && node scripts/prepare-codex-integration.mjs && electron-vite dev",
     "typecheck": "tsc --noEmit",
     "start": "electron-vite preview",
-    "build": "node scripts/prepare-codex-integration.mjs && electron-vite build",
+    "build": "node scripts/create-brand-icon.mjs && node scripts/prepare-codex-integration.mjs && electron-vite build",
     "test": "vitest run",
     "installer:build": "node scripts/build-installer.mjs",
     "installer:audit": "node scripts/package-audit.mjs"
