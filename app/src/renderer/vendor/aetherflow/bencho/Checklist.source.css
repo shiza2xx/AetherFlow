@@ -1,0 +1,233 @@
+.chk {
+  box-sizing: border-box;
+  /* ── it opens, it does not jump ──────────────────────────
+     One row taller when you add a task, over a third of a
+     second. The component states its height rather than
+     letting the rows add up to it, which is what gives this
+     something to interpolate.
+
+     WITH THE OVERFLOW CLIPPED, which is what makes it read as
+     the card opening rather than as a box being resized around
+     things already sitting outside it: the new task takes the
+     empty slot the spare row was in, and the spare row is
+     revealed as the card grows to make it a new one. */
+  overflow: hidden;
+  transition: height 420ms cubic-bezier(0.22, 1, 0.36, 1);
+  /* the rows are in flow and stay in flow — the fall is a
+     transform on each of them, so nothing here is positioned.
+     What this is for now is the stacking context the heap's
+     z-order needs. */
+  position: relative;
+  background: var(--fill-slab, var(--card));
+  font-family: var(--font-ui);
+  color: var(--fill-on, var(--ink));}
+
+/* the hairline is the Stroke control's to give, the way it is
+   for every other block — a spread shadow rather than a
+   border, so it costs the card no layout */
+[data-stroke="on"] .chk {
+  box-shadow: 0 0 0 1px var(--pane-edge);}
+
+.chk-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  /* so the heap can be ordered. Rows land on each other and
+     the one that lands LAST is the top of the pile, which is
+     the opposite of the DOM order they are written in. */
+  position: relative;
+  /* NOTHING at the sides: the card's own padding is the inset,
+     and a second one here would put the box further in than
+     the card's edge says it is */
+  padding: 0;
+  border: 0;
+  border-radius: 10px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  /* the ROW is the target, not the box. A 22px checkbox is a
+     22px hit area, and the words beside it are the part
+     anybody actually points at */
+  -webkit-tap-highlight-color: transparent;}
+
+/* ── the spare row ─────────────────────────────────────────
+   The one thing in this card that is not a task, and it has
+   to read that way at a glance or it is a fourth item you
+   have not ticked yet. So: the same geometry as a row, and a
+   third of the ink. It comes up on hover, and the field it
+   turns into sits at full strength — you are writing in it by
+   then, and a placeholder that stays faint while you type
+   reads as broken. */
+.chk-add {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  /* ── the same type as a task, set ONCE on the row ────────
+     Both the label and the field it turns into say `font:
+     inherit`, which was inheriting the card's — 16px at 400
+     with no tracking, against a task's 14 at 450. Next to
+     three lines of the smaller face the placeholder read as a
+     heading rather than as the next line of the list.
+
+     It goes on the row rather than on each of them because a
+     button and an input are the same line of text at two
+     moments, and a size stated twice is a size that will
+     disagree with itself later. See .chk-say, which is where
+     these three numbers come from. */
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  transition: opacity 220ms ease;}
+
+/* it keeps its space while the heap is down — removing it
+   would change the card's height in the middle of a fall */
+.chk-add[data-hide] {
+  opacity: 0;
+  pointer-events: none;}
+
+/* the box that is not a checkbox: the ring at a fraction of
+   its strength and nothing inside it. No dashes — a dashed
+   outline is a second idea about what "empty" looks like, and
+   this card already has one that works. */
+.chk-ghost {
+  flex: none;
+  box-shadow: inset 0 0 0 1.5px rgba(var(--fill-on-rgb, var(--ink-rgb)), 0.16);}
+
+.chk-new {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  /* `font: inherit` does not carry this: a button and an
+     input take letter-spacing from the UA sheet, not from
+     their parent, so the row's tracking stopped at them. */
+  letter-spacing: inherit;
+  text-align: left;
+  cursor: pointer;
+  opacity: 0.34;
+  transition: opacity 160ms ease;}
+
+.chk-new:hover { opacity: 0.62; }
+
+.chk-field {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  /* `font: inherit` does not carry this: a button and an
+     input take letter-spacing from the UA sheet, not from
+     their parent, so the row's tracking stopped at them. */
+  letter-spacing: inherit;
+  outline: none;}
+
+.chk-field::placeholder {
+  color: color-mix(in srgb, var(--fill-on, #17181a) 32%, var(--fill-slab, #ffffff));}
+
+/* ── on the floor ──────────────────────────────────────────
+   Opaque, and only once it has fallen. A row is a transparent
+   button for its whole life until the three of them are lying
+   against each other, and at that point transparency means two
+   tasks reading through each other at three degrees of
+   rotation — a mess rather than a heap.
+
+   ON A PSEUDO-ELEMENT, and inset, because the row's own box is
+   not the object that falls. A row is 40px tall so that the
+   whole line is a target; what you can SEE in it is about
+   twenty. Painting the full 40 and then stacking the slips
+   tight enough to touch means each one covers the top of the
+   words below it. The slip is the visible part — the
+   component sends its own inset down as --slip, since only it
+   knows how big the Box knob has made the contents.
+
+   Behind the words, not over them: the row carries a z-index
+   while it is fallen, which makes it a stacking context, so a
+   negative one here lands under its own contents and nothing
+   else. */
+.chk-row[data-fell]::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: var(--slip, 9px);
+  bottom: var(--slip, 9px);
+  border-radius: 10px;
+  background: var(--fill-slab, var(--card));
+  z-index: -1;}
+
+.chk-row:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(var(--fill-on-rgb, var(--ink-rgb)), 0.4);}
+
+/* ── the box ────────────────────────────────────────────────
+   The ring never changes. It is drawn once, at rest, and the
+   fill opens inside it — so what you see is a box being
+   filled in rather than one colour being swapped for another.
+   `overflow: hidden` is what keeps the fill's overshoot
+   inside the ring instead of past it. */
+.chk-box {
+  position: relative;
+  flex: none;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  box-shadow: inset 0 0 0 1.5px rgba(var(--fill-on-rgb, var(--ink-rgb)), 0.28);}
+
+.chk-fill {
+  position: absolute;
+  inset: 0;
+  background: var(--fill-on, var(--ink));
+  /* from the middle out — an origin at a corner would read as
+     a panel sliding in rather than as the box filling */
+  transform-origin: center;}
+
+/* ── the tick ───────────────────────────────────────────────
+   Drawn rather than faded: `stroke-dashoffset` walks the
+   stroke on from its start, so the mark is made the way a
+   person makes it. It sits ON the fill and takes the fill's
+   own ground colour, which is why it can be full strength and
+   still be invisible until there is something under it. */
+.chk-tick {
+  position: relative;
+  width: 68%;
+  height: 68%;
+  overflow: visible;
+  fill: none;
+  stroke: var(--fill-slab, var(--card));
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;}
+
+.chk-say {
+  position: relative;
+  /* sized to the WORDS, not to the row: the rule is a scale of
+     this box, so a full-width span would strike out the empty
+     half of the line as well */
+  display: inline-block;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  line-height: 1.2;}
+
+.chk-word { display: inline-block; }
+
+.chk-rule {
+  position: absolute;
+  left: 0;
+  right: 0;
+  /* on the type's own middle rather than the box's — a rule
+     centred on a line box sits low, because the box carries
+     the descender space and the letters do not */
+  top: 46%;
+  height: 1.5px;
+  border-radius: 2px;
+  background: currentColor;
+  transform-origin: left center;
+  pointer-events: none;}

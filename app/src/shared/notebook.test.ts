@@ -1,0 +1,7 @@
+import {describe,expect,it} from 'vitest';
+import {validateNotebookDocument,validateNotebookTitle} from './notebook';
+
+describe('Notebook rich-text boundary',()=>{
+ it('accepts only bounded paragraphs, text, line breaks, strong, and emphasis',()=>{const value={type:'doc',content:[{type:'paragraph',content:[{type:'text',text:'Идея / Studio',marks:[{type:'strong'},{type:'em'}]},{type:'hard_break'}]}]};expect(validateNotebookDocument(value)).toEqual(value);expect(validateNotebookTitle('  Идея  ')).toBe('Идея');});
+ it('rejects HTML, links, attributes, unsupported nodes, excessive depth, and oversized JSON generically',()=>{const invalid=[{type:'doc',content:[{type:'paragraph',content:[{type:'text',text:'secret',marks:[{type:'link',attrs:{href:'javascript:alert(1)'}}]}]}]},{type:'doc',attrs:{class:'secret'},content:[]},{type:'doc',content:[{type:'paragraph',content:[{type:'image',attrs:{src:'https://example.invalid'}}]}]},{type:'doc',content:[{type:'paragraph',content:[{type:'text',text:'x',marks:[{type:'strong',attrs:{style:'color:red'}}]}]}]}];for(const input of invalid)expect(()=>validateNotebookDocument(input)).toThrow('Notebook content is invalid or exceeds its limit.');expect(()=>validateNotebookDocument({type:'doc',content:[{type:'paragraph',content:[{type:'text',text:'x'.repeat(1024*1024)}]}]})).toThrow('Notebook content is invalid or exceeds its limit.');expect(()=>validateNotebookTitle('x'.repeat(241))).toThrow('Notebook title is invalid.');});
+});

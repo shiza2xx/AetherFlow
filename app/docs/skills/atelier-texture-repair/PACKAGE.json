@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "include": [
+    "SKILL.md",
+    "scripts/composite_masked_patch.py",
+    "scripts/apply_composited_atlas.py",
+    "scripts/repair_pbr_mask.py",
+    "scripts/repair_normal_mask.py"
+  ]
+}

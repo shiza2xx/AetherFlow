@@ -1,0 +1,11 @@
+export type UpdateManifestPayload={schemaVersion:1;repository:string;version:string;assetName:string;size:number;sha512:string};
+export type SignedUpdateManifest=UpdateManifestPayload&{signature:string};
+export function canonicalUpdatePayload(manifest:Partial<SignedUpdateManifest>):string;
+export function compareSemver(left:string,right:string):number;
+export function updateAssetUrl(version:string,assetName:string):string;
+export function validateUpdateManifest(raw:unknown,options:{currentVersion?:string;publicKey?:string|Buffer;maxBytes?:number}):{available:false;version:string}|{available:true;schemaVersion:1;repository:string;version:string;assetName:string;size:number;sha512:string;url:string};
+export function signUpdateManifest(payload:UpdateManifestPayload,privateKey:string|Buffer|KeyObject):SignedUpdateManifest;
+export const UPDATE_REPOSITORY:string;
+export const UPDATE_MANIFEST_URL:string;
+export const TRUSTED_UPDATE_HOSTS:ReadonlySet<string>;
+import type {KeyObject} from 'node:crypto';

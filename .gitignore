@@ -1,0 +1,7 @@
+# Publish only the application source and a future user-written README.
+/*
+!/.gitignore
+!/app/
+!/README.md
+
+!/LICENSE

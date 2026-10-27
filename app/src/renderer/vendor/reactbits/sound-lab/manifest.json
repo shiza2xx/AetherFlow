@@ -1,0 +1,110 @@
+{
+  "officialUrl": "https://www.reactbits.dev/tools/sound-lab",
+  "rendererUrl": "https://www.reactbits.dev/assets/player-DWWgh5TT.js",
+  "sounds": [
+    {
+      "name": "Boop",
+      "tune": {
+        "pitch": -3.5,
+        "space": 0.4,
+        "punch": 0.2,
+        "variation": 0.7
+      },
+      "duration": 0.3164166666666667,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 15188,
+      "peak": 0.3272280991077423,
+      "wav": "boop.wav",
+      "recipe": "boop.recipe.js"
+    },
+    {
+      "name": "Pluck",
+      "tune": {},
+      "duration": 0.4631875,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 22233,
+      "peak": 0.2772361636161804,
+      "wav": "pluck.wav",
+      "recipe": "pluck.recipe.js"
+    },
+    {
+      "name": "Daylight",
+      "tune": {},
+      "duration": 0.6401666666666667,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 30728,
+      "peak": 0.31051260232925415,
+      "wav": "daylight.wav",
+      "recipe": "daylight.recipe.js"
+    },
+    {
+      "name": "Nightfall",
+      "tune": {},
+      "duration": 0.7851666666666667,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 37688,
+      "peak": 0.2697348892688751,
+      "wav": "nightfall.wav",
+      "recipe": "nightfall.recipe.js"
+    },
+    {
+      "name": "Shake",
+      "tune": {},
+      "duration": 0.3453333333333333,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 16576,
+      "peak": 0.5247427225112915,
+      "wav": "shake.wav",
+      "recipe": "shake.recipe.js"
+    },
+    {
+      "name": "Drawer",
+      "tune": {},
+      "duration": 0.4819375,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 23133,
+      "peak": 0.3572748005390167,
+      "wav": "drawer.wav",
+      "recipe": "drawer.recipe.js"
+    },
+    {
+      "name": "Summit",
+      "tune": {},
+      "duration": 1.6729375,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 80301,
+      "peak": 0.3653465807437897,
+      "wav": "summit.wav",
+      "recipe": "summit.recipe.js"
+    },
+    {
+      "name": "Orbit",
+      "tune": {},
+      "duration": 0.837125,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 40182,
+      "peak": 0.20922116935253143,
+      "wav": "orbit.wav",
+      "recipe": "orbit.recipe.js"
+    },
+    {
+      "name": "Wink",
+      "tune": {},
+      "duration": 0.40427083333333336,
+      "sampleRate": 48000,
+      "channels": 2,
+      "frames": 19405,
+      "peak": 0.3540453016757965,
+      "wav": "wink.wav",
+      "recipe": "wink.recipe.js"
+    }
+  ]
+}

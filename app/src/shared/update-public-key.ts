@@ -1,0 +1,1 @@
+export const UPDATE_PUBLIC_KEY_PEM='-----BEGIN PUBLIC KEY-----\nMCowBQYDK2VwAyEAimuqKK4xjqfDDM6QdC48Ccqkv0P48R9NkQzPHV7hlxs=\n-----END PUBLIC KEY-----\n';

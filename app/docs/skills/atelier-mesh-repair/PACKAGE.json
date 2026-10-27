@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "include": [
+    "SKILL.md",
+    "references/repair-methods.md",
+    "scripts/inspect_mesh_boundaries.py",
+    "references/segmentation-groups.md",
+    "scripts/repair_group_boundary.py"
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "include": [
+    "SKILL.md",
+    "references/image-contract.md",
+    "references/texture-reference-images.md",
+    "scripts/validate_reference_manifest.py",
+    "scripts/validate_reference_manifest.mjs"
+  ]
+}

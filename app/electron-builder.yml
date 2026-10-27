@@ -1,0 +1,77 @@
+appId: com.aetherflow.studio
+productName: AetherFlow
+artifactName: AetherFlow-NSIS-${version}.${ext}
+asar: true
+compression: normal
+npmRebuild: false
+directories:
+  output: release/nsis-payload
+  buildResources: build
+files:
+  - out/**/*
+  - package.json
+  - '!**/node_modules/**/tests{,/**/*}'
+  - '!**/node_modules/**/__tests__{,/**/*}'
+  - '!**/node_modules/**/test{,/**/*}'
+extraResources:
+  - from: ../LICENSE
+    to: LICENSE
+  - from: tools/ffmpeg
+    to: tools/ffmpeg
+    filter:
+      - ffmpeg.exe
+      - ffprobe.exe
+      - LICENSE.txt
+      - README.txt
+      - toolchain.json
+  - from: build/codex-integration
+    to: codex-integration
+  - from: tools/blender-5.2.2-windows-x64
+    to: tools/blender
+    filter:
+      - "**/*"
+      - "!**/*.pdb"
+      - "!**/*.lib"
+      - "!**/*.pyc"
+      - "!**/__pycache__{,/**/*}"
+  - from: scripts
+    to: scripts
+    filter:
+      - mcp-stdio.mjs
+      - mcp-stdio-profile.mjs
+      - mcp-stdio-bridge.mjs
+      - codex-interactive.mjs
+      - codex-pty-sidecar.mjs
+      - codex-terminal-probe-bridge.mjs
+      - update-launcher.mjs
+  - from: docs/skills
+    to: docs/skills
+  - from: docs/licenses
+    to: docs/licenses
+  - from: THIRD_PARTY_NOTICES.md
+    to: THIRD_PARTY_NOTICES.md
+  - from: src/renderer/assets
+    to: branding
+    filter:
+      - aetherflow-light.png
+      - aetherflow-dark.png
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+  icon: build/icon.ico
+  signAndEditExecutable: false
+  requestedExecutionLevel: asInvoker
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  perMachine: false
+  allowElevation: false
+  createDesktopShortcut: always
+  createStartMenuShortcut: true
+  runAfterFinish: false
+  deleteAppDataOnUninstall: false
+  differentialPackage: false
+  include: build/installer.nsh
+afterPack: scripts/after-pack.mjs

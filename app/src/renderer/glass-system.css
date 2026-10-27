@@ -1,0 +1,251 @@
+/* Shared AetherFlow glass surfaces. The supplied GlassSurface SVG primitive remains on card and guide surfaces; this layer gives every shared control/content block the same material tokens without a per-control canvas. */
+:root {
+  --af-glass-fill: rgba(12, 26, 48, .44);
+  --af-glass-edge: rgba(255, 255, 255, .18);
+  --af-glass-highlight: rgba(255, 255, 255, .12);
+  --af-glass-shadow: 0 8px 24px rgba(2, 10, 23, .24), inset 0 1px 0 var(--af-glass-highlight);
+  --af-glass-primary: #286fae;
+  --af-glass-primary-hover: #347fbe;
+  --af-glass-primary-ink: #f5fbff;
+}
+html[data-theme="light"] {
+  --af-glass-fill: rgba(232, 244, 255, .42);
+  --af-glass-edge: rgba(255, 255, 255, .60);
+  --af-glass-highlight: rgba(255, 255, 255, .76);
+  --af-glass-shadow: 0 8px 24px rgba(34, 72, 112, .12), inset 0 1px 0 var(--af-glass-highlight);
+  --af-glass-primary: #1765aa;
+  --af-glass-primary-hover: #0e548f;
+  --af-glass-primary-ink: #fff;
+}
+
+/* Keep the native draggable titlebar, project rail and breadcrumb chrome clean. */
+.studio-shell > .titlebar,
+.studio-shell > .sidebar,
+.studio-shell .main-area > .topline { backdrop-filter: none; -webkit-backdrop-filter: none; }
+.studio-shell .main-area > .topline { position: sticky; top: 0; z-index: 5; height: 42px; background: var(--bg); border-bottom: 1px solid var(--line); }
+
+/* One glass-control recipe for primary, secondary, icon, destructive, disabled and focused actions.
+   Controls retain their original DOM, role, hit target, and content; no SVG layer can cover text. */
+.studio-shell .main-area button:not(.stepper__segment):not(.stepper__dot):not(.stepper__bar),
+.overlay button,
+.modal-overlay button,
+.toast-stack button {
+  border-color: color-mix(in srgb, var(--af-glass-edge), var(--line) 42%);
+  background-color: var(--af-glass-fill);
+  color: var(--text);
+  box-shadow: inset 0 1px 0 var(--af-glass-highlight);
+  -webkit-backdrop-filter: blur(10px) saturate(140%);
+  backdrop-filter: blur(10px) saturate(140%);
+  transition: background-color 150ms ease, border-color 150ms ease, box-shadow 150ms ease, transform 150ms ease;
+}
+.studio-shell .main-area button:not(:disabled):hover,
+.overlay button:not(:disabled):hover,
+.modal-overlay button:not(:disabled):hover,
+.toast-stack button:not(:disabled):hover {
+  border-color: color-mix(in srgb, var(--pink), var(--af-glass-edge) 46%);
+  background-color: color-mix(in srgb, var(--raised), var(--af-glass-fill) 52%);
+  box-shadow: var(--af-glass-shadow);
+}
+.studio-shell .main-area button:focus-visible,
+.overlay button:focus-visible,
+.modal-overlay button:focus-visible,
+.toast-stack button:focus-visible {
+  outline: 2px solid var(--pink);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--pink), transparent 82%), var(--af-glass-shadow);
+}
+.studio-shell .main-area button:disabled,
+.overlay button:disabled,
+.modal-overlay button:disabled,
+.toast-stack button:disabled {
+  color: var(--muted);
+  opacity: .62;
+  cursor: not-allowed;
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--af-glass-highlight), transparent 40%);
+}
+.studio-shell .main-area button.primary-button,
+.studio-shell .main-area button.save-wide,
+.studio-shell .main-area button.journey-guide-jump,
+.studio-shell .main-area button.aetherflow-glass-button,
+.overlay button.primary-button,
+.modal-overlay button.primary-button {
+  border: 1px solid color-mix(in srgb, var(--af-glass-primary), white 28%);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--af-glass-primary-hover), white 8%), var(--af-glass-primary)) !important;
+  color: var(--af-glass-primary-ink) !important;
+  box-shadow: 0 5px 15px rgba(2, 15, 34, .24), inset 0 1px 0 rgba(255, 255, 255, .35);
+  opacity: 1;
+}
+.studio-shell .main-area button.primary-button:not(:disabled):hover,
+.studio-shell .main-area button.save-wide:not(:disabled):hover,
+.studio-shell .main-area button.journey-guide-jump:not(:disabled):hover,
+.overlay button.primary-button:not(:disabled):hover,
+.modal-overlay button.primary-button:not(:disabled):hover {
+  background: linear-gradient(180deg, var(--af-glass-primary-hover), color-mix(in srgb, var(--af-glass-primary), black 8%));
+  color: var(--af-glass-primary-ink) !important;
+  opacity: 1;
+}
+.studio-shell .main-area button.primary-button:disabled,
+.studio-shell .main-area button.aetherflow-glass-button:disabled,
+.overlay button.primary-button:disabled,
+.modal-overlay button.primary-button:disabled {
+  background: color-mix(in srgb, var(--af-glass-primary), var(--panel) 38%) !important;
+  color: var(--af-glass-primary-ink) !important;
+  opacity: .82;
+}
+.studio-shell .main-area button.danger-button,
+.studio-shell .main-area button.delete-button,
+.modal-overlay button.danger-button {
+  border-color: color-mix(in srgb, var(--error), white 18%);
+  background: color-mix(in srgb, var(--error), var(--af-glass-fill) 38%);
+  color: #fff;
+}
+.studio-shell .main-area input:not([type="checkbox"]):not([type="radio"]),
+.studio-shell .main-area textarea,
+.studio-shell .main-area select,
+.overlay input:not([type="checkbox"]):not([type="radio"]),
+.overlay textarea,
+.overlay select,
+.modal-overlay input:not([type="checkbox"]):not([type="radio"]),
+.modal-overlay textarea,
+.modal-overlay select {
+  background-color: color-mix(in srgb, var(--af-glass-fill), var(--panel) 52%);
+  border-color: color-mix(in srgb, var(--af-glass-edge), var(--line) 38%);
+  color: var(--text);
+}
+
+/* Actual information surfaces: cards, stage guidance, setting groups, work panels, dialogs and notices. */
+.studio-shell .main-area .aetherflow-tilted .tilted-card__front,
+.studio-shell .main-area .aetherflow-tilted .tilted-card__back,
+.studio-shell .main-area .gallery-add-card,
+.studio-shell .main-area .character-create-card,
+.studio-shell .main-area .task-board-card,
+.studio-shell .main-area .settings-section,
+.studio-shell .main-area .setting-row,
+.studio-shell .main-area .integration-row,
+.studio-shell .main-area .backup-callout,
+.studio-shell .main-area .journey-step-guide,
+.studio-shell .main-area .journey-guide-next,
+.studio-shell .main-area .journey-action-cta,
+.studio-shell .main-area .inspector,
+.studio-shell .main-area .calendar-view,
+.studio-shell .main-area .drop-slot,
+.overlay .modal,
+.overlay .dialog,
+.overlay .browser-dialog,
+.modal-overlay .modal,
+.modal-overlay .dialog,
+.toast-stack .toast {
+  background-color: var(--af-glass-fill);
+  border-color: color-mix(in srgb, var(--af-glass-edge), var(--line) 40%);
+  box-shadow: var(--af-glass-shadow);
+  -webkit-backdrop-filter: blur(14px) saturate(145%);
+  backdrop-filter: blur(14px) saturate(145%);
+}
+.studio-shell .main-area .aetherflow-tilted .tilted-card__front,
+.studio-shell .main-area .aetherflow-tilted .tilted-card__back { color: var(--text); }
+.studio-shell .main-area .journey-step-guide { border-radius: 18px; }
+.studio-shell .main-area .journey-action-stepper { padding: 9px 11px; border-radius: 14px; background: color-mix(in srgb, var(--af-glass-fill), var(--panel) 24%); border-color: var(--af-glass-edge); }
+.studio-shell .main-area .journey-guide-next,
+.studio-shell .main-area .journey-action-cta,
+.studio-shell .main-area .journey-action-step-content > span { border-radius: 12px; }
+.studio-shell .main-area .gallery-add-card,
+.studio-shell .main-area .character-create-card { border-radius: 18px; border-style: solid; }
+.studio-shell .main-area .settings-section,
+.studio-shell .main-area .inspector,
+.studio-shell .main-area .calendar-view { border-radius: 16px; }
+.studio-shell .main-area .settings-section { padding: 16px; border: 1px solid color-mix(in srgb, var(--af-glass-edge), var(--line) 40%); margin-bottom: 16px; }
+.studio-shell .main-area .journey-source-canvas,
+.studio-shell .main-area .journey-result-rail,
+.studio-shell .main-area .journey-stage-actions,
+.studio-shell .main-area .reference-workspace,
+.studio-shell .main-area .view-slots,
+.studio-shell .main-area .drop-slot,
+.studio-shell .main-area .operation-panel,
+.studio-shell .main-area .backup-callout,
+.studio-shell .main-area .task-board-card {
+  background-color: var(--af-glass-fill);
+  border-color: color-mix(in srgb, var(--af-glass-edge), var(--line) 40%);
+  box-shadow: var(--af-glass-shadow);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
+  backdrop-filter: blur(12px) saturate(140%);
+}
+.studio-shell .main-area .setting-row,
+.studio-shell .main-area .integration-row { border-radius: 12px; padding-inline: 12px; }
+.studio-shell .main-area .gallery-add-card strong,
+.studio-shell .main-area .character-create-card strong { color: var(--text); }
+/* A collapsed task has one glass surface: the checklist title button. The
+   TiltedCard wrapper and article stay transparent until the checklist opens. */
+.studio-shell .main-area .aetherflow-tilted.task-tilt .tilted-card__front { background: transparent; border: 0; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; }
+.studio-shell .main-area .aetherflow-tilted.task-tilt .tilted-card__front > .tilted-card-glass { display: none !important; }
+.studio-shell .main-area .task-board-card:not(.is-open) { background: transparent; border-color: transparent; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; }
+.studio-shell .main-area .character-back > .primary-button { color: var(--af-glass-primary-ink); }
+.studio-shell .main-area button.aetherflow-glass-button > .glass-button-label {
+  position: relative;
+  z-index: 2;
+  color: var(--af-glass-primary-ink) !important;
+  -webkit-text-fill-color: var(--af-glass-primary-ink) !important;
+  opacity: 1 !important;
+}
+.studio-shell .main-area .concept-back .tile-actions button,
+.studio-shell .main-area .character-back > button:not(.button-glass-layer),
+.studio-shell .main-area .concept-back .gallery-image-removal button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 40px;
+  min-height: 40px;
+  padding-block: 4px;
+  border: 1px solid color-mix(in srgb, var(--af-glass-edge), var(--line) 35%);
+  border-radius: 12px;
+  background-color: var(--af-glass-fill);
+  color: var(--text);
+  box-shadow: inset 0 1px 0 var(--af-glass-highlight);
+  -webkit-backdrop-filter: blur(10px) saturate(140%);
+  backdrop-filter: blur(10px) saturate(140%);
+}
+.studio-shell .main-area .concept-back .tile-actions { background: transparent; }
+.studio-shell .main-area .concept-back .tile-actions button.aetherflow-glass-button,
+.studio-shell .main-area .character-back > button.aetherflow-glass-button {
+  color: var(--af-glass-primary-ink) !important;
+  -webkit-text-fill-color: var(--af-glass-primary-ink) !important;
+}
+.studio-shell .main-area .concept-back .tile-actions button.aetherflow-glass-button .glass-button-label { white-space: nowrap; font-size: 11px; }
+.studio-shell .main-area .concept-back .gallery-image-removal button {
+  justify-content: flex-start;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.studio-shell .main-area .concept-back .gallery-image-removal button span { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+
+/* Art already supplies the card's rich visual layer. Avoid a separate live
+   backdrop blur for every face in the Gallery grid; retain its tinted glass
+   fill, blue edge, tilt, glare, and spring interaction. */
+.studio-shell .main-area .gallery-grid .concept-tilt .tilted-card__front,
+.studio-shell .main-area .gallery-grid .concept-tilt .tilted-card__back,
+.studio-shell .main-area .character-grid .character-tilt .tilted-card__front,
+.studio-shell .main-area .character-grid .character-tilt .tilted-card__back {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+/* React Bits Stepper keeps its spring/slide mechanics but inherits the app's round geometry and blue tokens. */
+.journey-stepper-source.stepper {
+  --stepper-radius: 20px;
+  --stepper-well-radius: 14px;
+  --stepper-tile-radius: 12px;
+  font-family: Manrope, 'Segoe UI', sans-serif;
+}
+.journey-stepper-source .stepper__segment { min-height: 40px; border-radius: 12px; font-family: inherit; }
+.journey-stepper-source .stepper__title { font-size: 12px; font-weight: 700; }
+.journey-stepper-source .stepper__description { font-size: 11px; }
+.journey-stepper-source .stepper__badge { width: 24px; height: 24px; }
+.journey-stepper-source .stepper__step { font-family: Manrope, 'Segoe UI', sans-serif; }
+.journey-stepper-source .stepper__step button { border-radius: 11px; font-size: 12px; }
+@media (max-width: 1120px) {
+  .studio-shell .main-area .journey-action-stepper { padding: 7px; }
+  .journey-stepper-source .stepper__segment { padding-inline: 8px; }
+}

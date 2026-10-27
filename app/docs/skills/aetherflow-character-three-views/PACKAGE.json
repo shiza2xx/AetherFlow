@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 1,
+  "include": [
+    "SKILL.md",
+    "references/head-view-prompt-patterns.md"
+  ]
+}

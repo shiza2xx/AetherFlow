@@ -1,0 +1,624 @@
+/* Consolidated UI Fix Pack corrections. Preserve the blue theme palettes,
+   source interactions and motion while keeping the layout and state clear. */
+
+/* The embedded terminal is a bottom dock, not the navigation rail. Keep the
+   actual content grid compact at every supported desktop width. */
+.app-shell.studio-shell{grid-template:44px minmax(0,1fr) 26px/var(--studio-side-width,232px) minmax(0,1fr)!important}
+.studio-shell>.sidebar{box-sizing:border-box;width:232px!important;max-width:232px;min-width:0;justify-self:start;overflow-x:hidden}
+.studio-shell .main-area{min-width:0}
+/* Keep the workspace beside the actual navigation rail. The terminal floats
+   over the lower-left corner, so reserve vertical scroll room for the area it
+   covers instead of shifting every page right by the dock width. */
+.studio-shell>.sidebar{height:calc(100% - var(--studio-terminal-height,300px))}
+.codex-dock{max-width:var(--studio-side-width,232px)}
+.codex-dock-title{gap:7px}
+.codex-process-status{flex:none;color:var(--muted);font-size:10px;white-space:nowrap}
+.codex-owner{min-width:0}
+@media(max-width:960px){.studio-shell>.sidebar{width:200px!important;max-width:200px}}
+
+/* Planner filters stay one row high. Every plan remains available in the
+   keyboard-accessible listbox, while configuration follows the selection. */
+.plan-desk{min-height:0!important;padding:8px 10px!important;margin:8px 0 10px!important}
+.plan-filter-row{display:flex;align-items:center;flex-wrap:wrap;gap:8px 12px;min-height:38px!important}
+.plan-filter-row>.aetherflow-gooey{width:min(270px,100%);flex:0 1 270px}
+.plan-filter-row .aetherflow-gooey-stage{height:36px!important}
+.plan-filter-row .aetherflow-gooey-trigger{height:36px!important;min-height:36px!important}
+.plan-filter-count{color:var(--muted);font-size:12px;white-space:nowrap}
+.plan-config-selected{margin-left:auto;min-height:34px}
+.menu-select-popover{z-index:40;max-height:min(340px,calc(100vh - 100px));overflow:auto;overscroll-behavior:contain}
+
+/* A populated dashboard keeps the requested centered start action and gives
+   the active character a compact, image-led return card. */
+.studio-dashboard>.active-character-link{display:grid;width:min(100%,980px);min-height:86px;max-height:none;grid-template-columns:58px minmax(0,1fr) auto;grid-template-rows:auto auto auto;align-items:center;gap:2px 12px;margin:8px 0 12px;padding:8px 12px;border-radius:13px}
+.studio-dashboard>.active-character-link>span:first-child{grid-column:2;grid-row:1;font-size:10px}
+.studio-dashboard>.active-character-link>strong{grid-column:2;grid-row:2;font-size:14px}
+.studio-dashboard>.active-character-link>small{grid-column:2;grid-row:3;font-size:11px}
+.studio-dashboard>.active-character-link .active-character-thumb{grid-column:1;grid-row:1/4;width:52px;height:60px;max-width:52px;max-height:60px;object-fit:contain;padding:3px}
+.studio-dashboard>.active-character-link .active-character-continue{grid-column:3;grid-row:1/4;position:static;display:flex;align-items:center;gap:5px;white-space:nowrap;font-size:11px}
+.studio-dashboard>.active-character-link .active-character-progress{grid-column:2/4;grid-row:4;margin-top:4px}
+.studio-next{width:min(100%,1080px)}
+.studio-next-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:0 0 6px}
+.studio-next-heading{min-width:0}
+.studio-next-title-line{display:flex;align-items:baseline;flex-wrap:wrap;gap:2px 10px}
+.studio-next-title-line h2{margin:0;font-size:19px}
+.studio-next-count{color:var(--muted);font-size:11px}
+.studio-next-heading>p{margin:3px 0 0;color:var(--muted);font-size:11px}
+.studio-next-header>.text-button{flex:none}
+.studio-next .task-list{width:100%}
+.studio-next .task-row{min-height:52px}
+@media(max-width:700px){.studio-dashboard>.active-character-link{grid-template-columns:50px minmax(0,1fr);gap:3px 9px;padding:8px}.studio-dashboard>.active-character-link .active-character-thumb{width:46px;height:52px;max-width:46px;max-height:52px}.studio-dashboard>.active-character-link .active-character-continue{grid-column:2;grid-row:4}.studio-dashboard>.active-character-link .active-character-progress{grid-column:2;grid-row:5}.studio-next-header{align-items:flex-start}.studio-next-count{white-space:normal}}
+
+/* Expanded task cards use one rounded panel. Checklist rows grow with their
+   text, real checkboxes stay visible, and the Add item affordance has no
+   decorative checkbox shape of its own. */
+.task-board-grid{align-items:start}
+.task-board-card{height:auto!important;min-height:0;overflow:visible}
+.task-board-card.is-open{position:relative;z-index:8;padding:9px;border:1px solid var(--line-strong);border-radius:14px;background:var(--panel);box-shadow:0 8px 24px color-mix(in srgb,#07172c,transparent 82%)}
+.task-board-card.is-open .aetherflow-checklist-stage{height:auto!important;min-height:64px;overflow:visible}
+.task-board-card.is-open .aetherflow-checklist-trigger{min-height:54px;max-height:none;padding:8px 10px}
+.task-board-card.is-open .aetherflow-checklist-panel{padding:6px 8px 10px;background:transparent!important}
+.task-board-card.is-open .chk-adaptive{height:auto!important;min-height:0;overflow:visible!important;padding:3px 0!important}
+.task-board-card.is-open .chk-row{height:auto!important;min-height:40px!important;max-height:none!important;overflow:visible!important;padding:8px 2px!important;align-items:flex-start}
+.task-board-card.is-open .chk-row-wrap{height:auto!important;min-height:0!important;align-items:flex-start;gap:9px}
+.task-board-card.is-open .chk-source-draw-checkbox{display:flex!important;width:18px;height:18px;margin:2px 0 0;flex:0 0 18px}
+.task-board-card.is-open .chk-source-draw-checkbox .aetherflow-draw-control,.task-board-card.is-open .chk-source-draw-checkbox .aetherflow-draw-input,.task-board-card.is-open .chk-source-draw-checkbox .aetherflow-draw-box{width:18px;height:18px}
+.task-board-card.is-open .chk-row-text{display:block;width:auto;flex:1;min-width:0;white-space:normal;text-align:left}
+.task-board-card.is-open .chk-say{display:block;width:100%;max-width:100%;max-height:none;overflow:visible;white-space:normal;overflow-wrap:anywhere;word-break:normal;font-size:13px;line-height:1.5}
+.task-board-card.is-open .chk-add{min-height:38px;padding:5px 2px!important;gap:0}
+.task-board-card .chk-add .chk-ghost{display:none!important}
+.task-board-card.is-open .task-board-settings{margin-top:7px}
+.aetherflow-checklist-disclosure{position:relative}
+.aetherflow-checklist-title-tooltip{position:absolute;z-index:50;left:8px;top:calc(100% + 4px);display:none;width:max-content;max-width:min(420px,calc(100vw - 40px));padding:7px 9px;border:1px solid var(--line-strong);border-radius:8px;background:var(--panel);color:var(--text);box-shadow:0 8px 20px #07172c55;font-size:12px;line-height:1.4;white-space:normal;overflow-wrap:anywhere;pointer-events:none}
+.aetherflow-checklist-trigger[data-truncated=true]:hover~.aetherflow-checklist-title-tooltip,.aetherflow-checklist-trigger[data-truncated=true]:focus-visible~.aetherflow-checklist-title-tooltip{display:block}
+
+/* Expanded card backs are content-sized so every action remains reachable. */
+.aetherflow-tilted[data-expanded-back]{min-height:0!important;max-height:none!important;overflow:visible!important}
+.aetherflow-tilted[data-expanded-back] .tilted-card__body{min-height:0!important;max-height:none!important}
+.aetherflow-tilted[data-expanded-back] .tilted-card__back{overflow:visible!important}
+.aetherflow-tilted[data-expanded-back] .tilted-card__back-content{position:relative;height:auto!important;min-height:0!important;max-height:none!important;overflow:visible!important}
+.concept-tilt[data-expanded-back],.character-tilt[data-expanded-back]{min-height:0!important;max-height:none!important}
+.concept-tilt[data-expanded-back] .tilted-card__front,.character-tilt[data-expanded-back] .tilted-card__front{min-height:0!important}
+.concept-back{display:flex;flex-direction:column;gap:9px;min-height:0;padding:14px;border:1px solid var(--line);border-radius:13px;background:color-mix(in srgb,var(--panel),transparent 2%)}
+.concept-back-heading{min-height:58px}
+.concept-back .tile-actions{display:flex;align-items:center;flex-wrap:wrap;gap:6px}
+.concept-back .tile-actions button{min-height:34px;padding:0 8px;font-size:12px}
+.concept-back .gallery-image-removal{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:5px;max-height:none;overflow:visible;padding-top:6px;border-top:1px solid var(--line)}
+.concept-back .gallery-image-removal button{justify-content:flex-start;min-width:0;min-height:34px;text-align:left}
+.concept-back .gallery-image-removal button span{min-width:0;overflow-wrap:anywhere;white-space:normal}
+.character-back{display:flex;flex-direction:column;height:auto!important;min-height:0!important;gap:9px;padding:14px;border:1px solid var(--line);border-radius:13px;background:color-mix(in srgb,var(--panel),transparent 2%)}
+.character-back-summary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.character-back-summary span{min-width:0;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--raised);font-size:12px;line-height:1.4;overflow-wrap:anywhere}
+.character-blocker-reason{margin:0;padding:8px 10px;border-left:3px solid var(--amber);border-radius:6px;background:color-mix(in srgb,var(--amber-soft),transparent 25%);font-size:13px;line-height:1.5}
+.character-stage-history{width:100%}
+.character-stage-history>summary{justify-content:space-between;min-height:36px;font-size:12px}
+.character-back-stages{display:grid;gap:2px;max-height:none!important;overflow:visible!important}
+.character-back-stages>div{display:grid;grid-template-columns:18px minmax(0,1fr) auto;align-items:center;gap:8px;min-height:28px!important;padding:3px 5px;border-bottom:1px solid var(--line);font-size:12px!important}
+.character-back-stages>div span{font-size:12px;line-height:1.4;overflow-wrap:anywhere;white-space:normal!important}
+.character-back-stages>div small{font-size:11px!important;white-space:nowrap}
+.character-back-stages>div i{width:16px;height:16px}
+.character-open-button{align-self:flex-start;min-height:36px}
+@media(max-width:700px){.character-back-summary{grid-template-columns:minmax(0,1fr)}.concept-back .tile-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.concept-back .gallery-image-removal{grid-template-columns:minmax(0,1fr)}}
+
+/* The source-art page keeps its preview and real Continue action above the
+   fold. Detailed explanation is available on demand. */
+.journey-source-stage{grid-template-columns:minmax(0,1.4fr) minmax(230px,.7fr);gap:20px;align-items:start}
+.journey-source-canvas.populated{height:clamp(260px,calc(100vh - 560px),420px)!important;min-height:260px;max-height:420px}
+.journey-source-canvas.populated .artwork-preview,.journey-source-canvas.populated .artwork-preview img{max-height:100%;height:100%;object-fit:contain}
+.journey-source-notes{padding:8px 0}
+.journey-source-guidance{margin:0 0 12px}
+.journey-source-guidance>summary{min-height:34px;padding:7px 9px;border:1px solid var(--line);border-radius:8px;background:var(--raised);color:var(--text);font-size:12px;cursor:pointer}
+.journey-source-guidance p{margin:8px 0 0;color:var(--muted);font-size:12px;line-height:1.5}
+.journey-source-thumbs{margin:12px 0}
+.journey-step-guide[data-step=source]{margin-bottom:8px;padding:8px 10px}
+.journey-step-guide[data-step=source] .journey-action-stepper{margin:0 0 5px;padding:2px}
+.journey-step-guide[data-step=source] .journey-stepper-source .stepper__segment{height:32px}
+.journey-step-guide[data-step=source] .journey-stepper-source .stepper__description{display:none}
+.journey-step-guide[data-step=source] .journey-guide-manual{margin-top:0}
+.journey-step-guide[data-step=source] .journey-action-cta{margin-top:2px;padding:4px 6px}
+.journey-step-guide[data-step=source] .journey-action-cta p{display:block!important}
+.journey-step-guide[data-step=source] .journey-action-cta{grid-template-columns:minmax(0,1fr) auto}
+.journey-step-guide[data-step=source] .journey-stepper-source .stepper__description{display:none}
+.journey-source-stage~.journey-stage-actions{margin:10px 0}
+.journey-source-stage~.journey-footer{padding:10px 0}
+@media(max-height:850px){.journey-source-canvas.populated{height:clamp(220px,calc(100vh - 600px),300px)!important;min-height:220px}.studio-shell .character-journey{padding-top:12px;padding-bottom:12px}.journey-step-guide{margin-bottom:7px}}
+@media(max-width:900px){.journey-source-stage{grid-template-columns:minmax(0,1fr);gap:10px}.journey-source-canvas.populated{height:clamp(210px,38vh,340px)!important}.journey-source-thumbs{grid-template-columns:repeat(3,minmax(0,1fr))}}
+
+/* The stage guide remains a single quiet panel around its current action. */
+.journey-step-guide{background:var(--panel)!important;background-image:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+.journey-action-stepper{margin:3px 0 6px!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+.journey-action-cta{margin-top:4px!important;padding:4px 0 0!important;border:0!important;border-radius:0!important;background:transparent!important}
+.journey-action-cta p{font-size:12px;line-height:1.45}
+.journey-guide-manual{margin-top:4px!important}
+.journey-guide-detail{padding-top:6px}
+.journey-source-canvas.populated{height:clamp(220px,calc(100vh - 640px),360px)!important;min-height:220px;max-height:360px}
+.journey-source-guidance>summary{border-color:var(--line-strong);background:color-mix(in srgb,var(--panel),transparent 8%)}
+@media(max-height:850px){.journey-source-canvas.populated{height:clamp(200px,calc(100vh - 600px),300px)!important;min-height:200px;max-height:300px}}
+
+/* Report comparison uses the clips' native 16:9 framing with contain; the
+   context panel moves below the player at narrow widths. */
+.urd-layout{grid-template-columns:minmax(0,1fr) minmax(250px,28%);gap:18px}
+.urd-canvas:has(.urd-video-pair){display:block!important;width:100%;height:auto!important;min-height:0!important;overflow:visible!important;padding:0;background:transparent;border:0}
+.urd-canvas:has(.urd-video-pair)>.urd-video-pair{height:auto!important;min-height:0!important;overflow:visible!important}
+.urd-video-pair{height:auto!important;min-height:0!important;overflow:visible!important}
+.urd-video-pair-sources.is-paired{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start;gap:10px;overflow:visible!important}
+.urd-video-pair-pane{min-width:0;height:auto!important;min-height:0!important;border:1px solid var(--line);border-radius:12px;background:var(--panel);overflow:hidden}
+.urd-video-pair-pane figcaption{display:grid;grid-template-columns:auto minmax(0,1fr);gap:3px 8px;min-height:44px;padding:6px 9px}
+.urd-video-pair-pane figcaption .urd-video-file-name{min-width:0;white-space:normal;overflow-wrap:anywhere;line-height:1.3}
+.urd-video-pair-pane figcaption>span:last-child{grid-column:1/-1;margin-left:0}
+.urd-video-pair-pane .urd-video-stage{display:grid;flex:none;width:100%;height:auto;aspect-ratio:16/9;min-height:0;overflow:hidden;background:#08111f}
+.urd-video-pair-pane .urd-video-stage>video{display:block;width:100%;height:100%;max-width:100%;max-height:100%;object-fit:contain;background:#08111f}
+.urd-video-controls{min-height:0;padding:8px 10px;border:1px solid var(--line);border-radius:12px;background:var(--panel)}
+.urd-video-controls input[type=range].urd-video-volume{width:96px;min-width:84px;height:7px;flex:0 1 96px;border-radius:999px;background:linear-gradient(to right,var(--pink) var(--volume-progress,0%),var(--line-strong) var(--volume-progress,0%));accent-color:var(--pink)}
+.urd-volume-value{min-width:38px;padding:2px 4px;border:1px solid var(--line);border-radius:6px;background:var(--raised);color:var(--text);font-size:11px;text-align:center;font-variant-numeric:tabular-nums}
+.urd-summary{padding:12px;border:1px solid var(--line);border-radius:13px;background:color-mix(in srgb,var(--panel),transparent 2%)}
+.urd-description{font-size:13px;line-height:1.6}
+.urd-checks{margin-top:14px;padding-top:12px}
+.urd-file-name{white-space:normal;overflow-wrap:anywhere}
+@media(max-width:1350px){.studio-shell .main-area .page-content{padding-top:12px!important}.urd-heading{margin-bottom:10px;gap:12px}.urd-back{margin-bottom:5px}.urd-title>p{margin-top:6px}.urd-layout{grid-template-columns:minmax(0,1fr);gap:10px}.urd-summary{grid-row:2;max-width:none}.urd-canvas:has(.urd-video-pair){height:auto!important}.urd-video-pair-sources.is-paired{grid-template-columns:repeat(2,minmax(0,1fr))}.urd-video-controls{flex-wrap:wrap}.urd-toolbar{margin-bottom:7px}.urd-view-steps{margin-bottom:4px}}
+@media(max-width:760px){.urd-video-pair-sources.is-paired{grid-template-columns:minmax(0,1fr)}.urd-video-pair-pane .urd-video-stage{aspect-ratio:16/9}.urd-video-actions{flex-wrap:wrap}.urd-video-controls input[type=range].urd-video-volume{width:78px;min-width:72px}}
+
+/* Settings sections are a segmented navigation with a clear current tab. */
+.studio-shell .main-area .settings-layout{display:block!important}
+.studio-shell .main-area .settings-nav{display:flex!important;flex-direction:row!important;align-items:center;flex-wrap:wrap;gap:5px;width:max-content;max-width:100%;padding:5px;border:1px solid var(--line-strong);border-radius:13px;background:color-mix(in srgb,var(--panel),transparent 3%)}
+.studio-shell .main-area .settings-nav button{display:block;width:auto!important;flex:0 0 auto;min-width:0;min-height:36px;padding:0 13px;border:1px solid transparent;border-radius:9px;background:transparent;color:var(--muted);font-size:12px;font-weight:650;white-space:nowrap;text-align:center}
+.studio-shell .main-area .settings-nav button:hover{background:var(--raised);color:var(--text)}
+.studio-shell .main-area .settings-nav button[aria-selected=true],.studio-shell .main-area .settings-nav button[aria-pressed=true]{border-color:color-mix(in srgb,var(--pink),transparent 15%);background:var(--pink-soft);color:var(--pink);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--pink),transparent 58%)}
+.studio-shell .main-area .settings-nav button:focus-visible{outline:2px solid var(--pink);outline-offset:2px}
+.settings-nav button:focus-visible{outline:2px solid var(--pink);outline-offset:2px}
+@media(max-width:620px){.studio-shell .main-area .settings-nav{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));width:100%;box-sizing:border-box}.studio-shell .main-area .settings-nav button{width:100%!important;min-width:0;white-space:normal;line-height:1.3}}
+
+/* The flipped gallery and character faces already supply a rounded glass
+   surface. Keep the content directly on that face instead of nesting a second
+   bordered plate; reserve filled surfaces for actual controls. */
+.concept-back,.character-back{border:0!important;border-radius:0!important;background:transparent!important}
+.concept-back .tile-actions button:not(.pink-text),.character-back>button:not(.primary-button){backdrop-filter:none!important;-webkit-backdrop-filter:none!important;background:var(--raised)}
+.character-back-summary span{padding:0;border:0;border-radius:0;background:transparent;font-size:12px;line-height:1.4}
+.character-back-summary{align-items:start;gap:5px 12px;color:var(--text)}
+.concept-back .gallery-image-removal{padding-top:8px}
+.settings-content{min-width:0}
+
+.urd-toolbar{display:flex;align-items:center;flex-wrap:wrap;gap:8px}
+.urd-mode-select-wrap,.urd-video-view-select-wrap{display:inline-flex;align-items:center;gap:7px;min-width:0;min-height:36px;padding:0 10px;border:1px solid var(--line);border-radius:9px;background:var(--panel);color:var(--muted)}
+.urd-video-view-select-label{font-size:11px;white-space:nowrap}
+.urd-mode-select,.urd-video-view-select{min-width:0;max-width:min(280px,55vw);min-height:32px;border:0;background:transparent;color:var(--text);font-size:12px}
+
+/* Unity activity rows keep report name, status and date together on a legible
+   glass card rather than scattering tiny metadata across the canvas. */
+.report-row{display:grid;grid-template-columns:36px minmax(0,1fr) minmax(95px,130px) 16px;grid-template-rows:auto auto auto;align-items:center;gap:3px 12px;min-height:82px;margin:0 0 8px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:color-mix(in srgb,var(--panel),transparent 3%);color:var(--text)}
+.report-row:hover{border-color:var(--line-strong);background:var(--raised)}
+.report-row>.report-icon{grid-column:1;grid-row:1/4;color:var(--pink)}
+.report-row-copy{display:contents}
+.report-row-copy>strong{grid-column:2;grid-row:1;min-width:0;color:var(--text);font-size:14px;line-height:1.35;overflow-wrap:anywhere}
+.report-row-copy>p{grid-column:2;grid-row:2;margin:0;color:var(--muted);font-size:12px;line-height:1.4;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.report-row-copy>small{grid-column:2;grid-row:3;color:var(--muted);font-size:11px}
+.report-row>.status{grid-column:3;grid-row:1;justify-self:start}
+.report-row>time{grid-column:3;grid-row:2/4;align-self:start;color:var(--muted);font-size:11px}
+.report-row>svg:last-child{grid-column:4;grid-row:1/4;color:var(--muted)}
+@media(max-width:720px){.report-row{grid-template-columns:28px minmax(0,1fr) 16px;grid-template-rows:auto auto auto auto;gap:4px 9px}.report-row>.report-icon{grid-row:1/5}.report-row-copy>strong,.report-row-copy>p,.report-row-copy>small{grid-column:2}.report-row-copy>strong{grid-row:1}.report-row-copy>p{grid-row:2;white-space:normal}.report-row-copy>small{grid-row:3}.report-row>.status{grid-column:2;grid-row:4}.report-row>time{grid-column:2;grid-row:5}.report-row>svg:last-child{grid-column:3;grid-row:1/6}}
+
+.statusbar-storage{display:flex;align-items:center;gap:7px;color:var(--muted);font-size:11px}
+.statusbar-storage>i{flex:none;width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 0 3px var(--green-soft)}
+
+/* A plan selector is a bounded control; the generic menu selector expands to
+   the width of forms unless its planning context gives it an explicit size. */
+.plan-filter-row>.menu-select{width:min(270px,100%);flex:0 1 270px}
+.plan-filter-row>.menu-select .menu-select-trigger{width:100%}
+
+/* Keep character and concept backs wide enough for readable metadata/actions.
+   Content still determines expanded height, and the history remains optional. */
+.character-grid{grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr))}
+.gallery-grid.preview-comfortable{grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr))}
+.gallery-grid.preview-compact{grid-template-columns:repeat(auto-fill,minmax(min(100%,280px),1fr))}
+.character-back-summary{grid-template-columns:repeat(2,minmax(0,1fr));font-size:12px;line-height:1.4}
+.character-back-summary span{min-width:0;overflow-wrap:anywhere}
+.character-stage-history>summary{min-height:38px}
+.character-back-stages>div{grid-template-columns:18px minmax(0,1fr) minmax(64px,auto);gap:8px}
+.character-open-button{align-self:flex-start}
+
+/* One painted checklist surface: flowing multi-line rows have no card-sized
+   fills of their own, while the source checkbox/strike motion stays intact. */
+.task-board-card.is-open .chk-row-wrap{height:auto!important;min-height:40px!important;align-items:flex-start;overflow:visible!important}
+.task-board-card.is-open .chk-row{display:flex;height:auto!important;min-height:40px!important;max-height:none!important;align-items:flex-start;overflow:visible!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important}
+.task-board-card.is-open .chk-row::before{display:none!important}
+.task-board-card.is-open .chk-adaptive,.task-board-card.is-open .chk-adaptive .chk-row-text{background:transparent!important;box-shadow:none!important}
+.task-board-card.is-open .chk-say{min-height:1.4em;font-size:13px;line-height:1.5}
+.task-board-card.is-open .chk-add{min-height:40px;align-items:center}
+.task-board-card .chk-add .chk-ghost{display:none!important;visibility:hidden!important}
+.task-board-card.is-open .aetherflow-checklist-stage{height:auto!important;overflow:visible!important}
+.task-board-card.is-open .aetherflow-checklist-panel{max-height:none!important;overflow:visible!important}
+.task-board-card.is-open .task-checklist-editor,.task-board-card.is-open .task-checklist-board-items,.task-board-card.is-open .task-checklist-animated,.task-board-card.is-open .chk{border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important}
+
+/* Report descriptions stay below the full-frame player on narrow windows. */
+@media(max-width:1350px){.urd-layout{grid-template-columns:minmax(0,1fr)!important}.urd-summary{grid-row:2}.urd-canvas:has(.urd-video-pair){height:auto!important;min-height:0!important}.urd-video-pair-sources.is-paired{grid-template-columns:repeat(2,minmax(0,1fr))}.urd-video-pair-pane figcaption .urd-video-file-name{overflow-wrap:anywhere}.urd-video-controls{flex-wrap:wrap}}
+@media(max-width:760px){.character-back-summary{grid-template-columns:minmax(0,1fr)}.gallery-grid.preview-comfortable,.gallery-grid.preview-compact{grid-template-columns:minmax(0,1fr)}}
+
+/* Plain-surface theme override: NightSky/AetherSky keep their existing blue
+   tokens, while theme art, refraction, blur and specular glass layers stay out
+   of the rendered desktop UI. Media, artwork and model imagery remain intact. */
+:root{--af-glass-fill:var(--panel);--af-glass-edge:var(--line);--af-glass-highlight:transparent;--af-glass-shadow:none}
+html[data-theme="light"]{--af-glass-fill:var(--panel);--af-glass-edge:var(--line);--af-glass-highlight:transparent;--af-glass-shadow:none}
+.app-shell.studio-shell{background:var(--bg)!important;background-image:none!important}
+.studio-shell>.titlebar,.studio-shell>.sidebar,.studio-shell>.statusbar,.studio-shell>.main-area,.studio-shell .main-area>.topline{background:var(--panel)!important;background-image:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+.studio-shell .main-area{background:var(--bg)!important}
+.aetherflow-sky-source{display:none!important}
+.studio-shell *, .overlay *, .modal-overlay *, .toast-stack *{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+.glass-surface,.glass-surface__filter,.glass-surface__content,.glass-surface__canvas,.glass-surface__frame,.glass-surface__sheen,.glass-surface__rim,.glass-surface__line,.glass-surface__glow,
+.studio-shell .tilted-card-glass,.studio-shell .button-glass-layer,.studio-shell .journey-guide-glass{display:none!important}
+.studio-shell .tilted-card__glare,.studio-shell .tilted-card__rim,.studio-shell .tilted-card__edge{display:none!important}
+.studio-shell .main-area .aetherflow-tilted .tilted-card__front,.studio-shell .main-area .aetherflow-tilted .tilted-card__back{background:var(--panel)!important;background-image:none!important;border-color:var(--line)!important;box-shadow:none!important}
+.studio-shell .main-area .aetherflow-glass,.studio-shell .main-area .journey-step-guide,.studio-shell .main-area .journey-action-stepper,
+.studio-shell .main-area .settings-nav,.studio-shell .main-area .settings-section,.studio-shell .main-area .setting-row,
+.studio-shell .main-area .integration-row,.studio-shell .main-area .backup-callout,.studio-shell .main-area .inspector,
+.studio-shell .main-area .calendar-view,.studio-shell .main-area .drop-slot,.studio-shell .main-area .operation-panel,
+.studio-shell .main-area .task-board-card.is-open,.studio-shell .main-area .report-row,.studio-shell .main-area .urd-summary,
+.studio-shell .main-area .urd-mode-family,.studio-shell .main-area .urd-mode-select-wrap,.studio-shell .main-area .urd-video-controls,
+.studio-shell .main-area .viewer-toolbar,.studio-shell .main-area .viewer-tools,.studio-shell .main-area .viewer-playback,
+.studio-shell .main-area .studio-next,.studio-shell .main-area .active-character-link,
+.studio-shell .main-area .notebook-concealed,.studio-shell .main-area .notebook-page,.studio-shell .main-area .notebook-list,
+.studio-shell .main-area .notebook-paper,.studio-shell .main-area .notebook-confirm,
+.studio-shell .main-area .journey-source-populated-hint,.studio-shell .main-area .viewer-top button,
+.overlay .modal,.overlay .dialog,.overlay .browser-dialog,.modal-overlay .modal,.modal-overlay .dialog,
+.toast-stack .toast{background:var(--panel)!important;background-image:none!important;border-color:var(--line)!important;box-shadow:none!important}
+.studio-shell .main-area .plan-desk,.studio-shell .main-area .concept-back,.studio-shell .main-area .character-back,
+.studio-shell .main-area .character-back-summary span,.studio-shell .main-area .character-blocker-reason,
+.studio-shell .main-area .board-column,.studio-shell .main-area .board-card,
+.studio-shell .main-area .task-board-card,.studio-shell .main-area .task-board-card.is-open,
+.studio-shell .main-area .journey-source-populated-hint,.studio-shell .main-area .urd-video-pair-pane,
+.studio-shell .main-area .urd-video-player,.studio-shell .main-area .viewer-tree,.studio-shell .main-area .viewer-hierarchy,
+.studio-shell .main-area .viewer-popover,.studio-shell .main-area .viewer-error,.studio-shell .main-area .viewer-message,
+.studio-shell .main-area .viewer-load,.studio-shell .main-area .plan-config-row:hover,
+.overlay .modal,.overlay .dialog,.overlay .browser-dialog,.modal-overlay .modal,.modal-overlay .dialog,
+.toast-stack .toast{background:var(--panel)!important;background-image:none!important;border-color:var(--line)!important;box-shadow:none!important}
+.studio-shell .main-area .character-blocker-reason{border-left-color:var(--amber);color:var(--text)}
+.studio-shell .main-area .board-column{border-color:var(--line)}
+.studio-shell .main-area .journey-main-art,.studio-shell .main-area .journey-fit-preview{background:var(--panel)!important}
+/* The full guided editor is an overlay, not a .main-area descendant. Keep its
+   actual stage actions, artifact rail and primary gate together on entry. */
+.studio-shell .guided-character-editor .character-journey{padding:14px 24px 10px}
+.studio-shell .guided-character-editor .journey-header{margin-bottom:8px}
+.studio-shell .guided-character-editor .journey-heading h2{font-size:23px}
+.studio-shell .guided-character-editor .journey-heading>p{margin-top:5px;line-height:1.4}
+.studio-shell .guided-character-editor .journey-step-guide{margin-bottom:8px;padding:9px 12px}
+.studio-shell .guided-character-editor .journey-action-stepper{margin:4px 0 6px;padding:3px}
+.studio-shell .guided-character-editor .journey-action-stepper .stepper__body{padding:4px}
+.studio-shell .guided-character-editor .journey-action-stepper .stepper__segment{height:32px;padding-inline:6px}
+.studio-shell .guided-character-editor .journey-action-cta{margin:3px 0;padding:5px 7px}
+.studio-shell .guided-character-editor .journey-action-cta p{font-size:12px;line-height:1.4}
+.studio-shell .guided-character-editor .journey-context-line{gap:8px;padding-bottom:8px;margin-bottom:9px}
+.studio-shell .guided-character-editor .journey-result-rail{max-height:320px;overflow-y:auto;overscroll-behavior:contain}
+.studio-shell .guided-character-editor .journey-slot-list{gap:3px}
+.studio-shell .guided-character-editor .journey-slot-list>button{gap:7px;padding:6px}
+.studio-shell .guided-character-editor .journey-slot-list strong{font-size:11px;line-height:1.2}
+.studio-shell .guided-character-editor .journey-slot-list small{margin-top:2px;font-size:10px;line-height:1.2}
+.studio-shell .guided-character-editor .journey-operations{margin:10px 0;padding:10px 12px}
+.studio-shell .guided-character-editor .journey-operations h3{margin:0 0 6px;font-size:13px}
+.studio-shell .guided-character-editor .guided-preview-audit{gap:5px;padding:5px 0}
+.studio-shell .guided-character-editor .journey-stage-actions{margin:10px 0}
+.studio-shell .guided-character-editor .journey-footer{position:sticky;bottom:0;z-index:30;margin-top:4px;padding:8px 0;background:var(--bg)!important;border-top:1px solid var(--line)}
+/* The full guided editor is an overlay beside the rail, so it does not sit
+   under .main-area. Keep its viewer and gated action compact at supported
+   short desktop sizes, while leaving every artifact and tool reachable. */
+@media(max-height:850px) and (max-width:1450px){
+  .studio-shell .guided-character-editor .character-journey{padding:0 18px 8px}
+  .studio-shell .guided-character-editor .journey-header{margin-bottom:5px}
+  .studio-shell .guided-character-editor .journey-heading h2{font-size:22px}
+  .studio-shell .guided-character-editor .journey-heading>p{margin-top:3px;line-height:1.35}
+  .studio-shell .guided-character-editor .journey-step-guide{margin-bottom:4px;padding:3px 6px}
+  .studio-shell .guided-character-editor .journey-action-stepper{margin:0;padding:1px}
+  .studio-shell .guided-character-editor .journey-action-stepper .stepper__body{padding:0}
+  .studio-shell .guided-character-editor .journey-action-stepper .stepper__pane{padding:2px 4px}
+  .studio-shell .guided-character-editor .journey-action-stepper .stepper__track{padding:2px}
+  .studio-shell .guided-character-editor .journey-action-stepper .stepper__segment{height:26px;padding-inline:4px}
+  .studio-shell .guided-character-editor .journey-action-step-content{padding:0}
+  .studio-shell .guided-character-editor .journey-action-cta{margin:0;padding:2px 4px;gap:3px 6px}
+  .studio-shell .guided-character-editor .journey-action-cta p{font-size:11px;line-height:1.3}
+  .studio-shell .guided-character-editor .journey-guide-manual{margin-top:0}
+  .studio-shell .guided-character-editor .journey-guide-manual>summary{min-height:18px;padding:1px 0}
+  .studio-shell .guided-character-editor .journey-context-line{gap:6px;padding-bottom:5px;margin-bottom:7px;font-size:10px}
+  .studio-shell .guided-character-editor .journey-session-link{min-height:24px;padding:0 5px;font-size:10px}
+  .studio-shell .guided-character-editor .model-workbench{grid-template-columns:minmax(0,1fr) 190px;gap:8px}
+  .studio-shell .guided-character-editor .journey-main-art>.atelier-model-viewer{height:100%!important;min-height:0!important}
+  .studio-shell .guided-character-editor .journey-result-rail{max-height:225px;overflow-y:auto;overscroll-behavior:contain}
+  .studio-shell .guided-character-editor .journey-slot-list{gap:1px}
+  .studio-shell .guided-character-editor .journey-slot-list>button{gap:5px;padding:3px 4px}
+  .studio-shell .guided-character-editor .journey-slot-list>button>svg{width:14px;height:14px;flex:0 0 14px}
+  .studio-shell .guided-character-editor .journey-slot-list strong{font-size:10px;line-height:1.15}
+  .studio-shell .guided-character-editor .journey-slot-list small{margin-top:1px;font-size:9px;line-height:1.1}
+  .studio-shell .guided-character-editor .journey-candidate-history{padding:5px 7px}
+  .studio-shell .guided-character-editor .journey-upload{min-height:28px;margin-top:4px;padding:4px 7px}
+  .studio-shell .guided-character-editor .journey-operations{margin:5px 0;padding:6px 8px}
+  .studio-shell .guided-character-editor .journey-operations h3{margin:0 0 2px;font-size:12px}
+  .studio-shell .guided-character-editor .journey-operations .guided-operation-actions{gap:4px;align-items:center}
+  .studio-shell .guided-character-editor .journey-operations .guided-operation-actions>button{min-height:26px;margin:0;padding:4px 6px;font-size:10px}
+  .studio-shell .guided-character-editor .journey-operations .guided-operation-actions>details>summary{min-height:24px;padding:3px 4px}
+  .studio-shell .guided-character-editor .guided-preview-audit{gap:3px;padding:2px 0;font-size:10px;line-height:1.2}
+  .studio-shell .guided-character-editor .guided-preview-audit button{min-height:24px;padding:3px 5px;font-size:10px}
+  .studio-shell .guided-character-editor .journey-stage-actions{margin:4px 0}
+  .studio-shell .guided-character-editor .journey-stage-actions>button{min-height:28px;padding-top:4px;padding-bottom:4px}
+  .studio-shell .guided-character-editor .journey-correct-button{padding:4px}
+  .studio-shell .guided-character-editor .journey-footer{gap:8px;padding:6px 0}
+  .studio-shell .guided-character-editor .journey-details{margin-top:0}
+}
+.studio-shell .main-area .setting-row,.studio-shell .main-area .integration-row{background:var(--panel)!important}
+.studio-shell .main-area .journey-stepper-source{--stepper-well:var(--panel);--stepper-track:var(--line);--stepper-faint:var(--muted);background:var(--panel)!important;border:1px solid var(--line)!important}
+.studio-shell .guided-character-editor,.studio-shell .guided-character-editor .journey-step-guide,
+.studio-shell .guided-character-editor .journey-action-stepper,.studio-shell .guided-character-editor .journey-stepper-source,
+.studio-shell .guided-character-editor .journey-main-art,.studio-shell .guided-character-editor .journey-operations,
+.studio-shell .guided-character-editor .journey-result-rail,.studio-shell .guided-character-editor .journey-route,
+.studio-shell .guided-character-editor .guided-handoff-inspection,.studio-shell .guided-character-editor .journey-footer{
+  background:var(--panel)!important;background-image:none!important;border-color:var(--line)!important;box-shadow:none!important
+}
+.studio-shell .guided-character-editor .atelier-model-viewer .viewer-toolbar,
+.studio-shell .guided-character-editor .atelier-model-viewer .viewer-top button,
+.studio-shell .guided-character-editor .atelier-model-viewer .viewer-playback,
+.studio-shell .guided-character-editor .atelier-model-viewer .viewer-tools,
+.studio-shell .guided-character-editor .atelier-model-viewer .viewer-tree,
+.studio-shell .guided-character-editor .atelier-model-viewer .viewer-hierarchy,
+.studio-shell .guided-character-editor .atelier-model-viewer .viewer-popover,
+.studio-shell .guided-character-editor .atelier-model-viewer .viewer-error,
+.studio-shell .guided-character-editor .atelier-model-viewer .viewer-message{
+  background:var(--panel)!important;background-image:none!important;border-color:var(--line)!important;box-shadow:none!important
+}
+/* Informational source provenance stays readable without covering the model. */
+.studio-shell .guided-character-editor .atelier-model-viewer .viewer-message.is-info{
+  top:12px!important;right:auto!important;width:min(38%,540px);max-width:38%;box-sizing:border-box;
+  color:var(--text)!important;background:var(--panel)!important;border-color:var(--line)!important
+}
+.studio-shell .guided-character-editor .atelier-model-viewer .viewer-message.is-info>svg{color:var(--blue)!important}
+.studio-shell .guided-character-editor{background:var(--bg)!important;border:0!important}
+.studio-shell .guided-character-editor button:not(.text-button):not(.primary-button):not(.danger-button):not(.journey-guide-jump){background-color:var(--raised);background-image:none!important;box-shadow:none!important;color:var(--text)}
+.studio-shell .guided-character-editor button:not(:disabled):not(.text-button):not(.primary-button):hover{background-color:var(--raised-2);border-color:var(--line-strong)}
+.studio-shell .guided-character-editor button.primary-button,.studio-shell .guided-character-editor button.journey-guide-jump{background:var(--pink)!important;border-color:var(--pink)!important;color:var(--primary-text)!important;box-shadow:none!important}
+.studio-shell .guided-character-editor button.danger-button,.studio-shell .guided-character-editor button.delete-button{background:var(--error)!important;border-color:var(--error)!important;color:#fff!important}
+.studio-shell .guided-character-editor .journey-stepper-source{--stepper-well:var(--panel);--stepper-track:var(--line);--stepper-faint:var(--muted);background:var(--panel)!important}
+.journey-stepper-source .stepper__segment,.journey-stepper-source .stepper__step button{background:var(--raised)!important;box-shadow:none!important}
+.journey-stepper-source .stepper__segment[aria-current="step"],.journey-stepper-source .stepper__segment[aria-pressed="true"],.journey-stepper-source .stepper__step button[aria-current="step"],.journey-stepper-source .stepper__step button[aria-pressed="true"]{background:var(--pink-soft)!important;color:var(--pink)!important}
+.studio-shell .main-area button:not(.text-button):not(.nav-item),.overlay button:not(.text-button),.modal-overlay button:not(.text-button),.toast-stack button:not(.text-button){background-image:none!important;box-shadow:none!important}
+.studio-shell .main-area button:not(.text-button):not(.nav-item):not(.primary-button):not(.save-wide):not(.journey-guide-jump):not(.danger-button):not(.delete-button),
+.overlay button:not(.text-button):not(.primary-button):not(.danger-button),.modal-overlay button:not(.text-button):not(.primary-button):not(.danger-button),.toast-stack button:not(.text-button){background-color:var(--raised);color:var(--text)}
+.studio-shell .main-area button:not(:disabled):not(.text-button):not(.nav-item):not(.primary-button):hover,
+.overlay button:not(:disabled):not(.text-button):not(.primary-button):hover,.modal-overlay button:not(:disabled):not(.text-button):not(.primary-button):hover,.toast-stack button:not(:disabled):not(.text-button):hover{background-color:var(--raised-2);border-color:var(--line-strong)}
+.studio-shell .main-area button.primary-button,.studio-shell .main-area button.save-wide,.studio-shell .main-area button.journey-guide-jump,.studio-shell .main-area button.aetherflow-glass-button,.studio-shell .main-area button.specular-button,
+.overlay button.primary-button,.modal-overlay button.primary-button{background:var(--pink)!important;border-color:var(--pink)!important;color:var(--primary-text)!important;box-shadow:none!important}
+.studio-shell .main-area button.primary-button:not(:disabled):hover,.studio-shell .main-area button.save-wide:not(:disabled):hover,.studio-shell .main-area button.journey-guide-jump:not(:disabled):hover,.studio-shell .main-area button.aetherflow-glass-button:not(:disabled):hover,.studio-shell .main-area button.specular-button:not(:disabled):hover,.overlay button.primary-button:not(:disabled):hover,.modal-overlay button.primary-button:not(:disabled):hover{background:var(--pink-strong)!important;border-color:var(--pink-strong)!important}
+.studio-shell .main-area button.danger-button,.studio-shell .main-area button.delete-button,.overlay button.danger-button,.modal-overlay button.danger-button{background:var(--error)!important;border-color:var(--error)!important;color:#fff!important}
+.studio-shell .main-area button[aria-pressed="true"],.studio-shell .main-area button[aria-selected="true"],.studio-shell .main-area button.selected{background:var(--pink-soft)!important;color:var(--pink)!important;border-color:var(--pink)!important;box-shadow:none!important}
+.studio-shell .main-area input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),.studio-shell .main-area textarea,.studio-shell .main-area select,
+.overlay input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),.overlay textarea,.overlay select,.modal-overlay input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),.modal-overlay textarea,.modal-overlay select{background:var(--panel)!important;background-image:none!important}
+.studio-shell .main-area .topline .icon-button{background:var(--raised)!important;border:1px solid var(--line)!important}
+.studio-shell .main-area .topline .icon-button:hover{background:var(--raised-2)!important}
+.studio-shell .sidebar .nav-item.active{background:var(--pink-soft)!important}
+.studio-shell .sidebar .nav-item,.studio-shell .sidebar .project-card,.studio-shell .sidebar .profile{box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+.app-shell.studio-shell{grid-template-columns:var(--studio-side-width,232px) minmax(0,1fr)!important}
+.studio-shell>.sidebar{width:232px!important;min-width:232px!important;max-width:232px!important;justify-self:start}
+@media(max-width:960px){.studio-shell>.sidebar{width:200px!important;min-width:200px!important;max-width:200px!important}}
+.studio-start-action .specular-button{background:var(--pink)!important;background-image:none!important;border:1px solid var(--pink)!important;box-shadow:none!important;color:var(--primary-text)!important}
+.studio-start-action .specular-button::before,.studio-start-action .specular-button::after,.border-glow::after{display:none!important}
+.studio-start-action .specular-button:hover{background:var(--pink-strong)!important;border-color:var(--pink-strong)!important;box-shadow:none!important;transform:translateY(-1px)}
+.studio-shell .main-area .studio-start-section{background:var(--panel)!important;background-image:none!important;border-color:var(--line)!important;box-shadow:none!important}
+.studio-shell .tilted-card__shadow{display:none!important}
+.studio-dashboard>.active-character-link{width:min(100%,860px)!important;min-height:88px!important;max-height:112px!important;grid-template-columns:62px minmax(0,1fr) auto!important;grid-template-rows:auto auto auto!important;gap:3px 11px!important;margin:8px 0 12px!important;padding:9px 12px!important;background:var(--panel)!important;background-image:none!important;box-shadow:none!important}
+.studio-dashboard>.active-character-link .active-character-thumb{grid-column:1!important;grid-row:1/4!important;width:56px!important;height:64px!important;max-width:56px!important;max-height:64px!important;object-fit:contain!important}
+.studio-dashboard>.active-character-link>span:first-child{grid-column:2!important;grid-row:1!important}
+.studio-dashboard>.active-character-link>strong{grid-column:2!important;grid-row:2!important}
+.studio-dashboard>.active-character-link>small{grid-column:2!important;grid-row:3!important}
+.studio-dashboard>.active-character-link .active-character-progress{grid-column:2!important;grid-row:4!important}
+.studio-dashboard>.active-character-link .active-character-continue{grid-column:3!important;grid-row:1/5!important;position:static!important;white-space:normal!important;max-width:180px}
+.studio-dashboard>.studio-next{width:min(100%,1080px)!important;max-width:1080px!important;padding:10px 12px!important;margin:0!important;border:1px solid var(--line)!important;border-radius:13px!important;background:var(--panel)!important}
+.studio-next-header{width:100%;align-items:flex-start!important;gap:14px!important}
+.studio-next-heading{flex:1 1 auto;min-width:0}
+.studio-next-title-line{align-items:baseline;flex-wrap:wrap;gap:2px 10px}
+.studio-next-count{margin-left:0!important;white-space:normal}
+.studio-next-header>.text-button{flex:0 0 auto}
+.aetherflow-tilted{--tc-glare:0!important;--tc-rim-color:transparent!important;--tc-rim-light:transparent!important}
+
+/* The terminal shares the compact navigation rail. Its resize handle stays
+   inside that rail so the dock never covers planner, viewer, or report UI. */
+.codex-dock{width:var(--studio-terminal-width,232px)!important;max-width:var(--studio-side-width,232px)!important}
+.codex-dock.collapsed{width:var(--studio-terminal-width,232px)!important}
+
+/* One opaque card plane: the reusable Tilt face owns concept/character backs;
+   their content wrappers and the task/create fronts remain transparent. */
+.studio-shell .main-area .aetherflow-tilted.task-tilt .tilted-card__front,
+.studio-shell .main-area .aetherflow-tilted.aetherflow-create-tilt .tilted-card__front{background:transparent!important;background-image:none!important;border:0!important;box-shadow:none!important}
+.studio-shell .main-area .aetherflow-tilted .concept-back,
+.studio-shell .main-area .aetherflow-tilted .character-back{background:transparent!important;background-image:none!important;border:0!important;box-shadow:none!important}
+
+/* Keep primary labels readable on the pale-blue action surface in both themes. */
+.studio-shell .main-area button.primary-button,
+.studio-shell .main-area button.aetherflow-glass-button,
+.studio-shell .main-area button.specular-button,
+.studio-shell .main-area button.journey-guide-jump,
+.studio-shell .guided-character-editor button.primary-button,
+.studio-shell .guided-character-editor button.journey-guide-jump{color:var(--primary-text)!important}
+.studio-shell .main-area button.primary-button .glass-button-label,
+.studio-shell .main-area button.aetherflow-glass-button .glass-button-label,
+.studio-shell .guided-character-editor button.primary-button .glass-button-label{color:var(--primary-text)!important}
+
+/* Task detail titles wrap inside the inspector instead of disappearing at its
+   edge. The board itself remains title-only and compact. */
+.task-inspector .inspector-title{min-width:0;max-width:100%;white-space:normal!important;overflow:visible!important;text-overflow:clip!important;overflow-wrap:anywhere;word-break:normal}
+.task-inspector textarea.inspector-title{display:block;width:100%;min-height:34px;height:auto;margin:0;padding:8px 0;border:0;border-bottom:1px solid var(--line);border-radius:0;background:transparent!important;color:var(--text);font:inherit;font-size:22px;font-weight:750;letter-spacing:-.03em;line-height:1.25;resize:none;overflow:hidden!important;white-space:pre-wrap!important;overflow-wrap:anywhere;word-break:normal}
+
+/* These controls previously missed the shared button/input treatment because
+   their markup uses notebook-delete-action and a guided import path field. */
+.studio-shell .main-area .notebook-paper>footer .notebook-delete-action{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:32px;padding:0 10px;border:1px solid var(--line-strong);border-radius:8px;background:var(--raised);color:var(--muted);font-size:12px;font-weight:650;transition:background .16s,color .16s,border-color .16s}
+.studio-shell .main-area .notebook-paper>footer .notebook-delete-action:hover:enabled{border-color:var(--error);background:var(--raised-2);color:var(--error)}
+.studio-shell .main-area .notebook-paper>footer .notebook-delete-action:disabled{opacity:.55;cursor:wait}
+.studio-shell .main-area .notebook-paper>footer .notebook-delete-action:focus-visible{outline:2px solid var(--pink);outline-offset:2px}
+.overlay .guided-path-import input,.file-browser-overlay .guided-path-import input{min-width:0;min-height:36px;padding:0 10px;border:1px solid var(--line-strong)!important;border-radius:8px!important;background:var(--panel)!important;color:var(--text);box-shadow:none;outline-offset:2px}
+.overlay .guided-path-import input:hover,.file-browser-overlay .guided-path-import input:hover{border-color:var(--pink)!important}
+.overlay .guided-path-import input:focus-visible,.file-browser-overlay .guided-path-import input:focus-visible{border-color:var(--pink)!important;outline:2px solid var(--pink);outline-offset:2px}
+.file-browser-overlay .browser-manual-path .input-with-button input{flex:1;min-width:0;min-height:36px;padding:0 10px;border:1px solid var(--line-strong)!important;border-radius:8px!important;background:var(--panel)!important;color:var(--text);box-shadow:none;outline-offset:2px}
+.file-browser-overlay .browser-manual-path .input-with-button input:hover{border-color:var(--pink)!important}
+.file-browser-overlay .browser-manual-path .input-with-button input:focus-visible{border-color:var(--pink)!important;outline:2px solid var(--pink);outline-offset:2px}
+
+/* Checked rows retain the animated strike while keeping their copy readable;
+   Add item remains a quiet action rather than a fourth checklist row. */
+.studio-shell .main-area .task-board-card.is-open .chk-add .chk-new{display:inline-flex;align-items:center;gap:8px;min-height:34px;padding:3px 7px;border:1px solid transparent;border-radius:8px;background:transparent;color:var(--muted)!important;opacity:1!important;font-size:13px;font-weight:650;text-align:left;transition:background .16s,color .16s,border-color .16s}
+.studio-shell .main-area .task-board-card.is-open .chk-add .chk-new:hover{border-color:var(--line);background:var(--raised);color:var(--text)!important;opacity:1!important}
+.studio-shell .main-area .task-board-card.is-open .chk-add .chk-new:focus-visible{outline:2px solid var(--pink);outline-offset:2px}
+.studio-shell .main-area .task-board-card.is-open .chk-add .chk-field{min-width:0;width:100%;min-height:34px;padding:5px 8px;border:1px solid var(--line-strong);border-radius:8px;background:var(--panel);color:var(--text)}
+
+/* Native review corrections: use the rounded control as the only visible
+   plane for a closed checklist card, and keep paired media behind its rounded
+   panes instead of painting square wrapper plates. */
+html[data-theme] .studio-shell .main-area article.task-board-card:not(.is-open){background:transparent!important;background-image:none!important;border:0!important;border-radius:14px!important;box-shadow:none!important;}
+html[data-theme] .studio-shell .main-area .urd-video-pair{background:transparent!important;background-image:none!important;border:0!important;border-radius:16px!important;box-shadow:none!important;overflow:hidden;}
+html[data-theme] .studio-shell .main-area .urd-video-pair-sources.is-paired{background:transparent!important;background-image:none!important;gap:10px!important;}
+html[data-theme] .studio-shell .main-area .urd-video-pair-pane{background:var(--panel)!important;background-image:none!important;border:1px solid var(--line)!important;border-radius:12px!important;box-shadow:none!important;overflow:hidden;}
+
+/* Correct nested WebKit text paint as well as CSS color; the old glass layer
+   forced a pale text fill onto dark-theme primary actions. */
+html[data-theme] .studio-shell .main-area button.primary-button,
+html[data-theme] .studio-shell .main-area button.aetherflow-glass-button,
+html[data-theme] .studio-shell .main-area button.specular-button,
+html[data-theme] .studio-shell .main-area button.journey-guide-jump,
+html[data-theme] .guided-character-editor button.primary-button,
+html[data-theme] .guided-character-editor button.journey-guide-jump{color:var(--primary-text)!important;text-shadow:none!important;}
+html[data-theme] .studio-shell .main-area button.primary-button>.glass-button-label,
+html[data-theme] .studio-shell .main-area button.aetherflow-glass-button>.glass-button-label,
+html[data-theme] .studio-shell .main-area button.specular-button>.glass-button-label,
+html[data-theme] .studio-shell .main-area button.journey-guide-jump>.glass-button-label,
+html[data-theme] .guided-character-editor button.primary-button>.glass-button-label,
+html[data-theme] .guided-character-editor button.journey-guide-jump>.glass-button-label{color:var(--primary-text)!important;-webkit-text-fill-color:var(--primary-text)!important;text-shadow:none!important;opacity:1!important;}
+html[data-theme="light"] .studio-shell .main-area button.primary-button:not(:disabled),
+html[data-theme="light"] .studio-shell .main-area button.aetherflow-glass-button:not(:disabled),
+html[data-theme="light"] .studio-shell .main-area button.specular-button:not(:disabled),
+html[data-theme="light"] .studio-shell .main-area button.journey-guide-jump:not(:disabled),
+html[data-theme="light"] .guided-character-editor button.primary-button:not(:disabled),
+html[data-theme="light"] .guided-character-editor button.journey-guide-jump:not(:disabled){background:var(--pink-strong)!important;border-color:var(--pink-strong)!important;}
+html[data-theme] .studio-shell .main-area button.primary-button:disabled,
+html[data-theme] .studio-shell .main-area button.aetherflow-glass-button:disabled,
+html[data-theme] .studio-shell .main-area button.specular-button:disabled,
+html[data-theme] .studio-shell .main-area button.journey-guide-jump:disabled,
+html[data-theme] .guided-character-editor button.primary-button:disabled,
+html[data-theme] .guided-character-editor button.journey-guide-jump:disabled{background:var(--raised)!important;border-color:var(--line-strong)!important;color:var(--muted)!important;opacity:1!important;}
+html[data-theme] .studio-shell .main-area button.primary-button:disabled>.glass-button-label,
+html[data-theme] .studio-shell .main-area button.aetherflow-glass-button:disabled>.glass-button-label,
+html[data-theme] .studio-shell .main-area button.specular-button:disabled>.glass-button-label,
+html[data-theme] .studio-shell .main-area button.journey-guide-jump:disabled>.glass-button-label,
+html[data-theme] .guided-character-editor button.primary-button:disabled>.glass-button-label,
+html[data-theme] .guided-character-editor button.journey-guide-jump:disabled>.glass-button-label{color:var(--muted)!important;-webkit-text-fill-color:var(--muted)!important;}
+
+/* The all-task input treatment supplies the rounded shell. Leave its search
+   field transparent so it does not create a second rectangular plane. */
+html[data-theme] .studio-shell .main-area .searchbox input:not([type="checkbox"]):not([type="radio"]):not([type="range"]){background:transparent!important;background-image:none!important;border:0!important;box-shadow:none!important;}
+
+/* Theme the native settings controls without replacing their input semantics,
+   keyboard behavior, focus targets, or pointer/keyboard commit handlers. */
+.studio-shell .main-area .sound-setting-toggle input[type="checkbox"]{appearance:none;-webkit-appearance:none;display:grid;place-items:center;flex:0 0 18px;width:18px;height:18px;margin:0;border:1px solid var(--line-strong);border-radius:5px;background:var(--panel);color:var(--primary-text);accent-color:var(--pink);cursor:pointer;}
+.studio-shell .main-area .sound-setting-toggle input[type="checkbox"]::after{content:"";width:8px;height:4px;border-left:2px solid currentColor;border-bottom:2px solid currentColor;transform:translateY(-1px) rotate(-45deg);opacity:0;}
+.studio-shell .main-area .sound-setting-toggle input[type="checkbox"]:checked{border-color:var(--pink-strong);background:var(--pink);}
+.studio-shell .main-area .sound-setting-toggle input[type="checkbox"]:checked::after{opacity:1;}
+.studio-shell .main-area .sound-setting-toggle input[type="checkbox"]:focus-visible,.studio-shell .main-area .sound-volume-control input[type="range"]:focus-visible{outline:2px solid var(--pink);outline-offset:3px;}
+.studio-shell .main-area .sound-setting-toggle input[type="checkbox"]:disabled{opacity:.55;cursor:not-allowed;}
+.studio-shell .main-area .sound-volume-control input[type="range"]{appearance:none;-webkit-appearance:none;width:min(180px,22vw);height:6px;padding:0;margin:0;border:0;border-radius:999px;background:linear-gradient(to right,var(--pink) var(--volume-progress,28%),var(--line-strong) var(--volume-progress,28%));accent-color:var(--pink);cursor:pointer;}
+.studio-shell .main-area .sound-volume-control input[type="range"]::-webkit-slider-runnable-track{height:6px;border-radius:999px;background:transparent;}
+.studio-shell .main-area .sound-volume-control input[type="range"]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;width:16px;height:16px;margin-top:-5px;border:2px solid var(--panel);border-radius:50%;background:var(--pink);box-shadow:0 0 0 1px var(--line-strong);}
+.studio-shell .main-area .sound-volume-control input[type="range"]:disabled{opacity:.55;cursor:not-allowed;}
+
+/* Keep the Codex correction action visibly actionable and keyboard clear. */
+.studio-shell .guided-character-editor .journey-stage-actions>.journey-correct-button{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:36px;padding:0 10px;border:1px solid var(--line-strong);border-radius:9px;background:var(--raised)!important;background-image:none!important;color:var(--text)!important;box-shadow:none!important;font-size:12px;font-weight:650;}
+.studio-shell .guided-character-editor .journey-stage-actions>.journey-correct-button:hover{background:var(--raised-2)!important;border-color:var(--pink)!important;color:var(--text)!important;}
+.studio-shell .guided-character-editor .journey-stage-actions>.journey-correct-button:focus-visible{outline:2px solid var(--pink);outline-offset:2px;}
+.studio-shell .guided-character-editor .journey-stage-actions>.journey-correct-button[aria-expanded="true"]{background:var(--pink-soft)!important;border-color:var(--pink)!important;color:var(--text)!important;}
+.studio-shell .guided-character-editor .journey-stage-actions>.journey-correct-button:disabled{opacity:.62;cursor:not-allowed;}
+
+/* Match the full artwork face height used by neighboring concept and character tiles. */
+.aetherflow-create-tilt .gallery-add-card,.aetherflow-create-tilt .character-create-card{height:100%;min-height:0;}
+
+
+/* Responsive report evidence, controls and viewer geometry. */
+.studio-shell .main-area:has(.unity-report-document){display:flex;flex-direction:column;min-height:0;overflow:hidden}
+.studio-shell .main-area:has(.unity-report-document)>.page-content{display:flex;flex:1 1 auto;flex-direction:column;min-height:0;max-width:none;margin:0;padding:10px 14px 12px;overflow:hidden}
+.unity-report-document{display:flex;flex:1 1 auto;flex-direction:column;min-width:0;min-height:0;height:100%;padding:12px 18px 14px}
+.unity-report-document>.urd-heading{flex:none}
+.unity-report-document>.urd-layout{display:grid;flex:1 1 auto;min-height:0;grid-template-columns:minmax(0,1fr) minmax(220px,28%);align-items:stretch;gap:16px}
+.unity-report-document .urd-viewer{display:flex;flex-direction:column;min-width:0;min-height:0}
+.unity-report-document .urd-toolbar,.unity-report-document .urd-view-steps,.unity-report-document .urd-viewer-footer{flex:none}
+.unity-report-document .urd-canvas:has(>.urd-video-player){display:flex!important;flex:1 1 auto;min-width:0;min-height:0;height:auto!important;max-height:none;overflow:hidden!important}
+.unity-report-document .urd-canvas:has(>.urd-video-player)>.urd-video-player{display:flex;flex:1 1 auto;flex-direction:column;width:100%;height:auto!important;max-height:none;min-width:0;min-height:0;overflow:hidden!important}
+.urd-video-pair-sources{display:flex;flex:1 1 auto;min-width:0;min-height:0;overflow:hidden}
+.urd-video-pair-sources.is-paired{display:flex;flex:1 1 0;min-width:0;min-height:0;align-items:stretch;overflow:hidden}
+.urd-video-pair-sources:not(.is-paired)>.urd-video-pair-pane{flex:1 1 0;width:100%;min-width:0}
+.urd-video-pair-pane{display:flex;flex:1 1 0;flex-direction:column;width:auto;height:auto;min-width:0;min-height:0;overflow:hidden}
+.urd-video-pair-pane figcaption{flex:none}
+.urd-video-pair-pane .urd-video-stage{display:grid;flex:1 1 0!important;width:100%;height:auto!important;min-width:0;min-height:0;aspect-ratio:auto!important;overflow:hidden}
+.urd-video-pair-pane .urd-video-stage>video{width:100%;height:100%;max-width:100%;max-height:100%;object-fit:contain}
+.urd-video-pair:fullscreen,.urd-video-player:fullscreen{position:fixed!important;inset:0!important;z-index:2147483647;display:flex!important;flex-direction:column;width:100vw!important;height:100vh!important;max-width:none!important;max-height:none!important;min-width:0;min-height:0;padding:16px;overflow:hidden;background:var(--bg)}
+.urd-video-player:fullscreen .urd-video-stage{flex:1 1 auto;min-width:0;min-height:0;overflow:hidden}
+.urd-video-pair:fullscreen .urd-video-pair-sources.is-paired{display:grid!important;flex:1 1 auto;width:100%;height:auto;min-width:0;min-height:0;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:minmax(0,1fr);align-items:stretch}.urd-video-pair:fullscreen .urd-video-pair-pane{height:auto;min-width:0;min-height:0}.urd-video-pair:fullscreen .urd-video-pair-pane .urd-video-stage{flex:1 1 0!important;height:auto!important;min-width:0;min-height:0;aspect-ratio:auto!important}
+.urd-video-pair:fullscreen .urd-video-controls,.urd-video-player:fullscreen .urd-video-controls{flex:none}
+.urd-summary{min-width:0;max-height:100%;overflow:auto}
+.urd-back{display:inline-flex;align-items:center;gap:7px;min-height:34px;margin:0 0 8px;padding:6px 11px;border:1px solid var(--line-strong);border-radius:10px;background:var(--raised);color:var(--text);font-size:12px;font-weight:650;transition:background .14s,border-color .14s,color .14s}
+.urd-back:hover{border-color:var(--pink);background:var(--pink-soft);color:var(--text)}
+.urd-back:focus-visible{outline:2px solid var(--pink);outline-offset:2px}
+.document-tabs{align-items:center;gap:7px;padding:0 18px}
+.document-tab{align-items:center;gap:2px;max-width:260px;min-height:36px;padding:2px 3px;border:1px solid transparent;border-radius:10px;background:transparent;transition:background .14s,border-color .14s,color .14s}
+.document-tab:hover{border-color:var(--line);border-radius:10px;background:var(--raised)}
+.document-tab.active{border-color:var(--line-strong);border-bottom-color:var(--line-strong);border-radius:10px;background:var(--raised);color:var(--text)}
+.document-tab button{min-width:0;min-height:30px;padding:0 10px;border-radius:7px}
+.document-tab button:last-child{display:grid;width:30px;min-width:30px;height:30px;place-items:center;border-radius:7px;color:var(--muted);font-size:16px}
+.document-tab button:last-child:hover{background:var(--raised-2);color:var(--text)}
+.document-tab:focus-within{outline:2px solid var(--pink);outline-offset:2px}
+.menu-select-popover{overscroll-behavior:contain;scrollbar-gutter:stable;touch-action:pan-y;z-index:100}
+.menu-select-popover button{height:auto;min-height:32px;padding:6px 9px;border-radius:6px;text-align:left;white-space:normal}
+.menu-select-popover button:focus-visible{outline-offset:-2px}
+.guided-character-editor [data-tooltip]::after,.model-workbench-document [data-tooltip]::after{content:none!important}
+.viewport-tooltip{position:fixed;z-index:2147483600;max-width:min(320px,calc(100vw - 24px));padding:8px 10px;border:1px solid var(--line-strong);border-radius:9px;background:var(--raised-2);box-shadow:0 10px 30px #0006;color:var(--text);font-size:12px;font-weight:550;line-height:1.45;white-space:normal;overflow-wrap:anywhere;pointer-events:none}
+.journey-fitting-workspace{min-height:0;align-items:stretch}
+.journey-fit-preview{position:sticky;top:62px;height:clamp(360px,calc(100dvh - 190px),820px);min-height:0;align-self:stretch}
+.journey-fit-preview>.three-viewer.atelier-model-viewer{width:100%;height:100%!important;min-height:0!important;max-width:none;max-height:none}
+.guided-character-editor .journey-workbench.model-workbench .journey-main-art:has(>.three-viewer.atelier-model-viewer){height:clamp(620px,calc(100dvh - 180px),900px);min-height:620px;max-height:none}
+.journey-workbench.model-workbench .journey-main-art>.three-viewer.atelier-model-viewer{width:100%;height:100%!important;min-height:0!important;max-height:none!important;max-width:none!important}
+.model-workbench-canvas{flex:1 1 0;min-height:180px}
+.model-workbench-document>.model-workbench-canvas>.three-viewer.atelier-model-viewer{height:100%!important;min-height:0!important;max-height:none!important}
+@media(max-width:900px){.urd-layout{grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(240px,1fr) auto;overflow:auto}.urd-summary{max-height:28vh;overflow:auto}.urd-canvas.is-comparison:has(.urd-video-pair) .urd-video-pair-sources.is-paired{flex-direction:column}.urd-canvas.is-comparison:has(.urd-video-pair) .urd-video-pair-pane{min-height:0}.urd-video-pair:fullscreen .urd-video-pair-sources.is-paired{grid-template-columns:repeat(2,minmax(0,1fr))}.urd-video-controls{flex-wrap:wrap}}
+@media(max-width:760px){.journey-fitting-workspace{grid-template-columns:minmax(0,1fr)}.journey-fit-preview{position:relative;top:0;height:clamp(320px,calc(100dvh - 220px),720px)}}
+@media(max-width:560px){.unity-report-document{padding:8px}.urd-heading{gap:8px}.urd-layout{grid-template-rows:minmax(220px,1fr) auto}.urd-video-controls{padding:7px}.urd-video-actions{flex-wrap:wrap}}
+@media(max-width:1360px){.unity-report-document>.urd-layout{grid-template-columns:minmax(0,1fr)!important;grid-template-rows:minmax(220px,1fr) auto;min-height:0;overflow:hidden}.unity-report-document .urd-summary{grid-row:2;max-height:min(18vh,100px);overflow:auto}}
+
+
+
+.unity-report-document .urd-viewer-footer{min-height:28px;max-height:28px;overflow:hidden}
+
+.studio-shell .guided-character-editor .journey-footer{position:static!important;bottom:auto!important;z-index:auto;margin-top:14px;padding:14px 0;background:transparent}
+.studio-shell .guided-character-editor .journey-workbench.image-workbench{align-items:start;min-height:260px}
+.studio-shell .guided-character-editor .journey-workbench.image-workbench .journey-main-art{height:clamp(260px,48vh,460px);min-height:260px;max-height:none;align-self:start}
+.studio-shell .guided-character-editor .journey-workbench.image-workbench .journey-main-art>.artwork-preview{height:100%;min-height:260px}
+.studio-shell .guided-character-editor .journey-workbench.image-workbench .journey-result-rail{max-height:min(62vh,620px);min-height:220px}
+@media(max-height:560px){.studio-shell .guided-character-editor .journey-workbench.image-workbench .journey-main-art{height:260px;min-height:260px}.studio-shell .guided-character-editor .journey-workbench.image-workbench .journey-result-rail{min-height:220px}}
+
+/* File/result selection stays inside the card, including keyboard focus. */
+.studio-shell .guided-character-editor .journey-slot-list>button[data-guided-slot-id]{box-sizing:border-box;min-width:0;max-width:100%;transform:none!important;overflow:hidden;outline-offset:-3px!important}
+.studio-shell .guided-character-editor .journey-slot-list>button[data-guided-slot-id].selected,.studio-shell .guided-character-editor .journey-slot-list>button[data-guided-slot-id][aria-current=true]{outline:2px solid var(--blue,var(--pink))!important;outline-offset:-3px!important;border-color:var(--blue,var(--pink))!important;border-radius:10px;background-color:var(--pink-soft)!important}
+.studio-shell .guided-character-editor .journey-slot-list>button[data-guided-slot-id]:focus-visible{outline:2px solid var(--text)!important;outline-offset:-5px!important}
+.studio-shell .guided-character-editor .journey-slot-list{gap:8px}
+.studio-shell .guided-character-editor .journey-result-rail .journey-upload{white-space:normal!important;line-height:1.45;min-height:40px;height:auto;padding:10px 12px;overflow-wrap:anywhere}
+.studio-shell .guided-character-editor .atelier-model-viewer .viewer-notices .viewer-message.is-info{width:min(100%,600px)!important;max-width:100%!important;max-height:96px}
+
+/* Consistent action controls and readable operational text; keep navigation links distinct. */
+.studio-shell .main-area :is(.primary-button,.subtle-button,.danger-button){min-height:40px;border-radius:10px;gap:8px;padding:10px 14px;font-size:13px;line-height:1.45;box-sizing:border-box;white-space:normal;text-align:center}
+.studio-shell .main-area .subtle-button{border:1px solid var(--line-strong);background:var(--raised);color:var(--text)}
+.studio-shell .main-area .text-button{font-size:13px;line-height:1.45;border-radius:8px}
+.studio-shell .guided-character-editor :is(.guided-operation-actions,.journey-result-rail,.journey-session-actions) .text-button{border:1px solid var(--line-strong);background:var(--raised);padding:9px 12px;min-height:38px;display:inline-flex;gap:8px;align-items:center;justify-content:center;white-space:normal}
+.studio-shell .main-area .icon-button{min-width:34px;min-height:34px;border-radius:9px}
+.studio-shell .branched-nav .nav-item{font-size:13px;line-height:1.4}.studio-shell .branch-trigger{font-size:12px}
+.studio-shell .guided-character-editor .journey-heading p,.studio-shell .guided-character-editor .journey-depth-note,.studio-shell .guided-character-editor .guided-operations p,.studio-shell .guided-character-editor .guided-delivery-panel p,.studio-shell .guided-character-editor .guided-delivery-instructions,.studio-shell .guided-character-editor .guided-agent-intro p{font-size:14px;line-height:1.6}
+.studio-shell .guided-character-editor .journey-slot-list>button{padding:10px;gap:9px;min-height:64px;border-radius:10px}
+.studio-shell .guided-character-editor .journey-slot-list strong{font-size:13px;line-height:1.4}.studio-shell .guided-character-editor .journey-slot-list small{font-size:12px;line-height:1.45;margin-top:4px}
+.studio-shell .guided-character-editor .journey-context-line,.studio-shell .guided-character-editor .journey-guide-manual>summary,.studio-shell .guided-character-editor .journey-guide-detail :is(p,li),.studio-shell .guided-character-editor .journey-action-cta p,.studio-shell .guided-character-editor .journey-candidate-row,.studio-shell .guided-character-editor .guided-delivery-list :is(code,ul){font-size:13px;line-height:1.55}
+.studio-shell .guided-character-editor .journey-guide-jump{font-size:13px;min-height:38px;padding:9px 12px;max-width:260px;border-radius:10px}
+.studio-shell .guided-character-editor .journey-stepper-source .stepper__segment{height:auto;min-height:46px;padding:8px;flex:1 1 0;min-width:0;align-items:center}.studio-shell .guided-character-editor .journey-stepper-source .stepper__text{min-width:0}.studio-shell .guided-character-editor .journey-stepper-source .stepper__title{font-size:12px;line-height:1.4;white-space:normal;overflow-wrap:anywhere}
+.studio-shell .main-area :is(.settings-section,.studio-next-heading,.report-row-copy,.character-back-stages) p,.studio-shell .main-area .settings-section label{font-size:14px;line-height:1.55}
+
+/* Modal operations use the same control sizes as the main workspace. */
+.overlay .dialog :is(.primary-button,.subtle-button,.danger-button){min-height:40px;padding:10px 14px;gap:8px;border-radius:10px;font-size:13px;line-height:1.45;white-space:normal}
+.overlay .dialog .subtle-button{border:1px solid var(--line-strong);background:var(--raised);color:var(--text)}
+.overlay .dialog .icon-button{min-width:34px;min-height:34px;border-radius:9px}
+.overlay .dialog .dialog-head h2{font-size:18px;line-height:1.35}.overlay .dialog .dialog-head p{font-size:13px;line-height:1.5}
+.overlay .dialog .field-label{font-size:13px;line-height:1.5;gap:7px}.overlay .dialog .field-label :is(input,textarea){font-size:14px;line-height:1.5;padding:10px 12px;border-radius:9px}
+.overlay .dialog .menu-select{min-height:40px;border-radius:9px;font-size:13px}
+
+.overlay .dialog .create-character-guidance{font-size:14px;line-height:1.6;color:var(--muted);padding:12px 14px;margin:0 0 16px;border:1px solid var(--line);border-radius:10px;background:var(--raised)}

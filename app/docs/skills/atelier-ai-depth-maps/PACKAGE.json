@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1,
+  "include": [
+    "SKILL.md",
+    "references/depth-map-contract.md",
+    "references/depth-style-example.png"
+  ]
+}

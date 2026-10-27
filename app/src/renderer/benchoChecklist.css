@@ -1,0 +1,275 @@
+.chk {
+  box-sizing: border-box;
+  /* ── it opens, it does not jump ──────────────────────────
+     One row taller when you add a task, over a third of a
+     second. The component states its height rather than
+     letting the rows add up to it, which is what gives this
+     something to interpolate.
+
+     WITH THE OVERFLOW CLIPPED, which is what makes it read as
+     the card opening rather than as a box being resized around
+     things already sitting outside it: the new task takes the
+     empty slot the spare row was in, and the spare row is
+     revealed as the card grows to make it a new one. */
+  overflow: hidden;
+  transition: height 420ms cubic-bezier(0.22, 1, 0.36, 1);
+  /* the rows are in flow and stay in flow — the fall is a
+     transform on each of them, so nothing here is positioned.
+     What this is for now is the stacking context the heap's
+     z-order needs. */
+  position: relative;
+  background: var(--fill-slab, var(--card));
+  font-family: var(--font-ui);
+  color: var(--fill-on, var(--ink));}
+
+/* the hairline is the Stroke control's to give, the way it is
+   for every other block — a spread shadow rather than a
+   border, so it costs the card no layout */
+[data-stroke="on"] .chk {
+  box-shadow: 0 0 0 1px var(--pane-edge);}
+
+.chk-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  /* so the heap can be ordered. Rows land on each other and
+     the one that lands LAST is the top of the pile, which is
+     the opposite of the DOM order they are written in. */
+  position: relative;
+  /* NOTHING at the sides: the card's own padding is the inset,
+     and a second one here would put the box further in than
+     the card's edge says it is */
+  padding: 0;
+  border: 0;
+  border-radius: 10px;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  /* the ROW is the target, not the box. A 22px checkbox is a
+     22px hit area, and the words beside it are the part
+     anybody actually points at */
+  -webkit-tap-highlight-color: transparent;}
+
+/* ── the spare row ─────────────────────────────────────────
+   The one thing in this card that is not a task, and it has
+   to read that way at a glance or it is a fourth item you
+   have not ticked yet. So: the same geometry as a row, and a
+   third of the ink. It comes up on hover, and the field it
+   turns into sits at full strength — you are writing in it by
+   then, and a placeholder that stays faint while you type
+   reads as broken. */
+.chk-add {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  /* ── the same type as a task, set ONCE on the row ────────
+     Both the label and the field it turns into say `font:
+     inherit`, which was inheriting the card's — 16px at 400
+     with no tracking, against a task's 14 at 450. Next to
+     three lines of the smaller face the placeholder read as a
+     heading rather than as the next line of the list.
+
+     It goes on the row rather than on each of them because a
+     button and an input are the same line of text at two
+     moments, and a size stated twice is a size that will
+     disagree with itself later. See .chk-say, which is where
+     these three numbers come from. */
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  transition: opacity 220ms ease;}
+
+/* it keeps its space while the heap is down — removing it
+   would change the card's height in the middle of a fall */
+.chk-add[data-hide] {
+  opacity: 0;
+  pointer-events: none;}
+
+/* the box that is not a checkbox: the ring at a fraction of
+   its strength and nothing inside it. No dashes — a dashed
+   outline is a second idea about what "empty" looks like, and
+   this card already has one that works. */
+.chk-ghost {
+  flex: none;
+  box-shadow: inset 0 0 0 1.5px rgba(var(--fill-on-rgb, var(--ink-rgb)), 0.16);}
+
+.chk-new {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  /* `font: inherit` does not carry this: a button and an
+     input take letter-spacing from the UA sheet, not from
+     their parent, so the row's tracking stopped at them. */
+  letter-spacing: inherit;
+  text-align: left;
+  cursor: pointer;
+  opacity: 0.34;
+  transition: opacity 160ms ease;}
+
+.chk-new:hover { opacity: 0.62; }
+
+.chk-field {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  /* `font: inherit` does not carry this: a button and an
+     input take letter-spacing from the UA sheet, not from
+     their parent, so the row's tracking stopped at them. */
+  letter-spacing: inherit;
+  outline: none;}
+
+.chk-field::placeholder {
+  color: color-mix(in srgb, var(--fill-on, #17181a) 32%, var(--fill-slab, #ffffff));}
+
+/* ── on the floor ──────────────────────────────────────────
+   Opaque, and only once it has fallen. A row is a transparent
+   button for its whole life until the three of them are lying
+   against each other, and at that point transparency means two
+   tasks reading through each other at three degrees of
+   rotation — a mess rather than a heap.
+
+   ON A PSEUDO-ELEMENT, and inset, because the row's own box is
+   not the object that falls. A row is 40px tall so that the
+   whole line is a target; what you can SEE in it is about
+   twenty. Painting the full 40 and then stacking the slips
+   tight enough to touch means each one covers the top of the
+   words below it. The slip is the visible part — the
+   component sends its own inset down as --slip, since only it
+   knows how big the Box knob has made the contents.
+
+   Behind the words, not over them: the row carries a z-index
+   while it is fallen, which makes it a stacking context, so a
+   negative one here lands under its own contents and nothing
+   else. */
+.chk-row[data-fell]::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: var(--slip, 9px);
+  bottom: var(--slip, 9px);
+  border-radius: 10px;
+  background: var(--fill-slab, var(--card));
+  z-index: -1;}
+
+.chk-row:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(var(--fill-on-rgb, var(--ink-rgb)), 0.4);}
+
+/* ── the box ────────────────────────────────────────────────
+   The ring never changes. It is drawn once, at rest, and the
+   fill opens inside it — so what you see is a box being
+   filled in rather than one colour being swapped for another.
+   `overflow: hidden` is what keeps the fill's overshoot
+   inside the ring instead of past it. */
+.chk-box {
+  position: relative;
+  flex: none;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  box-shadow: inset 0 0 0 1.5px rgba(var(--fill-on-rgb, var(--ink-rgb)), 0.28);}
+
+.chk-fill {
+  position: absolute;
+  inset: 0;
+  background: var(--fill-on, var(--ink));
+  /* from the middle out — an origin at a corner would read as
+     a panel sliding in rather than as the box filling */
+  transform-origin: center;}
+
+/* ── the tick ───────────────────────────────────────────────
+   Drawn rather than faded: `stroke-dashoffset` walks the
+   stroke on from its start, so the mark is made the way a
+   person makes it. It sits ON the fill and takes the fill's
+   own ground colour, which is why it can be full strength and
+   still be invisible until there is something under it. */
+.chk-tick {
+  position: relative;
+  width: 68%;
+  height: 68%;
+  overflow: visible;
+  fill: none;
+  stroke: var(--fill-slab, var(--card));
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;}
+
+.chk-say {
+  position: relative;
+  /* sized to the WORDS, not to the row, so wrapped text keeps
+     its own fragments and its strike stops at the final glyph */
+  display: inline-block;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  line-height: 1.2;}
+
+.chk-word { display: inline-block; }
+
+.chk-word { white-space: pre-wrap; }
+.task-checklist-complete-row{display:flex;justify-content:flex-end;margin-top:9px;padding-top:8px;border-top:1px solid var(--line)}
+.task-checklist-complete-row .primary-button{min-height:36px;padding-inline:12px}
+.aetherflow-draw-root{display:flex;align-items:center;gap:6px;user-select:none;min-width:18px}.aetherflow-draw-control{position:relative;display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;flex:none}.aetherflow-draw-input{position:absolute;inset:0;width:18px;height:18px;margin:0;opacity:0;z-index:2;cursor:pointer}.aetherflow-draw-input:disabled{cursor:not-allowed}.aetherflow-draw-box{width:18px;height:18px;border:1px solid var(--line-strong);border-radius:5px;display:flex;align-items:center;justify-content:center;color:var(--primary-text);background:var(--panel);pointer-events:none}.aetherflow-draw-input:focus-visible+.aetherflow-draw-box{outline:2px solid var(--pink);outline-offset:3px}.aetherflow-draw-mark{color:var(--primary-text);stroke:var(--primary-text)}.aetherflow-draw-indeterminate{width:10px;height:2px;border-radius:2px;background:var(--primary-text)}.aetherflow-draw-label{min-width:0;color:var(--text);cursor:pointer}.aetherflow-draw-label-title{font-size:12px;font-weight:650;line-height:1.4}.aetherflow-draw-description{margin-top:2px;color:var(--muted);font-size:11px;line-height:1.4}.aetherflow-draw-root.is-disabled,.aetherflow-draw-label.is-disabled{opacity:.5}.aetherflow-gooey{position:relative;display:inline-flex;flex-direction:column;align-items:center;min-width:0;z-index:4;user-select:none}.aetherflow-gooey-filter{position:absolute;left:0;top:0;width:0;height:0;overflow:hidden}.aetherflow-gooey-stage{position:relative;overflow:visible}.aetherflow-gooey-layer{position:absolute;inset:0;pointer-events:none;isolation:isolate;z-index:1}.aetherflow-gooey-blob{position:absolute;left:0;top:0;background:var(--panel);border:1px solid var(--line-strong);box-shadow:0 8px 22px var(--shadow)}.aetherflow-gooey-trigger{position:absolute;left:0;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:0 13px;border:1px solid var(--line-strong);border-radius:999px;background:var(--panel);color:var(--text);cursor:pointer;text-align:left;transition:border-color .16s,background .16s}.aetherflow-gooey-trigger:hover{border-color:var(--pink);background:var(--raised)}.aetherflow-gooey-trigger:focus-visible{outline:2px solid var(--pink);outline-offset:2px}.aetherflow-gooey-value{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text);font-size:12px;font-weight:650}.aetherflow-gooey-options{position:absolute;left:0;z-index:20;margin:0;padding:8px 0;list-style:none;border:1px solid var(--line-strong);border-radius:14px;background:var(--panel);box-shadow:0 14px 30px #0004;overflow:hidden}.aetherflow-gooey-option{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 8px;padding:0 10px;border-radius:9px;color:var(--muted);font-size:12px;cursor:pointer;transition:background .15s,color .15s}.aetherflow-gooey-option:hover,.aetherflow-gooey-option.is-active{background:var(--raised-2);color:var(--text)}.aetherflow-gooey-dot{width:7px;height:7px;flex:none;border-radius:50%;background:var(--pink)}.plan-desk-head{position:relative;z-index:3;align-items:center}.plan-desk-head .aetherflow-gooey{width:240px;flex:none}.plan-desk{position:relative;z-index:3}.task-checklist-editor{margin:0 0 18px;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--panel)}.task-checklist-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:7px}.task-checklist-heading>div{display:flex;align-items:baseline;gap:9px;min-width:0}.task-checklist-heading h3{margin:0;color:var(--text);font-size:13px}.task-checklist-heading span{color:var(--muted);font-size:11px}.task-checklist-animated{min-width:0;transition:opacity .16s}.task-checklist-step{display:grid;grid-template-columns:minmax(0,1fr) 28px 28px 28px;align-items:center;gap:4px;padding:3px 0;border-top:1px solid var(--line)}.task-checklist-step input{min-width:0;height:30px;padding:0 7px;border:1px solid transparent;border-radius:5px;background:transparent;color:var(--text);font-size:12px}.task-checklist-step input:focus{border-color:var(--line-strong);background:var(--bg)}.task-checklist-step button{display:grid;place-items:center;width:28px;height:28px;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--muted)}.task-checklist-step button:hover:not(:disabled){border-color:var(--pink);color:var(--pink)}.task-checklist-step button:disabled{opacity:.4;cursor:default}.task-checklist-manage{margin-top:7px}.chk{--fill-on:var(--pink);--fill-slab:var(--panel);--fill-on-rgb:145,188,245;--ink-rgb:234,243,255;--pane-edge:var(--line-strong);--font-ui:Manrope,'Segoe UI',sans-serif;width:100%!important;max-width:100%;color:var(--text)}html[data-theme=light] .chk{--fill-on:var(--pink);--fill-slab:var(--panel);--fill-on-rgb:40,126,201;--ink-rgb:23,42,66}.chk .chk-row{max-width:100%;color:var(--text)}.chk-row:focus-visible{outline:2px solid var(--pink);outline-offset:2px}.chk-field{color:var(--text)}.chk-field::placeholder{color:var(--muted)}.chk-new{color:var(--muted)}.chk-new:hover{color:var(--text)}@media(max-width:700px){.plan-desk-head{align-items:flex-start;gap:12px;flex-direction:column}.plan-desk-head .aetherflow-gooey{width:100%!important}.task-checklist-step{grid-template-columns:minmax(0,1fr) 26px 26px 26px}}
+
+/* AetherFlow keeps long and dense canonical lists in settled document flow.
+   Their check/strike springs remain active; the demo heap fall is omitted so
+   completed rows stay readable and independently operable. */
+.chk.chk-adaptive{height:auto!important;min-height:40px;padding:8px 12px!important;overflow:visible!important;}
+.chk-adaptive .chk-row{height:auto!important;min-height:40px;align-items:flex-start;padding:7px 0;}
+.chk-adaptive .chk-box{margin-top:1px;}
+.chk-adaptive .chk-say{flex:1;min-width:0;white-space:normal;overflow-wrap:anywhere;line-height:1.4;}
+.chk-adaptive .chk-word{display:inline;white-space:normal;overflow-wrap:anywhere;}
+.task-checklist-animated .chk{background:transparent!important;box-shadow:none!important;}
+.task-checklist-animated .chk.chk-adaptive{padding-inline:4px!important;}
+.aetherflow-checklist-disclosure{position:relative;width:100%;min-width:0;}
+.aetherflow-checklist-stage{position:relative;min-width:0;overflow:visible;transition:height .35s cubic-bezier(.23,1,.32,1);}
+.aetherflow-checklist-liquid{position:absolute;inset:0;z-index:0;pointer-events:none;filter:url(#aetherflow-goo);isolation:isolate;}
+.aetherflow-checklist-pill,.aetherflow-checklist-drop{position:absolute;left:0;top:0;width:100%;background:var(--panel);border:1px solid var(--line-strong);box-shadow:0 8px 22px var(--shadow);}
+.aetherflow-checklist-pill{height:38px;border-radius:19px;}
+.aetherflow-checklist-drop{border-radius:16px;will-change:transform;}
+.aetherflow-checklist-trigger{position:relative;z-index:2;width:100%;height:38px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 12px;border:1px solid var(--line-strong);border-radius:20px;background:transparent;color:var(--text);text-align:left;}
+.aetherflow-checklist-trigger:hover{border-color:var(--pink);}
+.aetherflow-checklist-trigger:focus-visible{outline:2px solid var(--pink);outline-offset:2px;}
+.aetherflow-checklist-trigger>span:first-child{display:flex;align-items:center;gap:8px;min-width:0;}
+.aetherflow-checklist-trigger strong{font-size:12px;line-height:1.2;}
+.aetherflow-checklist-trigger small{color:var(--muted);font-size:11px;white-space:nowrap;}
+.aetherflow-checklist-chevron{display:grid;place-items:center;flex:none;width:20px;height:20px;border-radius:50%;background:var(--raised-2);color:var(--text);font-size:15px;line-height:1;}
+.aetherflow-checklist-panel{position:relative;z-index:1;padding:5px 10px 9px;}
+.task-checklist-editor.is-compact{margin:10px 0 0;padding:0;border:0;background:transparent;}
+.task-checklist-editor.is-compact .aetherflow-checklist-panel{padding-inline:6px;}
+.task-checklist-editor:not(.is-compact){margin:0 0 12px;padding:0;border:0;background:transparent;}
+.task-checklist-animated{min-width:0;}
+.task-checklist-actions{display:flex;justify-content:flex-end;padding-top:4px;}
+.task-checklist-saving{padding:5px 2px;color:var(--muted);font-size:11px;}
+.task-checklist-error{margin-top:7px;padding:8px 10px;border:1px solid color-mix(in srgb,var(--error) 55%,transparent);border-radius:8px;background:color-mix(in srgb,var(--error) 10%,var(--panel));color:var(--text);font-size:12px;line-height:1.4;overflow-wrap:anywhere;}
+.task-checklist-error small{display:block;margin-top:3px;color:var(--muted);font-size:11px;}
+.board-checklist-disclosure{min-width:0;}
+
+.task-checklist-editor.is-compact .aetherflow-checklist-trigger{gap:5px;padding-inline:8px;}
+.task-checklist-editor.is-compact .aetherflow-checklist-trigger>span:first-child{gap:5px;}
+.task-checklist-editor.is-compact .aetherflow-checklist-trigger strong{white-space:nowrap;font-size:11px;}
+.task-checklist-editor.is-compact .aetherflow-checklist-trigger small{max-width:52px;overflow:hidden;text-overflow:ellipsis;}
+.task-checklist-editor.is-compact .aetherflow-checklist-chevron{width:18px;height:18px;}
+.aetherflow-checklist-drop{background:var(--raised);}
+.chk-row-wrap{display:flex;align-items:flex-start;gap:12px;position:relative;width:100%;min-width:0;overflow:visible}.chk-source-draw-checkbox{width:22px;height:22px;flex:none;margin-top:8px}.chk-source-draw-checkbox .aetherflow-draw-control,.chk-source-draw-checkbox .aetherflow-draw-input,.chk-source-draw-checkbox .aetherflow-draw-box{width:22px;height:22px}.chk-source-draw-checkbox .aetherflow-draw-box{border-radius:7px}.chk-row-text{display:block;flex:1;min-width:0;align-items:flex-start}.chk-adaptive .chk-row-wrap{min-height:40px}
+
+/* In the expanded task card, the card is the only painted plane. Keep the
+   source gooey geometry and transitions alive while its duplicate fill is
+   transparent. The spare action is a plus button, never an empty checkbox. */
+.task-board-card.is-open .aetherflow-checklist-liquid{opacity:.08}
+.task-board-card.is-open .aetherflow-checklist-pill,
+.task-board-card.is-open .aetherflow-checklist-drop{background:transparent!important;border-color:transparent!important;box-shadow:none!important}
+.task-board-card.is-open .aetherflow-checklist-trigger{background:transparent;border-color:transparent}
+.task-board-card.is-open .chk-add{padding-inline:4px!important}
+.task-board-card .chk-add .chk-ghost{display:none}

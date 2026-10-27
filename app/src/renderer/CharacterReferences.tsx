@@ -1,0 +1,27 @@
+import {useState} from 'react';
+import {Check,FileImage,Plus,Sparkles} from 'lucide-react';
+import {localizedSlotRole,type Locale} from '../shared/i18n';
+import {Artwork} from './Artwork';
+
+export function StageOutputs({workflowState,activeStage,onStageUpload,onReview,locale='en',selectedId,onSelect,workspace=''}:{workflowState:any;activeStage:any;onStageUpload:any;onReview:any;locale?:Locale;selectedId?:string;onSelect?:(id:string)=>void;workspace?:string}){
+  const [ownSelected,setOwnSelected]=useState(''),ru=locale==='ru';
+  const slots=(workflowState?.workflow?.data?.slots||[]).filter((slot:any)=>slot.stageId===activeStage?.id);
+  const selected=slots.find((slot:any)=>slot.id===(selectedId||ownSelected))||slots[0];
+  const candidates=(activeStage?.candidates||[]).filter((candidate:any)=>candidate.slotId===selected?.id&&candidate.reviewStatus!=='rejected');
+  const candidate=candidates.at(-1),present=Boolean(candidate||selected?.artifactIds?.length);
+  return <section className="stage-outputs" data-testid="active-stage-outputs"><div className="view-slots" role="group" aria-label={ru?'Результаты текущего этапа':'Current stage outputs'}>{slots.map((slot:any)=>{
+    const latest=(activeStage?.candidates||[]).filter((item:any)=>item.slotId===slot.id&&item.reviewStatus!=='rejected').at(-1);
+    return <button key={slot.id} className={`view-slot-select ${slot.id===selected?.id?'active':''}`} aria-pressed={slot.id===selected?.id} onClick={()=>{setOwnSelected(slot.id);onSelect?.(slot.id);}}><strong>{localizedSlotRole(slot.role,locale)}</strong><small>{latest?.reviewStatus==='pending'?(ru?'На проверке':'Awaiting review'):slot.artifactIds?.length?(ru?'Принято':'Accepted'):(ru?'Ожидает результата':'Awaiting output')}</small>{slot.artifactIds?.length>0&&<Check size={13}/>}</button>;
+  })}</div>{selected&&<div className="selected-output-actions"><button className="subtle-button" onClick={()=>onStageUpload(activeStage.key,selected.id)}><Plus size={13}/>{present?(ru?'Заменить результат':'Replace output'):(ru?'Добавить результат':'Add output')}</button>{candidate?.reviewStatus==='pending'&&<div className="review-actions"><button className="primary-button" onClick={()=>onReview(activeStage.key,candidate.id,'accept')}>{ru?'Принять':'Accept'}</button><button className="subtle-button" onClick={()=>onReview(activeStage.key,candidate.id,'reject')}>{ru?'Вернуть':'Return'}</button></div>}</div>}</section>;
+}
+export default function CharacterReferences({arts,onAdd,onPrompt,onStageUpload,onReview,stageName,activeStage,workflowState,files=[],locale='en',workspace=''}:any){
+  const ru=locale==='ru',[selectedId,setSelected]=useState('');
+  const slots=(workflowState?.workflow?.data?.slots||[]).filter((slot:any)=>slot.stageId===activeStage?.id),slot=slots.find((item:any)=>item.id===selectedId)||slots[0];
+  const candidate=(activeStage?.candidates||[]).filter((item:any)=>item.slotId===slot?.id&&item.reviewStatus!=='rejected').at(-1);
+  const artifactId=candidate?.artifactId||slot?.artifactIds?.[0],artifact=files.find((item:any)=>item.id===artifactId),source=arts[0];
+  const image=artifactId&&(artifact?.data.mime?.startsWith('image/')||slot?.kind==='reference'||slot?.kind==='texture');
+  return <section className="reference-workspace" data-testid="character-reference-workspace"><div className="reference-workspace-head"><div><h2>{stageName||(ru?'Референсы':'References')}</h2><p>{ru?'Исходники, отдельные ракурсы и ваша проверка результатов.':'Source artwork, individual views, and your review.'}</p></div><div className="reference-primary-actions"><button className="subtle-button" onClick={onAdd}><Plus size={14}/>{ru?'Добавить исходник':'Add source'}</button>{activeStage?.key==='references'&&<button className="primary-button" onClick={onPrompt}><Sparkles size={14}/>{ru?'Генерировать референсы':'Generate references'}</button>}</div></div>
+    <div className="reference-slot-layout"><StageOutputs workflowState={workflowState} activeStage={activeStage} selectedId={slot?.id} onSelect={setSelected} onStageUpload={onStageUpload} onReview={onReview} locale={locale} workspace={workspace}/><div className="reference-current">{image?<figure className="reference-selected-artifact"><Artwork id={artifactId} alt={artifact?.name||localizedSlotRole(slot.role,locale)} locale={locale} workspace={workspace} lazy={false} full/><figcaption>{localizedSlotRole(slot.role,locale)}<small>{candidate?.reviewStatus==='pending'?(ru?'Ожидает вашей проверки':'Awaiting your review'):(ru?'Принятый результат':'Accepted output')}</small></figcaption></figure>:<div className="reference-empty"><FileImage size={30}/><strong>{slot?localizedSlotRole(slot.role,locale):(ru?'Выберите этап':'Choose a stage')}</strong><span>{artifactId?(ru?'Этот результат доступен в истории файлов.':'This output is available in file history.'):(ru?'Для этого ракурса ещё нет результата. Подготовьте промпт или добавьте готовый файл.':'No output for this view yet. Prepare a prompt or add an existing file.')}</span>{source&&<div className="reference-source-inset"><Artwork id={source.id} alt={source.name} locale={locale} workspace={workspace}/><small>{ru?'Исходный арт':'Source artwork'}</small></div>}</div>}</div></div>
+    {arts.length>0&&<div className="reference-art-grid" aria-label={ru?'Исходные изображения':'Source artwork'}>{arts.map((art:any)=><figure key={art.id}><Artwork id={art.id} alt={art.name} locale={locale} workspace={workspace}/><figcaption>{art.name}</figcaption></figure>)}</div>}
+  </section>;
+}

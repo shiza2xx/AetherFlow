@@ -1,0 +1,14 @@
+# Volumetric image reconstruction
+
+Inputs are the exact current paired color views, which may still be pending human review in step 2.5. A pending status stays pending; do not imply acceptance. Process head and body independently. Keep view-relative depth near=light/far=dark and all surrounding background black. These are generated visual depth images, not calibrated sensor measurements. Reject mismatched, rejected, invalidated, failed or stale pairs.
+
+Prompt skeleton (translate the saved prompt into app language):
+
+Create one standalone {view} AI-generated depth map of the exact {target} in its paired current color view. The color candidate may be pending review, and its hash and review status must remain truthful. Visually reconstruct volume. Preserve silhouette, proportions, straight-on view, pose, openings, details and multilayer geometry. Replace paint with smooth grayscale depth: near visible surfaces lighter, farther darker, fully black background. Separate overlaps through depth. Remove painted shadows, glossy highlights and noise. Do not create a clay render, ordinary black-and-white illustration, lighting study or depth-estimator result. Match the other three directions in scale, landmarks and volumetric interpretation. Preserve the exact paired color silhouette and hair shape without re-simplifying it. Deliver a separate complete image.
+
+Review color/map pairs at matched size, especially long hair, neck, garment openings, limbs/shoes. A flat white silhouette or lit sculpture fails even if its format validates. Machine checks never impersonate visual review.
+Register direction/part, input/output hashes, prompt version and human decision. Keep painted references for later materials; depth maps are for manual mesh generation.
+
+## Two-image prompt pattern
+
+Image 1 is the exact paired {view} color view of {target}; it is authoritative for this character. Image 2 is an unrelated four-view sheet showing ONLY the desired AI depth representation. Create ONE standalone {view} image with exactly image 1's silhouette, shape, details, openings, pose and framing. Reconstruct its visible volume using image 2's soft neutral grayscale transitions on a black background: nearer surfaces lighter, recessed and occluded layers darker, with distinct depth at overlaps. Replace paint and lighting with volume, retaining the source's actual geometry. Do not transplant the example character, hat, ornaments, neck, or four-panel layout. Do not create a gray color illustration, glossy sculpture, flat silhouette, calibrated sensor map or arbitrary fixed-value diagram. Retain spatial coherence with the other views. Output the generator's original PNG unchanged; the app checks neutral RGB with a small documented encoding tolerance. Inspect actual volume and silhouette separately from that check.
