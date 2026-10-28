@@ -1,7 +1,7 @@
 {
   "name": "aetherflow",
   "productName": "AetherFlow",
-  "version": "1.0.14",
+  "version": "1.0.15",
   "description": "Local character production workspace",
   "main": "out/main/index.js",
   "scripts": {
@@ -41,6 +41,7 @@
     "prosemirror-view": "1.42.6",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
+    "sonner": "^2.0.8",
     "three": "^0.186.1",
     "three-mesh-bvh": "^0.8.3",
     "zod": "^4.6.7"

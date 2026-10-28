@@ -12,7 +12,7 @@ export const QuerySchema = z.object({ kind:EntityKind.optional(), id:z.string().
 export type Mutation = z.infer<typeof MutationSchema>;
 export type Query = z.input<typeof QuerySchema>;
 import type { Locale } from './i18n';
-export type AppSettings = { theme:'dark'|'light'; motion:'full'|'reduced'; workspace:string; workspaceInstanceId?:string; unityPath:string; codexPath:string; nodePath:string; blenderPath:string; activeProjectId:string|null; locale:Locale; soundEnabled?:boolean; soundVolume?:number; autoCheckUpdates?:boolean; grantedRoots?:string[]; integrationSettingsRequireReview?:boolean };
+export type AppSettings = { theme:'dark'|'light'; motion:'full'|'reduced'; workspace:string; workspaceInstanceId?:string; unityPath:string; codexPath:string; nodePath:string; blenderPath:string; activeProjectId:string|null; locale:Locale; soundEnabled?:boolean; soundVolume?:number; autoCheckUpdates?:boolean; languageSelected?:boolean; grantedRoots?:string[]; integrationSettingsRequireReview?:boolean };
 export const RpcSchema = z.discriminatedUnion('op',[
  z.object({op:z.literal('list'),query:QuerySchema.optional()}),
  z.object({op:z.literal('get'),kind:EntityKind,id:z.string().uuid()}),

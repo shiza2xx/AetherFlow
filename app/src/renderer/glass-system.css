@@ -237,13 +237,13 @@ html[data-theme="light"] {
   --stepper-radius: 20px;
   --stepper-well-radius: 14px;
   --stepper-tile-radius: 12px;
-  font-family: Manrope, 'Segoe UI', sans-serif;
+  font-family: 'Manrope Variable', 'Segoe UI', sans-serif;
 }
 .journey-stepper-source .stepper__segment { min-height: 40px; border-radius: 12px; font-family: inherit; }
 .journey-stepper-source .stepper__title { font-size: 12px; font-weight: 700; }
 .journey-stepper-source .stepper__description { font-size: 11px; }
 .journey-stepper-source .stepper__badge { width: 24px; height: 24px; }
-.journey-stepper-source .stepper__step { font-family: Manrope, 'Segoe UI', sans-serif; }
+.journey-stepper-source .stepper__step { font-family: 'Manrope Variable', 'Segoe UI', sans-serif; }
 .journey-stepper-source .stepper__step button { border-radius: 11px; font-size: 12px; }
 @media (max-width: 1120px) {
   .studio-shell .main-area .journey-action-stepper { padding: 7px; }

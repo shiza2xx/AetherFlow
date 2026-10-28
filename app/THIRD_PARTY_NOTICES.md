@@ -89,3 +89,7 @@ Some AetherFlow Skills use and adapt workflow guidance from **3DCharaMakeSkills-
 The guidance was adapted into English-language Skills, combined with the user's original handoffs, and integrated with AetherFlow's staged workflow, MCP tools and review requirements. This attribution is for the adapted Skill materials; it does not attribute the AetherFlow application implementation or the entire character production pipeline to Lida.
 
 Original license, source notices and the author's English translation are preserved in [docs/licenses/lida](docs/licenses/lida/NOTICE.md). Original AetherFlow code remains separately licensed under MIT; third-party materials retain their own terms.
+
+## Sonner
+
+The application uses Sonner for update and import notifications. Sonner is distributed under the MIT license; its license is included with the installed dependency.

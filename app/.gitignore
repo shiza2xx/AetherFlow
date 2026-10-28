@@ -163,3 +163,11 @@
 !/src/main/mcp-registry-v2.test.ts
 !/src/main/workspace-restore-portable.test.ts
 !/src/renderer/plannerQuery.test.ts
+
+!/src/main/application-preferences.test.ts
+!/src/renderer/floatingPanel.test.ts
+!/src/renderer/updateController.test.ts
+
+!/src/main/app-updater.test.ts
+
+!/src/renderer/useSidebarMotion.test.ts

@@ -1,16 +1,12 @@
 /* Consolidated UI Fix Pack corrections. Preserve the blue theme palettes,
    source interactions and motion while keeping the layout and state clear. */
 
-/* The embedded terminal is a bottom dock, not the navigation rail. Keep the
-   actual content grid compact at every supported desktop width. */
+/* The navigation rail fills its row; the terminal is an independent window layer. */
 .app-shell.studio-shell{grid-template:44px minmax(0,1fr) 26px/var(--studio-side-width,272px) minmax(0,1fr)!important}
 .studio-shell>.sidebar{box-sizing:border-box;width:var(--studio-side-width,232px)!important;max-width:var(--studio-side-width,232px);min-width:0;justify-self:start;overflow-x:hidden}
 .studio-shell .main-area{min-width:0}
-/* Keep the workspace beside the actual navigation rail. The terminal floats
-   over the lower-left corner, so reserve vertical scroll room for the area it
-   covers instead of shifting every page right by the dock width. */
-.studio-shell>.sidebar{height:calc(100% - var(--studio-terminal-height,300px))}
-.codex-dock{max-width:var(--studio-side-width,272px)}
+.studio-shell>.sidebar{grid-column:1;align-self:stretch;height:100%}
+
 .codex-dock-title{gap:7px}
 .codex-process-status{flex:none;color:var(--muted);font-size:10px;white-space:nowrap}
 .codex-owner{min-width:0}
@@ -248,7 +244,7 @@ html[data-theme="light"]{--af-glass-fill:var(--panel);--af-glass-edge:var(--line
 html{--studio-side-width:232px;--studio-terminal-width:232px;--studio-terminal-height:42px}
 .app-shell.studio-shell{grid-template-rows:44px minmax(240px,1fr) 26px!important}
 .studio-shell>.main-area{grid-row:2;align-self:stretch;min-height:0;height:auto!important}
-.studio-shell>.sidebar{grid-row:2;height:calc(100% - var(--studio-terminal-height,42px))!important}
+.studio-shell>.sidebar{grid-row:2;height:100%!important}
 .studio-shell>.guided-character-editor{position:fixed!important;left:var(--studio-side-width,232px)!important;right:0;top:44px;bottom:26px;width:auto;min-width:0}
 .studio-shell .guided-character-editor .journey-workbench.model-workbench .journey-main-art:has(>.three-viewer.atelier-model-viewer){height:clamp(510px,calc(100dvh - 377px),545px);min-height:510px;max-height:none}
 .studio-shell .guided-character-editor .journey-workbench.model-workbench .journey-main-art>.three-viewer.atelier-model-viewer{height:100%!important;min-height:0!important;max-height:none!important}
@@ -450,8 +446,8 @@ html{--studio-side-width:232px;--studio-terminal-width:232px;--studio-terminal-h
 
 /* The terminal shares the compact navigation rail. Its resize handle stays
    inside that rail so the dock never covers planner, viewer, or report UI. */
-.codex-dock{width:var(--studio-terminal-width,272px)!important;max-width:var(--studio-side-width,272px)!important}
-.codex-dock.collapsed{width:var(--studio-terminal-width,272px)!important}
+
+
 .task-archived-label,.record-archived-badge{display:inline-flex;align-items:center;width:max-content;padding:3px 7px;border:1px solid var(--line);border-radius:999px;color:var(--muted);background:var(--raised);font-size:10px;font-weight:700}
 .task-archived-label{margin:8px 12px 0}
 .archive-record-action{min-height:38px;margin:12px 0;padding:8px 11px;border:1px solid var(--line-strong);border-radius:8px;background:var(--raised);color:var(--text);font:inherit;cursor:pointer}
