@@ -9,15 +9,16 @@
 .atelier-model-viewer .viewer-model-choice { flex:1 1 auto; min-width:0; }
 .atelier-model-viewer .viewer-model-name { display:flex; align-items:center; gap:9px; min-width:0; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; font-size:13px; color:var(--text); }
 .atelier-model-viewer .viewer-model-name>svg { flex:0 0 auto; color:var(--pink); }
-.atelier-model-viewer .viewer-model-actions { display:flex; align-items:center; gap:3px; flex:0 0 auto; }
+.atelier-model-viewer .viewer-model-actions { display:flex; flex-wrap:wrap; align-items:center; gap:3px; flex:0 0 auto; }
+.atelier-model-viewer .viewer-mark-requirement { flex:1 0 100%; color:var(--amber); font-size:10px; line-height:1.35; }
 .atelier-model-viewer .viewer-picker { width:100%; min-width:0; max-width:100%; justify-content:flex-start; background:var(--raised); color:var(--text); }
 .atelier-model-viewer .viewer-picker span { max-width:none; min-width:0; flex:1 1 auto; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .atelier-model-viewer .viewer-picker>svg { flex:0 0 auto; }
 .atelier-model-viewer .viewer-views { display:flex; align-items:center; gap:3px; flex:0 0 auto; padding:4px 12px 10px; overflow-x:auto; scrollbar-width:thin; }
 .atelier-model-viewer .viewer-views button { min-height:30px; flex:0 0 auto; }
-.atelier-model-viewer .viewer-stage { position:relative; flex:1 1 auto; min-height:200px; min-width:0; overflow:hidden; border:1px solid var(--line-strong); border-radius:10px; background:#182534; overscroll-behavior:contain; }
+.atelier-model-viewer .viewer-stage { position:relative; display:flex; flex-direction:column; flex:1 1 auto; min-height:200px; min-width:0; overflow:hidden; border:1px solid var(--line-strong); border-radius:10px; background:#182534; overscroll-behavior:contain; }
 .atelier-model-viewer[data-theme="light"] .viewer-stage { background:#e7edf4; }
-.atelier-model-viewer .viewer-stage>canvas { display:block; width:100%; height:100%; min-height:0; touch-action:none; overscroll-behavior:contain; }
+.atelier-model-viewer .viewer-stage>canvas { display:block; flex:1 1 auto; width:100%; height:0; min-height:120px; touch-action:none; overscroll-behavior:contain; }
 .atelier-model-viewer .source-art-overlay { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; pointer-events:none; }
 .atelier-model-viewer .viewer-markup-panel { position:absolute; z-index:8; top:12px; right:12px; bottom:12px; width:min(336px,calc(100% - 24px)); overflow:auto; padding:12px; border:1px solid var(--line-strong); border-radius:12px; background:var(--panel); color:var(--text); box-shadow:0 12px 32px #0004; display:flex; flex-direction:column; gap:9px; }
 .atelier-model-viewer .viewer-markup-panel header,.atelier-model-viewer .viewer-markup-tools { display:flex; align-items:center; justify-content:space-between; gap:7px; }
@@ -46,8 +47,8 @@
 .atelier-model-viewer .viewer-empty span { font-size:12px; }
 .atelier-model-viewer .viewer-loading { position:absolute; inset:auto 12px 12px auto; z-index:4; padding:10px 14px; border-radius:8px; background:var(--panel); color:var(--text); font-size:12px; }
 .atelier-model-viewer .viewer-message { position:absolute; top:12px; left:12px; right:12px; z-index:6; display:flex; align-items:flex-start; gap:10px; max-height:130px; overflow:auto; padding:12px; border:0; border-radius:10px; background:var(--panel); color:var(--text); font-size:12px; box-shadow:0 8px 24px #0002; }
-.atelier-model-viewer .viewer-notices { position:absolute; z-index:9; top:12px; left:12px; right:12px; display:flex; flex-direction:column; align-items:stretch; gap:8px; max-height:calc(100% - 24px); overflow:auto; pointer-events:none; }
-.atelier-model-viewer .viewer-notices.has-markup { right:360px; }
+.atelier-model-viewer .viewer-notices { position:static; z-index:9; flex:0 0 auto; width:calc(100% - 300px); max-height:120px; margin:8px 0 8px 8px; display:flex; flex-direction:column; align-items:stretch; gap:8px; overflow:auto; pointer-events:none; }
+.atelier-model-viewer .viewer-notices.has-markup { width:calc(100% - 360px); }
 .atelier-model-viewer .viewer-notices .viewer-message { position:static; inset:auto; width:100%; max-height:130px; flex:0 0 auto; pointer-events:auto; }
 .atelier-model-viewer .viewer-message>svg { color:var(--pink); flex:0 0 auto; margin-top:4px; }
 .atelier-model-viewer .viewer-message>div { flex:1; min-width:0; line-height:1.5; }
@@ -90,7 +91,7 @@
 .atelier-model-viewer .assembly-panel input { background:var(--bg); border-color:var(--line); color:var(--text); }
 .atelier-model-viewer .assembly-panel footer { flex-wrap:wrap; }
 @container (max-width:480px) { .atelier-model-viewer .viewer-model-toolbar { gap:6px; padding:8px 8px 4px; } .atelier-model-viewer .viewer-model-actions { gap:0; } .atelier-model-viewer .viewer-model-actions button { padding:0 8px; } .atelier-model-viewer .viewer-views { padding:4px 8px 8px; gap:0; } .atelier-model-viewer .viewer-views button { padding:0 9px; font-size:11px; } .atelier-model-viewer .viewer-footer>span:first-child { display:none; } }
-@container (max-width:480px) { .atelier-model-viewer .viewer-notices.has-markup { right:12px; max-height:112px; } .atelier-model-viewer .viewer-notices.has-markup .viewer-message { max-height:96px; } .atelier-model-viewer .viewer-stage:has(.viewer-notices.has-markup) .viewer-markup-panel { top:140px; } }
+  @container (max-width:700px) { .atelier-model-viewer .viewer-notices { width:auto; max-height:112px; margin:6px; } .atelier-model-viewer .viewer-notices.has-markup { width:auto; max-height:112px; } .atelier-model-viewer .viewer-notices.has-markup .viewer-message { max-height:96px; } .atelier-model-viewer .viewer-stage:has(.viewer-notices.has-markup) .viewer-markup-panel { top:140px; } }
 html[data-motion=reduced] .atelier-model-viewer button { transition:none; }
 .model-workbench .journey-main-art>.three-viewer.atelier-model-viewer{display:flex;max-height:none;max-width:none;border-radius:inherit}
 .model-workbench .journey-main-art:has(>.atelier-model-viewer){height:clamp(400px,calc(100dvh - 300px),900px)} .model-workbench .journey-main-art>.three-viewer.atelier-model-viewer{height:100%!important;min-height:0!important}
@@ -98,3 +99,21 @@ html[data-motion=reduced] .atelier-model-viewer button { transition:none; }
 .atelier-model-viewer .texture-mark-paint { cursor: crosshair; }
 
 .atelier-model-viewer .viewer-message.is-info{color:color-mix(in srgb,var(--text),var(--blue) 16%)!important;border:1px solid color-mix(in srgb,var(--blue),var(--line) 38%)!important;background:color-mix(in srgb,var(--panel),var(--blue-soft) 18%)!important}.atelier-model-viewer .viewer-message.is-info>svg{color:var(--blue)!important}.atelier-model-viewer .viewer-message.is-error{border:1px solid color-mix(in srgb,var(--pink),var(--line) 24%)}.atelier-model-viewer .viewer-message.is-error>svg{color:var(--pink)}
+.atelier-model-viewer .viewer-notices,.atelier-model-viewer .viewer-notices.has-markup{width:auto;box-sizing:border-box;margin:6px;}
+
+.atelier-model-viewer .viewer-markup-panel{padding:8px;gap:5px}
+.atelier-model-viewer .viewer-markup-panel>header{order:0}
+.atelier-model-viewer .viewer-markup-history{order:1;position:sticky;top:-8px;margin:0;padding:3px 0}
+.atelier-model-viewer .viewer-markup-primary-tools{order:2;position:sticky;top:92px;z-index:3;justify-content:flex-start;flex-wrap:nowrap;padding:4px;background:var(--panel);border:1px solid var(--line);border-radius:7px}
+.atelier-model-viewer .viewer-markup-primary-tools label{display:flex;align-items:center;gap:5px;min-width:95px}
+.atelier-model-viewer .viewer-markup-primary-tools input{width:82px}
+.atelier-model-viewer .viewer-markup-part{order:8}
+.atelier-model-viewer .viewer-markup-panel>.journey-select{order:3}
+.atelier-model-viewer .viewer-markup-uv{order:5;min-height:160px;max-height:220px}
+.atelier-model-viewer .viewer-markup-count{order:6}
+.atelier-model-viewer .viewer-markup-help{order:7}
+.atelier-model-viewer .viewer-markup-help>summary,.atelier-model-viewer .viewer-markup-part>summary{min-height:26px;display:flex;align-items:center;color:var(--muted);font-size:10px;cursor:pointer}
+.atelier-model-viewer .viewer-markup-help>p{margin:3px 0 0;max-height:54px;overflow:auto}
+.atelier-model-viewer .viewer-markup-panel>small{order:9}
+.notification-toast-stack{top:72px;bottom:auto;right:16px;width:min(330px,calc(100vw - var(--studio-side-width,232px) - 32px));max-height:min(38vh,300px)}
+.notification-toast-stack.is-expanded .notification-toast-cards{max-height:min(32vh,240px);overflow:auto}

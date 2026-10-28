@@ -601,11 +601,13 @@ def rig_source(bpy, cfg, directory):
                         {"path": snapshot, "hash": sha(snapshot), "role": "surface-baseline"}]}
 
 
-def restore_materials(bpy, cfg, directory, assembly=False):
+def _restore_materials_impl(bpy, cfg, directory, assembly=False):
     from mathutils.kdtree import KDTree
     baseline = Path(cfg["baseline"]).resolve()
     if not cfg.get("baselineHash") or sha(baseline) != cfg["baselineHash"]:
         raise ValueError("The managed rig-source baseline hash is missing or changed.")
+    transient_before = {name: set(getattr(bpy.data, name)) for name in
+                        ("objects", "collections", "meshes", "armatures", "materials", "actions", "images")}
     returned = load_objects(bpy, baseline if assembly else cfg["inputs"][0]["path"])
     if not assembly and not any(o.type == "ARMATURE" and len(o.data.bones) for o in returned):
         raise ValueError("Returned rig has no skeleton.")
@@ -614,6 +616,8 @@ def restore_materials(bpy, cfg, directory, assembly=False):
     returned_actions = set(bpy.data.actions)
     reference_alignment = {}
     group_inputs = {}
+    temporary_reference_objects = []
+    temporary_reference_collections = []
     if assembly:
         reference_objects = []
         for source in cfg["inputs"]:
@@ -645,6 +649,16 @@ def restore_materials(bpy, cfg, directory, assembly=False):
         with bpy.data.libraries.load(str(baseline), link=False) as (src, dst):
             dst.objects = src.objects
         reference_objects = [o for o in dst.objects if o is not None]
+        reference_collection = bpy.data.collections.new("AetherFlow temporary rig baseline")
+        bpy.context.scene.collection.children.link(reference_collection)
+        temporary_reference_collections.append(reference_collection)
+        for obj in reference_objects:
+            reference_collection.objects.link(obj)
+            temporary_reference_objects.append(obj)
+        # Library objects have no evaluated matrix_world until they belong to an
+        # evaluated scene. Linking the complete hierarchy preserves parents and
+        # lets Blender resolve rotation, scale and world transforms correctly.
+        bpy.context.view_layer.update()
     refs = [o for o in reference_objects if o.type == "MESH"]
     if not refs:
         raise ValueError("Rig baseline contains no mesh.")
@@ -660,6 +674,14 @@ def restore_materials(bpy, cfg, directory, assembly=False):
         material_meshes = [obj for obj in dst.objects if obj is not None and obj.type == "MESH"]
         if not material_meshes:
             raise ValueError("The current Workbench material source contains no meshes.")
+        material_collection = bpy.data.collections.new("AetherFlow temporary material source")
+        bpy.context.scene.collection.children.link(material_collection)
+        temporary_reference_collections.append(material_collection)
+        for obj in dst.objects:
+            if obj is not None:
+                material_collection.objects.link(obj)
+                temporary_reference_objects.append(obj)
+        bpy.context.view_layer.update()
         material_refs = {}
         material_face_maps = {}
         def world_vertex_set(obj):
@@ -790,11 +812,26 @@ def restore_materials(bpy, cfg, directory, assembly=False):
         raise ValueError("Returned rig is missing baseline faces.")
     alignment_report = {o.name: [[float(c) for c in row] for row in mat]
                         for o, mat in reference_alignment.items()}
-    for obj in reference_objects:
-        bpy.data.objects.remove(obj, do_unlink=True)
+    cleanup_objects = set(temporary_reference_objects) | set(reference_objects)
+    if assembly:
+        cleanup_objects.update(o for group in group_inputs.values() for o in group["objects"])
+    for obj in cleanup_objects:
+        if obj.name in bpy.data.objects:
+            bpy.data.objects.remove(obj, do_unlink=True)
+    for collection in temporary_reference_collections:
+        if collection.name in bpy.data.collections:
+            bpy.data.collections.remove(collection, do_unlink=True)
     for action in list(bpy.data.actions):
         if action not in returned_actions and action.users == 0:
             bpy.data.actions.remove(action)
+    # Library loading can leave orphan mesh/material/image datablocks even
+    # after their temporary objects are unlinked. Remove only new zero-user
+    # data; materials that the returned model now uses remain intact.
+    for name in ("meshes", "armatures", "materials", "images"):
+        datablocks = getattr(bpy.data, name)
+        for item in list(datablocks):
+            if item not in transient_before[name] and item.users == 0:
+                datablocks.remove(item)
     after_rig = rig_signature(returned)
     if before_rig != after_rig:
         raise ValueError("Material restoration changed returned rig/weights/actions.")
@@ -834,6 +871,25 @@ def restore_materials(bpy, cfg, directory, assembly=False):
             "globalAlignment": {"matrix": alignment_rows, "staticParent": root_name,
                                 "applied": aligned and not assembly, "rotationGuessed": False},
             "groupReturnAlignment": alignment_report}
+
+
+def restore_materials(bpy, cfg, directory, assembly=False):
+    # Library loads mutate Blender's global datablocks even when later geometry
+    # checks fail. Snapshot identities, then remove every helper-created object
+    # in a finally block; successful outputs were serialized before cleanup.
+    before = {name: set(getattr(bpy.data, name)) for name in (
+        "objects", "collections", "meshes", "armatures", "materials", "actions", "images")}
+    try:
+        return _restore_materials_impl(bpy, cfg, directory, assembly)
+    finally:
+        for name in ("objects", "collections", "meshes", "armatures", "materials", "actions", "images"):
+            datablocks = getattr(bpy.data, name)
+            for item in list(datablocks):
+                if item not in before[name]:
+                    if name in ("objects", "collections"):
+                        datablocks.remove(item, do_unlink=True)
+                    elif item.users == 0:
+                        datablocks.remove(item)
 
 
 class SurfaceDiagnosticError(ValueError):

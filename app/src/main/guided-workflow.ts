@@ -109,7 +109,72 @@ function currentHeadFit(g:any){
 }
 function currentRigBaseline(g:any){const fit=currentHeadFit(g),baseline=g.geometryBaseline,geometry=(g.slots||[]).find((item:any)=>item.key==='geometry-baseline'),mesh=(g.slots||[]).find((item:any)=>item.key==='mesh-only-fbx'),surface=(g.slots||[]).find((item:any)=>item.key==='surface-baseline'),fitted=(g.operativeSlots||g.slots||[]).find((item:any)=>item.key==='fitted-assembly'),fitId=fitted?.operativeArtifactId||fitted?.artifactId,fitHash=fitted?.operativeHash||fitted?.hash,unchangedMaterialCorrection=!!fitted?.workbenchCorrection&&['materials','textures'].includes(String(fitted.workbenchPurpose))&&fitted.workbenchCorrectionChecks?.geometryChangedObjects?.length===0&&fitted.sourceHash===fitted.hash,baselineMatchesCurrent=baseline?.fittedAssemblyHash===fitHash&&baseline?.fittedAssemblyArtifactId===fitId,baselineMatchesUnchangedAncestor=unchangedMaterialCorrection&&baseline?.fittedAssemblyHash===fitted.sourceHash&&baseline?.fittedAssemblyArtifactId===fitted.artifactId;return !!fit.confirmed&&!!baseline&&baseline.current!==false&&(baselineMatchesCurrent||baselineMatchesUnchangedAncestor)&&baseline.proof?.sourceHashes?.assembled===baseline.fittedAssemblyHash&&baseline.hash===baseline.verifiedHash&&baseline.artifactId===geometry?.artifactId&&baseline.hash===geometry?.hash&&!!mesh?.artifactId&&!!surface?.artifactId;}
 function candidateHash(store:AtelierStore,artifactId:string){const item=store.get('artifact',artifactId);if(!item||typeof item.data.hash!=='string'||!HASH.test(item.data.hash))throw new Error('Guided result must be a managed artifact with a verified hash.');const file=store.object(item.data.hash);if(!file||crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex')!==item.data.hash)throw new Error('Guided result bytes are missing or corrupt.');return {item,hash:item.data.hash};}
-function artifactOwnershipForCharacter(store:AtelierStore,artifactId:string){
+const guidedLineageKeys=['parentId','parentArtifactId','sourceParentId','sourceVersionId','versionOf','derivedFrom','derivedFromArtifactId','sourceArtifactId','originalArtifactId','previousVersionId'];
+function trustedGuidedArtifactLineage(store:AtelierStore,artifact:any,characterId:string,operationAncestry:Set<string>,artifactAncestry=new Set<string>(),allowedOutputOperationId?:string):boolean{
+ if(!artifact||artifact.kind!=='artifact'||artifactAncestry.has(artifact.id))return false;
+ const nextArtifacts=new Set(artifactAncestry);nextArtifacts.add(artifact.id);
+ const character=store.get('character',characterId),projectId=String(character?.data.projectId||'');
+ if(artifact.data.characterId!==undefined&&artifact.data.characterId!==characterId)return false;
+ if(artifact.data.projectId!==undefined&&(!projectId||artifact.data.projectId!==projectId))return false;
+ for(const key of guidedLineageKeys){const value=artifact.data[key];if(typeof value!=='string')continue;const parent=store.getAny(value);if(!parent)return false;
+  if(parent.kind==='character'&&parent.id!==characterId)return false;
+  if(parent.kind==='project'&&(!projectId||parent.id!==projectId))return false;
+  if(parent.kind==='artifact'&&!trustedGuidedArtifactLineage(store,parent,characterId,operationAncestry,nextArtifacts))return false;
+  if(parent.kind==='operation'&&parent.id!==allowedOutputOperationId&&!trustedGuidedOperationOutput(store,parent.id,artifact,characterId,operationAncestry))return false;
+ }
+ const provenance=artifact.data.provenance;if(provenance&&typeof provenance==='object'&&!Array.isArray(provenance))for(const key of ['artifactId','sourceArtifactId','sourceVersionId','parentArtifactId']){const value=(provenance as any)[key];if(typeof value==='string'){const parent=store.get('artifact',value);if(!parent||!trustedGuidedArtifactLineage(store,parent,characterId,operationAncestry,nextArtifacts))return false;}}
+ const galleryOriginal=store.list({kind:'concept',limit:1000}).some((concept:any)=>{const refs=new Set([...(Array.isArray(concept.data.referenceArtifactIds)?concept.data.referenceArtifactIds:[]),concept.data.referenceArtifactId].filter((value:any)=>typeof value==='string'));return refs.has(artifact.id)&&store.links(concept.id).some((link:any)=>link.from_id===concept.id&&link.to_id===artifact.id&&link.role==='source artwork');});
+ for(const link of store.links(artifact.id)){const otherId=link.from_id===artifact.id?link.to_id:link.from_id,other=store.getAny(otherId);if(other?.kind==='character'&&other.id!==characterId&&!(galleryOriginal&&link.role==='source artwork'))return false;if(other?.kind==='project'&&(!projectId||other.id!==projectId))return false;}
+ return true;
+}
+export function trustedGuidedOperationOutput(store:AtelierStore,operationId:string,output:any,characterId:string,ancestry=new Set<string>()){
+ if(ancestry.has(operationId))return false;const nextAncestry=new Set(ancestry);nextAncestry.add(operationId);
+ const operation=store.get('operation',operationId),data=operation?.data as any,report=data?.report,mode=String(data?.parameters?.mode||'');
+ const modes=new Set(['inventory','inspect-components','prepare-groups','repartition-groups','assemble-returns','rig-source','restore-rig-materials']);
+ if(!operation||data.status!=='complete'||data.characterId!==characterId||!modes.has(mode)||data.parameters?.autoexec!=='disabled'||!Array.isArray(data.inputs)||!data.inputs.length||output.data.parentId!==operationId)return false;
+ // Only accept an output edge recorded by the runner. A reverse or arbitrary
+ // relationship can mention an artifact without proving that this operation
+ // published it. `artifact` is the concrete role used by the published
+ // 1.0.13 surface runner; `operation output` is the current explicit role.
+ const outputLink=store.links(operationId).some((link:any)=>link.from_id===operationId&&link.to_id===output.id&&['artifact','operation output'].includes(String(link.role)));
+ const outputHash=String(output.data.hash||''),reportedOutput=(report?.outputs||[]).some((row:any)=>row?.hash===outputHash)||report?.reportHash===outputHash;
+ if(!outputLink||!HASH.test(outputHash)||!reportedOutput)return false;
+ const character=store.get('character',characterId),workflow=character?.data.workflowId?store.get('workflow',String(character.data.workflowId)):store.workflowForCharacter(characterId),guided=workflow?.data.guided as any;
+ const operationOwnerLink=store.links(characterId).some((link:any)=>link.from_id===characterId&&link.to_id===operationId&&link.role==='guided mesh operation');
+ if(!character||!operationOwnerLink||!workflow||workflow.data.definitionVersion!==2||guided?.definitionVersion!==2||workflow.data.characterId!==characterId)return false;
+ // Trust only accepted, currently selected stage outputs. Merely mentioning an
+ // artifact in a rejected candidate or stale slot must not establish ownership.
+ const owned=new Set<string>([
+  ...(guided.sourceArtifactIds||[]),
+  ...(guided.slots||[]).filter((slot:any)=>slot.reviewStatus==='accepted').flatMap((slot:any)=>[
+   ...(slot.artifactId?[slot.artifactId]:[]),
+   ...(slot.candidates||[]).filter((candidate:any)=>candidate.id===slot.candidateId&&candidate.reviewStatus==='accepted'&&candidate.artifactId===slot.artifactId&&candidate.hash===slot.hash).map((candidate:any)=>candidate.artifactId),
+  ]),
+ ]);
+ const acceptedCorrection=currentAcceptedWorkbenchCorrection(store,characterId);
+ if(acceptedCorrection&&store.links(characterId).some((link:any)=>(link.from_id===characterId&&link.to_id===acceptedCorrection.artifact.id)||(link.to_id===characterId&&link.from_id===acceptedCorrection.artifact.id)))owned.add(acceptedCorrection.artifact.id);
+ const hasNewInputIds=Array.isArray(data.inputArtifactIds),hasNewOutputIds=Array.isArray(data.outputArtifactIds);let inputIds:string[];
+ if(hasNewInputIds&&hasNewOutputIds){if(!data.outputArtifactIds.includes(output.id)||data.inputArtifactIds.includes(output.id))return false;inputIds=data.inputArtifactIds;}
+ else {
+  // 1.0.13 persisted the report/source hashes and semantic slot keys, but not
+  // explicit artifact-ID arrays. Reconstruct only when every hash maps to one
+  // current same-character slot and all optional inputs have recorded IDs.
+  if(hasNewInputIds||hasNewOutputIds||!report||!Array.isArray(report.inputHashes)||!report.sourceHashes||typeof report.sourceHashes!=='object')return false;
+  const sourceEntries=Object.entries(report.sourceHashes) as Array<[string,string]>,slots=guided.slots||[],sourceArtifact=(source:string)=>{const key=mode==='assemble-returns'?`texture-return-${source}`:mode==='rig-source'?'fitted-assembly':mode==='restore-rig-materials'?'rigged-return':`segmented-${source}`,slot=slots.find((candidate:any)=>candidate.key===key);return slot?.artifactId&&slot.reviewStatus==='accepted'&&slot.hash?{id:String(slot.artifactId),hash:String(slot.hash)}:null;};
+  if(sourceEntries.length!==report.inputHashes.length||sourceEntries.some(([source,hash],index)=>hash!==report.inputHashes[index]||!sourceArtifact(source)?.hash||sourceArtifact(source)?.hash!==hash))return false;
+  inputIds=sourceEntries.map(([source])=>sourceArtifact(source)!.id);
+  if(String(data.assetId||'')!==inputIds[0])return false;
+  if(data.parameters?.materialSourceArtifactId){const artifact=store.get('artifact',String(data.parameters.materialSourceArtifactId));if(!artifact||artifact.data.hash!==data.parameters.materialSourceHash)return false;inputIds.push(artifact.id);}
+  if(mode==='repartition-groups'&&data.parameters?.baselineArtifactId){const baseline=store.get('artifact',String(data.parameters.baselineArtifactId));if(!baseline||!HASH.test(String(baseline.data.hash||'')))return false;if(data.inputs.length>inputIds.length){if(data.inputs[inputIds.length]!==baseline.data.hash)return false;inputIds.push(baseline.id);}}
+  if(inputIds.length!==data.inputs.length)return false;
+ }
+ const inputRows=inputIds.map((id:string)=>store.get('artifact',id));
+  if(inputRows.some((input:any)=>!input||!owned.has(input.id))||String(data.assetId||'')!==String(inputIds[0]))return false;
+ const inputHashes=inputRows.map((input:any)=>String(input.data.hash||''));
+   if(data.inputs.length!==inputHashes.length||inputHashes.some((hash:string,index:number)=>!HASH.test(hash)||data.inputs[index]!==hash))return false;for(const input of inputRows)if(!trustedGuidedArtifactLineage(store,input,characterId,nextAncestry))return false;if(!trustedGuidedArtifactLineage(store,output,characterId,nextAncestry,new Set(),operationId))return false;const projectIds=new Set([data.projectId,output.data.projectId,...inputRows.map((input:any)=>input.data.projectId)].filter((id:any)=>typeof id==='string'&&id.length));if(projectIds.size>1)return false;const characterProject=String(character.data.projectId||'');if(characterProject&&[...projectIds].some(id=>id!==characterProject))return false;
+ return true;
+}
+export function artifactOwnershipForCharacter(store:AtelierStore,artifactId:string){
  const owners=new Set<string>(),visited=new Set<string>(),pending=[artifactId];let ambiguous=false;
  const add=(kind:'character'|'project',id:unknown)=>{if(typeof id!=='string'||!store.get(kind,id)){ambiguous=true;return;}owners.add(`${kind}:${id}`);};
  const lineageKeys=['parentId','parentArtifactId','sourceParentId','sourceVersionId','versionOf','derivedFrom','derivedFromArtifactId','sourceArtifactId','originalArtifactId','previousVersionId'];
@@ -120,7 +185,7 @@ function artifactOwnershipForCharacter(store:AtelierStore,artifactId:string){
  while(pending.length){const id=pending.pop()!;if(visited.has(id))continue;visited.add(id);const artifact=store.get('artifact',id);if(!artifact){ambiguous=true;continue;}
    const galleryShared=sharedGalleryIds.has(artifact.id);
    if(artifact.data.characterId!==undefined)add('character',artifact.data.characterId);if(artifact.data.projectId!==undefined)add('project',artifact.data.projectId);
-   for(const key of lineageKeys){const value=artifact.data[key];if(typeof value!=='string')continue;const parent=store.getAny(value);if(parent?.kind==='character')add('character',value);else if(parent?.kind==='project')add('project',value);else if(parent?.kind==='artifact')pending.push(value);else if(parent?.kind==='concept'&&key==='parentId'&&galleryShared)continue;else if(key==='parentId')ambiguous=true;}
+   for(const key of lineageKeys){const value=artifact.data[key];if(typeof value!=='string')continue;const parent=store.getAny(value);if(parent?.kind==='character')add('character',value);else if(parent?.kind==='project')add('project',value);else if(parent?.kind==='artifact')pending.push(value);else if(parent?.kind==='operation'&&key==='parentId'){if(trustedGuidedOperationOutput(store,value,artifact,String(parent.data.characterId||'')))add('character',parent.data.characterId);else ambiguous=true;}else if(parent?.kind==='concept'&&key==='parentId'&&galleryShared)continue;else if(key==='parentId')ambiguous=true;}
    const provenance=artifact.data.provenance;if(provenance&&typeof provenance==='object'&&!Array.isArray(provenance))for(const key of ['artifactId','sourceArtifactId','sourceVersionId','parentArtifactId']){const value=(provenance as any)[key];if(typeof value==='string'&&store.get('artifact',value))pending.push(value);}
    for(const link of store.links(id)){const otherId=link.from_id===id?link.to_id:link.from_id,other=store.getAny(otherId);if(other?.kind==='character'){if(!(galleryShared&&link.role==='source artwork'))add('character',other.id);}else if(other?.kind==='project')add('project',other.id);}
  }
@@ -193,22 +258,19 @@ export class GuidedWorkflow {
   private operativeSlots(characterId:string,slots:any[]){const correction=currentAcceptedWorkbenchCorrection(this.store,characterId);return slots.map(slot=>this.operativeSlot(characterId,slot,correction));}
   createCharacter(name:string,description='',sourceConceptId?:string){
     return this.store.transaction(()=>{
-      let made:any,sourceIds:string[]=[];
+      let character:any,sourceIds:string[]=[];
       if(sourceConceptId){
         const concept=this.store.get('concept',sourceConceptId);if(!concept)throw new Error('Source concept was not found.');if(concept.data.productionStarted===true)throw new Error('Production has already started from this concept.');
-        made=this.domain.createCharacter(concept.name,'head-body',String(concept.data.description||''),[]);this.store.link(made.character.id,concept.id,'source reference');
+        character=this.store.put({kind:'character',name:concept.name,data:{schemaVersion:1,template:'head-body',description:String(concept.data.description||''),partInventory:[],definitionVersion:2,headHairMode:'simplified'}});this.store.link(character.id,concept.id,'source reference');
         sourceIds=[...new Set([...(Array.isArray(concept.data.referenceArtifactIds)?concept.data.referenceArtifactIds:[]),...(concept.data.referenceArtifactId?[concept.data.referenceArtifactId]:[])])].map(String).filter(id=>{const asset=this.store.get('artifact',id);return !!asset&&String(asset.data.mime||'').startsWith('image/');});
-        for(const id of sourceIds)this.store.link(made.character.id,id,'source artwork');
-        this.store.put({id:concept.id,kind:'concept',name:concept.name,data:{...concept.data,productionStarted:true,characterId:made.character.id},expectedRevision:concept.revision});
-      }else made=this.domain.createCharacter(name,'head-body',description,[]);
-      made.character=this.store.put({id:made.character.id,kind:'character',name:made.character.name,data:{...made.character.data,headHairMode:'simplified'},expectedRevision:made.character.revision});
-      let workflow=this.store.get('workflow',String(made.character.data.workflowId));if(!workflow)throw new Error('New character workflow was not created.');
+        for(const id of sourceIds)this.store.link(character.id,id,'source artwork');
+      }else character=this.store.put({kind:'character',name,data:{schemaVersion:1,template:'head-body',description,partInventory:[],definitionVersion:2,headHairMode:'simplified'}});
       const guided={definitionVersion:2,currentStepKey:'source',completedStepKeys:[],sourceArtifactIds:sourceIds,slots:initialSlots(),groups:[],selectedMesh:{},manualRigContinue:false};ensureSlots(guided);
       const stages=GUIDED_STEPS.map(([key],number)=>({id:ID(),key,name:names(this.store.settings().locale)[number][0],required:true,applicable:true,prerequisites:number?[GUIDED_STEPS[number-1][0]]:[],requiredSlotRoles:[],requiredChecks:[],status:number?'idle':'review',candidates:[]}));
-      workflow=this.domain.saveGuidedWorkflow(workflow,{...workflow.data,definitionVersion:2,guided,stages,template:'head-body',partInventory:[],updatedAt:new Date().toISOString()},'system','guided.character-created',{definitionVersion:2,template:'head-body'});
-      this.store.put({id:made.character.id,kind:'character',name:made.character.name,data:{...made.character.data,template:'head-body',definitionVersion:2},expectedRevision:made.character.revision});
-      if(guided.sourceArtifactIds.length){const current=this.store.get('workflow',workflow.id)!;workflow=save(this.domain,this.store,current,guided,'system','source-linked',{sourceArtifactIds:guided.sourceArtifactIds});}
-      return {character:this.store.get('character',made.character.id),workflow};
+      const workflow=this.store.put({kind:'workflow',name:`${character.name} guided production`,data:{schemaVersion:1,definitionVersion:2,characterId:character.id,template:'head-body',stages,slots:[],partGroups:[],partInventory:[],guided,updatedAt:new Date().toISOString()}});
+      character=this.store.put({id:character.id,kind:'character',name:character.name,data:{...character.data,workflowId:workflow.id},expectedRevision:character.revision});this.store.link(character.id,workflow.id,'workflow');
+      if(sourceConceptId){const concept=this.store.get('concept',sourceConceptId)!;this.store.put({id:concept.id,kind:'concept',name:concept.name,data:{...concept.data,productionStarted:true,characterId:character.id},expectedRevision:concept.revision});}
+      return {character,workflow};
     });
   }
   isGuided(characterId:string){const state=this.domain.workflowFor(characterId);return state.workflow.data.definitionVersion===2&&!!state.workflow.data.guided;}

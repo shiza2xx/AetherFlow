@@ -79,7 +79,7 @@ export function getGuideActionCompletion(p:GuideState,actions:string[]):boolean[
  };
  const values=actionsFor[p.stepKey];return Array.from({length:p.stepKey==='receive-materials'?values?.length||0:actions.length},(_,index)=>values?.[index]===true);
 }
-export default function JourneyStepGuide(p:GuideState){
+export default function JourneyStepGuide(p:GuideState&{compactOnly?:boolean;manualOnly?:boolean}){
  const [selectedAction,setSelectedAction]=useState(0),progressSignature=getGuideActionCompletion(p,guideCopy(p.stepKey,p.locale)?.actions||[]).join(',');useEffect(()=>setSelectedAction(0),[p.stepKey,progressSignature]);
  const copy=guideCopy(p.stepKey,p.locale);if(!copy)return null;
  const ru=p.locale==='ru',t=(en:string,rus:string)=>ru?rus:en,next=nextGuideAction(p);
@@ -113,12 +113,14 @@ export default function JourneyStepGuide(p:GuideState){
  const actionSteps=actionLabels.map((label,i)=>({label,title:shortTitles[p.stepKey]?.[i]||additionalTitles[p.stepKey]?.[i]||label.split(/[.;]/,1)[0].trim(),done:getGuideActionCompletion(p,actionLabels)[i]??false}));
  const firstPending=actionSteps.findIndex(s=>!s.done),currentAction=firstPending<0?actionSteps.length:firstPending+1,actionState=actionSteps.map((s,i)=>s.done?'complete':i+1===currentAction?'active':'upcoming');
  const focusedAction=Math.min(actionSteps.length,selectedAction||currentAction),focusedTarget=firstPending<0&&!selectedAction?next.target:targetForAction(focusedAction-1);
- return <section className="journey-step-guide" data-testid="journey-step-guide" data-step={p.stepKey} aria-label={t('Step guide','Инструкция этапа')}>
+ return <section className={`journey-step-guide${p.manualOnly?' journey-step-guide-manual-only':''}`} data-testid="journey-step-guide" data-step={p.stepKey} aria-label={t('Step guide','Инструкция этапа')}>
+  {!p.manualOnly&&<>
   <div className="journey-action-stepper" data-action-stepper={p.stepKey} aria-label={t('Actions in this stage','Действия текущего этапа')}>
-   <StepperSource className="journey-stepper-source journey-action-stepper-source" step={focusedAction} initialStep={currentAction} keepLabels onStepChange={setSelectedAction} getStepStatus={(number:number)=>actionState[number-1]||'upcoming'} indicator="numbers" orientation="horizontal" transition="slide" showFooter={false} theme={typeof document!=='undefined'&&document.documentElement.dataset.theme==='light'?'light':'dark'} accentColor="var(--pink)" frame={false} radius={20} width="100%">
+   <StepperSource className="journey-stepper-source journey-action-stepper-source" stepLabel={ru?'Шаг':'Step'} step={focusedAction} initialStep={currentAction} keepLabels onStepChange={setSelectedAction} getStepStatus={(number:number)=>actionState[number-1]||'upcoming'} indicator="numbers" orientation="horizontal" transition="slide" showFooter={false} theme={typeof document!=='undefined'&&document.documentElement.dataset.theme==='light'?'light':'dark'} accentColor="var(--pink)" frame={false} radius={20} width="100%">
     {actionSteps.map((action,i)=><StepperStep key={`${p.stepKey}-${i}`} title={action.title} description={action.done?t('Requirement met','Требование выполнено'):i+1===currentAction?t('Current action','Текущее действие'):t('Still to do','Ещё предстоит')}><div className="journey-action-step-content">{i+1===focusedAction&&<div className="journey-action-cta"><p>{i+1===currentAction?next.text:action.label}</p><button type="button" className="journey-guide-jump" disabled={p.busy} onClick={event=>jump(focusedTarget,event.currentTarget)}><ArrowDown size={15}/><span>{targetLabel(focusedTarget)}</span></button></div>}</div></StepperStep>)}
    </StepperSource>
   </div>
-  <details className="journey-guide-manual" key={p.stepKey}><summary><BookOpen size={15}/><span>{t('Requirements and details','Требования и подробности')}</span><ChevronDown size={14}/></summary><div className="journey-guide-detail"><div><h3>{t('What you need','Что потребуется')}</h3><p>{copy.input}</p><h3>{t('Expected result','Что получится')}</h3><p>{copy.result}</p></div><div><h3>{t('Before continuing','Перед продолжением')}</h3><p>{copy.check}</p></div></div></details>
+  </>}
+  {!p.compactOnly&&<details className="journey-guide-manual" key={p.stepKey}><summary><BookOpen size={15}/><span>{t('Requirements and details','Требования и подробности')}</span><ChevronDown size={14}/></summary><div className="journey-guide-detail"><div><h3>{t('What you need','Что потребуется')}</h3><p>{copy.input}</p><h3>{t('Expected result','Что получится')}</h3><p>{copy.result}</p></div><div><h3>{t('Before continuing','Перед продолжением')}</h3><p>{copy.check}</p></div></div></details>}
  </section>;
 }

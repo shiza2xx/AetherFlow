@@ -1,8 +1,11 @@
-.af-settings-popover{position:absolute;right:164px;bottom:52px;width:min(340px,calc(100vw - 30px));padding:14px;border:1px solid var(--af-line-strong);border-radius:10px;background:var(--af-panel);box-shadow:0 12px 35px #0003;color:var(--af-muted);font-size:11px}
+.af-settings-popover{position:absolute;right:clamp(220px,26vw,380px);bottom:52px;width:min(340px,calc(100vw - 30px));padding:14px;border:1px solid var(--af-line-strong);border-radius:10px;background:var(--af-panel);box-shadow:0 12px 35px #0003;color:var(--af-muted);font-size:11px}
 .af-settings-popover>strong{display:block;margin-bottom:10px;color:var(--af-text)}
 .af-popover-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:7px 0;border-top:1px solid var(--af-line)}
 .af-popover-row button,.af-diagnostics button{padding:6px 9px;border:1px solid var(--af-line-strong);border-radius:7px;background:var(--af-raised);color:var(--af-muted);font-size:10px}
 .af-popover-row input[type=range]{width:128px;accent-color:var(--af-accent)}
 .af-diagnostics{display:grid;gap:8px;padding-top:10px;border-top:1px solid var(--af-line)}
 .af-diagnostics small{line-height:1.5;color:var(--af-dim)}
-@media(max-width:560px){.af-settings-popover{right:8px;bottom:94px}}
+@media(max-width:560px){.af-settings-popover{right:8px;bottom:152px}}
+.af-preferences{gap:0}.af-preferences>button{min-width:34px;min-height:32px;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:0 9px;border:1px solid var(--af-line-strong);border-radius:7px;background:var(--af-raised);color:var(--af-muted);font-size:10px}
+@media(min-width:901px){.af-start-content{justify-content:flex-start;margin-top:14px}.af-hero{max-height:150px;margin-bottom:14px}.af-celestial{height:36px;width:180px}.af-hero-logo-frame{width:54px;height:54px;margin-bottom:5px;padding:5px;border-radius:16px}.af-start h1{font-size:clamp(38px,4vw,56px);margin-bottom:4px}.af-hero-divider{margin-bottom:4px}.af-hero-caption{font-size:8px}.af-hero-note{margin-top:3px;font-size:10px}}
+@media(max-height:760px) and (min-width:901px){.af-hero{max-height:110px;margin-bottom:8px}.af-celestial{height:18px;width:130px}.af-hero-logo-frame{width:42px;height:42px;margin-bottom:3px;padding:4px;border-radius:13px}.af-start h1{font-size:clamp(32px,3.2vw,44px);margin-bottom:2px}.af-hero-divider,.af-hero-caption,.af-hero-note{display:none}.af-panel-head{padding-top:9px;padding-bottom:8px}.af-project-card>button:first-child,.af-create-card>button{height:92px}.af-card-grid{gap:8px}.af-panel-footer{margin-top:8px;padding-top:8px;padding-bottom:8px}}

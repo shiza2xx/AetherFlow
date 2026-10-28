@@ -1,7 +1,8 @@
 import {beforeEach,describe,expect,it,vi} from 'vitest';
 import {call} from './api';
 import {flushTaskChecklistMutations} from './taskChecklistMutations';
-import {completeTask} from './taskCompletion';
+import {completeTask,taskCompletionBlockers} from './taskCompletion';
+import type {Entity} from '../shared/contracts';
 
 vi.mock('./api',()=>({call:vi.fn()}));
 vi.mock('./taskChecklistMutations',()=>({flushTaskChecklistMutations:vi.fn()}));
@@ -41,4 +42,13 @@ describe('completeTask',()=>{
     if(result.ok)throw new Error('A revision conflict cannot complete a task.');
     expect(result.error.code).toBe('REVISION_CONFLICT');
   });
+});
+
+describe('taskCompletionBlockers',()=>{
+ it('resolves prerequisite names and open subtasks, preserves missing references, and deduplicates links',()=>{
+  const prerequisite={id:'task-prereq',kind:'task',name:'Approve the source',data:{status:'In progress'}} as unknown as Entity;
+  const child={id:'task-child',kind:'task',name:'Export the preview',data:{status:'To do',parentTaskId:entity.id}} as unknown as Entity;
+  const parent={...entity,data:{...entity.data,dependencyIds:['task-prereq','missing-id','task-prereq']}} as unknown as Entity;
+  expect(taskCompletionBlockers(parent,[prerequisite,child])).toEqual([{id:'task-prereq',name:'Approve the source',status:'In progress',missing:false},{id:'missing-id',name:'Missing task (missing-id)',missing:true},{id:'task-child',name:'Export the preview',status:'To do'}]);
+ });
 });

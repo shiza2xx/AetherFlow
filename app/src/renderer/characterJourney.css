@@ -35,7 +35,7 @@
 .journey-slot-list{display:flex;flex-direction:column;gap:7px}
 .journey-slot-list>button{min-width:0;text-align:left}
 .journey-slot-list>button>span{min-width:0;flex:1}
-.journey-slot-list>button strong,.journey-slot-list>button small{display:block;overflow-wrap:anywhere;word-break:break-word}
+.journey-slot-list>button strong,.journey-slot-list>button small{display:block;overflow-wrap:break-word;word-break:normal;hyphens:manual}
 .journey-slot-list>button.selected,[data-guided-slot-id][aria-current=true]{outline:2px solid var(--journey-accent);outline-offset:1px;background:var(--pink-soft)}
 @media(max-width:920px){.journey-workbench{grid-template-columns:minmax(0,1fr)}.journey-main-art{height:min(54vh,420px);min-height:260px}.journey-result-rail{max-height:34vh;min-height:150px}.journey-slot-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr))}}
 .studio-shell .guided-character-editor .journey-footer{position:static;bottom:auto;z-index:auto;margin-top:14px;padding:14px 0;background:transparent}
@@ -75,10 +75,10 @@
 
 /* Agent-created group names may be long and numerous. Keep the controls inside the stage. */
 .journey-group-tabs{min-width:0;max-width:100%;max-height:148px;overflow-y:auto;align-content:flex-start;padding:3px;scrollbar-width:thin}
-.journey-group-tabs button{min-width:0;max-width:min(280px,100%);white-space:normal;overflow-wrap:anywhere;text-align:left;line-height:1.4}
+.journey-group-tabs button{min-width:0;max-width:min(280px,100%);white-space:normal;word-break:normal;overflow-wrap:break-word;text-align:left;line-height:1.4}
 .guided-group-summary{min-width:0;max-height:148px;overflow-y:auto;scrollbar-width:thin}
-.guided-group-summary>span{min-width:0;max-width:100%;overflow-wrap:anywhere}
+.guided-group-summary>span{min-width:0;max-width:100%;word-break:normal;overflow-wrap:break-word}
 .guided-regroup-action{display:flex;flex-direction:column;align-items:flex-start;gap:10px}
 .guided-regroup-action :is(h3,p){margin:0}
 
-.journey-group-change-note{margin:12px 0;padding:12px;border:1px solid var(--line);border-radius:12px;font-size:13px;line-height:1.6;overflow-wrap:anywhere;color:var(--muted)}
+.journey-group-change-note{margin:12px 0;padding:12px;border:1px solid var(--line);border-radius:12px;font-size:13px;line-height:1.6;word-break:normal;overflow-wrap:break-word;color:var(--muted)}

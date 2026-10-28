@@ -658,8 +658,8 @@ function Row({
           : { type: "spring", stiffness: 380, damping: 34, mass: 0.9 }
       }
     >
-      <DrawCheckbox className="chk-source-draw-checkbox" checked={on} onChange={onToggle} reduceMotion={still} aria-label={label}/>
-      <button type="button" className="chk-row chk-row-text" aria-label={label} aria-pressed={on} onClick={onToggle}>
+      <DrawCheckbox className="chk-source-draw-checkbox" checked={on} onChange={onToggle} reduceMotion={still} aria-label={label} tabIndex={-1} aria-hidden="true"/>
+      <button type="button" role="checkbox" aria-checked={on} className="chk-row chk-row-text" aria-label={label} onClick={onToggle}>
       <span className="chk-say" ref={say}>
         {/* the words give up their ink as the rule crosses
             them — read off the same number, so a half-crossed

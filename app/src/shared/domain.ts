@@ -1,5 +1,4 @@
 import { z } from 'zod';
-import crypto from 'node:crypto';
 
 export const DomainVersion=z.literal(1);
 const Id=z.string().uuid();
@@ -11,22 +10,48 @@ export const StageSchema=z.object({id:Id,key:z.string().min(1),name:z.string().m
 export const CharacterDataSchema=z.object({schemaVersion:DomainVersion.optional(),workflowId:Id.optional(),template:z.enum(['head-body','separate-parts']).optional(),archived:z.boolean().optional(),description:z.string().optional()}).passthrough();
 export const PartInventoryItemSchema=z.object({name:z.string().trim().min(1).max(100),kind:z.enum(['garment','accessory']),sideViews:z.array(z.enum(['left','right'])).default([])});
 export type PartInventoryItem=z.infer<typeof PartInventoryItemSchema>;
-export function normalizePartInventory(items:unknown[]=[]):PartInventoryItem[]{const dedup=new Map<string,PartInventoryItem>();for(const item of items){const value=PartInventoryItemSchema.parse(typeof item==='string'?{name:item,kind:'garment',sideViews:[]}:item);dedup.set(`${value.kind}:${value.name.toLowerCase()}`,value);}if(dedup.size>128)throw new Error('Part inventory must contain at most 128 named items.');return [...dedup.values()];}
-export const WorkflowDataSchema=z.object({schemaVersion:DomainVersion,definitionVersion:z.literal(2).optional(),guided:z.record(z.string(),z.unknown()).optional(),characterId:Id,template:z.enum(['head-body','separate-parts']),stages:z.array(StageSchema),slots:z.array(z.object({id:Id,stageId:Id,partId:Id.optional(),role:z.string(),kind:z.enum(['reference','model','texture','rig','report']),required:z.boolean(),multiple:z.boolean().default(false),acceptedFormats:z.array(z.string()),artifactIds:z.array(Id).default([])})).default([]),partGroups:z.array(z.object({id:Id,name:z.string(),kind:z.enum(['geometry','material','motion']),partId:Id.optional(),members:z.array(Id).default([])})).default([]),partInventory:z.array(PartInventoryItemSchema).max(128).default([]),updatedAt:z.string()}).passthrough();
+const PublishedV1StageKeys=['references','3d-candidates','segmentation','materials','assembly','rig','weight-cleanup','review-and-export'] as const;
+const HistoricalId=z.string().uuid();
+const HistoricalStageSchema=z.record(z.string(),z.unknown()).superRefine((stage,ctx)=>{
+ if(typeof stage.id!=='string'||!z.string().uuid().safeParse(stage.id).success)ctx.addIssue({code:z.ZodIssueCode.custom,message:'Historical stage ID must be a UUID.'});
+ if(typeof stage.key!=='string'||!PublishedV1StageKeys.includes(stage.key as typeof PublishedV1StageKeys[number]))ctx.addIssue({code:z.ZodIssueCode.custom,message:'Historical stage key is unsupported.'});
+ if(typeof stage.name!=='string'||typeof stage.required!=='boolean'||typeof stage.applicable!=='boolean'||!Array.isArray(stage.prerequisites)||stage.prerequisites.some(value=>typeof value!=='string')||!Array.isArray(stage.requiredSlotRoles)||stage.requiredSlotRoles.some(value=>typeof value!=='string')||!Array.isArray(stage.requiredChecks)||stage.requiredChecks.some(value=>typeof value!=='string')||!['idle','running','review','accepted','invalidated','rejected','interrupted','cancelled'].includes(String(stage.status))||!Array.isArray(stage.candidates))ctx.addIssue({code:z.ZodIssueCode.custom,message:'Historical stage does not match the bounded published v1 shape.'});
+});
+const PublishedV1SlotSchema=z.object({id:HistoricalId,stageId:HistoricalId,role:z.string().min(1).max(200),kind:z.enum(['reference','model','texture','rig','report']),required:z.boolean(),multiple:z.boolean(),acceptedFormats:z.array(z.string().max(40)).max(50),artifactIds:z.array(HistoricalId).max(1000)}).passthrough();
+const historicalWorkflowBase=z.object({schemaVersion:z.literal(1),definitionVersion:z.literal(1).optional(),characterId:HistoricalId,stages:z.array(HistoricalStageSchema).max(8),slots:z.array(PublishedV1SlotSchema).max(10000),template:z.enum(['head-body','separate-parts']),partGroups:z.array(z.unknown()).max(10000),partInventory:z.array(z.unknown()).max(128),updatedAt:z.string().optional()}).passthrough();
+/** Exact-shape recognizer for records emitted by the published eight-stage v1 factories. */
+export function isPublishedV1WorkflowData(data:unknown):boolean{
+ if(!data||typeof data!=='object'||Array.isArray(data))return false;
+ const value=data as Record<string,any>;
+ if(value.definitionVersion===1){
+  if(!z.object({schemaVersion:z.literal(1),definitionVersion:z.literal(1),characterId:HistoricalId,stages:z.array(z.record(z.string(),z.unknown())).max(8),slots:z.array(z.record(z.string(),z.unknown())).max(10000)}).passthrough().safeParse(value).success||value.guided!==undefined)return false;
+  const stageIds=new Set<string>();for(const stage of value.stages){if(typeof stage.id!=='string'||!z.string().uuid().safeParse(stage.id).success||typeof stage.key!=='string'||!PublishedV1StageKeys.includes(stage.key as typeof PublishedV1StageKeys[number])||stage.status!==undefined&&!['idle','running','review','accepted','invalidated','rejected','interrupted','cancelled'].includes(String(stage.status)))return false;stageIds.add(stage.id);}
+  return value.slots.every((slot:any)=>slot.stageId===undefined||stageIds.has(String(slot.stageId)));
+ }
+ if(value.definitionVersion!==undefined)return false;
+ if(!historicalWorkflowBase.safeParse(value).success||value.guided!==undefined||value.stages.length!==PublishedV1StageKeys.length)return false;
+ if(value.stages.some((stage:any,index:number)=>stage.key!==PublishedV1StageKeys[index]))return false;
+ const stageIds=new Set(value.stages.map((stage:any)=>stage.id));
+ return value.slots.every((slot:any)=>stageIds.has(slot.stageId))&&value.stages.every((stage:any)=>stage.prerequisites.every((key:string)=>PublishedV1StageKeys.includes(key as typeof PublishedV1StageKeys[number])));
+}
+/** The published v1 character factory saved schemaVersion plus its workflowId mirror. */
+export function isPublishedV1CharacterData(data:unknown):boolean{
+ if(!data||typeof data!=='object'||Array.isArray(data))return false;
+ const value=data as Record<string,any>;
+ if(value.guided!==undefined||typeof value.workflowId!=='string'||!z.string().uuid().safeParse(value.workflowId).success)return false;
+ if(value.definitionVersion===1)return value.schemaVersion===undefined||value.schemaVersion===1;
+ return value.definitionVersion===undefined&&value.schemaVersion===1&&['head-body','separate-parts'].includes(String(value.template));
+}
+export const WorkflowDataSchema=z.object({schemaVersion:DomainVersion,definitionVersion:z.literal(2),guided:z.record(z.string(),z.unknown()).refine(value=>value.definitionVersion===2,'Guided workflow payload must declare version 2.'),characterId:Id,template:z.enum(['head-body','separate-parts']),stages:z.array(StageSchema),slots:z.array(z.object({id:Id,stageId:Id,partId:Id.optional(),role:z.string(),kind:z.enum(['reference','model','texture','rig','report']),required:z.boolean(),multiple:z.boolean().default(false),acceptedFormats:z.array(z.string()),artifactIds:z.array(Id).default([])})).default([]),partGroups:z.array(z.object({id:Id,name:z.string(),kind:z.enum(['geometry','material','motion']),partId:Id.optional(),members:z.array(Id).default([])})).default([]),partInventory:z.array(PartInventoryItemSchema).max(128).default([]),updatedAt:z.string()}).passthrough();
+// Published v1 workflows remain readable for archival history only. Keep their
+// bounded opaque stage/slot payloads intact; current writes and v2 validation
+// continue through WorkflowDataSchema.
+export const HistoricalWorkflowDataSchema=z.object({schemaVersion:z.literal(1).optional(),definitionVersion:z.literal(1).optional(),characterId:Id,stages:z.array(z.record(z.string(),z.unknown())).max(8),slots:z.array(z.record(z.string(),z.unknown())).max(10000).optional(),template:z.enum(['head-body','separate-parts']).optional(),updatedAt:z.string().optional()}).passthrough();
 export const OperationDataSchema=z.object({schemaVersion:DomainVersion,assetId:Id,status:z.enum(['running','complete','failed','cancelled','interrupted','editing','pending-review','accepted','rejected']),inputs:z.array(z.string().regex(/^[a-f0-9]{64}$/)),parameters:z.record(z.string(),z.unknown()),toolVersions:z.record(z.string(),z.string()),report:z.record(z.string(),z.unknown()).optional()}).passthrough();
 export const CheckpointDataSchema=z.object({schemaVersion:DomainVersion,assetId:Id,versionId:Id,sourceHash:z.string().regex(/^[a-f0-9]{64}$/),sourceManifest:z.record(z.string(),z.unknown()),manifestHash:z.string().regex(/^[a-f0-9]{64}$/),dependencies:z.array(z.object({hash:z.string().regex(/^[a-f0-9]{64}$/),logicalPath:z.string(),role:z.string().optional()})),createdAt:z.string(),status:z.enum(['verified','missing','corrupt'])}).passthrough();
 export const ExportDataSchema=z.object({schemaVersion:DomainVersion,sourceVersionId:Id,files:z.array(z.object({hash:z.string().regex(/^[a-f0-9]{64}$/),logicalPath:z.string(),role:z.string().optional()})),settings:z.record(z.string(),z.unknown()),createdAt:z.string(),path:z.string().optional(),bytes:z.number().int().nonnegative().optional(),hash:z.string().regex(/^[a-f0-9]{64}$/).optional(),manifestHash:z.string().regex(/^[a-f0-9]{64}$/).optional(),sourceExportId:Id.optional()}).passthrough();
 export const DomainDataSchemas:Partial<Record<string,z.ZodTypeAny>>={task:TaskDataSchema,character:CharacterDataSchema,workflow:WorkflowDataSchema,operation:OperationDataSchema,checkpoint:CheckpointDataSchema,export:ExportDataSchema};
-export function parseDomainData(kind:string,data:Record<string,unknown>){const schema=DomainDataSchemas[kind];if(!schema)return data;return schema.parse(kind==='workflow'||kind==='operation'||kind==='checkpoint'||kind==='export'?data:{schemaVersion:1,...data});}
-export const stagePlan=(characterId:string,template:'head-body'|'separate-parts',inventory:unknown[]=[] )=>{
- const stages=['References','3D Candidates','Segmentation','Materials','Assembly','Rig','Weight Cleanup','Review & Export'];
- const slug=(x:string)=>x.normalize('NFKD').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
- const parts=normalizePartInventory(inventory),roles=template==='head-body'?['head-front','head-left','head-right','head-back','body-front','body-left','body-right','body-back','balance-front','balance-own-right','balance-back'].map(x=>`reference-${x}`):['full-body-front','full-body-back','base-body-front','base-body-back','bald-head-front','bald-head-profile','hair-front','hair-profile','hair-back',...parts.flatMap(item=>item.kind==='garment'?[`clothing-${slug(item.name)}-front`,`clothing-${slug(item.name)}-back`,...item.sideViews.map(view=>`clothing-${slug(item.name)}-${view}`)]:[`accessory-${slug(item.name)}-front`,...item.sideViews.map(view=>`accessory-${slug(item.name)}-${view}`)])].map(x=>`reference-${x}`);
- const keys=stages.map(x=>x.toLowerCase().replaceAll(' ','-').replaceAll('&','and'));
- const outputs=[[],template==='head-body'?['candidate-head','candidate-body']:['candidate-base-body','candidate-bald-head','candidate-hair',...parts.map(x=>`candidate-${slug(x.name)}`)],['segmented-model','segmentation-report'],['material-preview','materialized-model','pbr-materials','pbr-material-report'],['assembled-model','assembly-report'],['rigged-model','rig-report'],['weight-cleaned-model','weight-cleanup-report'],['final-export','final-validation-report']];
- const checks=[['reference-images-decode','reference-slots-complete'],['candidate-model-valid'],['segmentation-manifest-valid'],['pbr-material-manifest-valid'],['assembly-correspondence-proven'],['skeleton-and-actions-valid'],['weight-invariants-valid'],['final-export-valid','source-integrity','dependency-closure','export-bytes-verified']];
- return stages.map((name,index)=>({id:crypto.randomUUID(),key:keys[index],name,required:true,applicable:true,prerequisites:index?[keys[index-1]]:[],requiredSlotRoles:index===0?roles:outputs[index],requiredChecks:checks[index],status:'idle' as const,candidates:[]}));
-};
+export function parseDomainData(kind:string,data:Record<string,unknown>){const schema=kind==='workflow'&&isPublishedV1WorkflowData(data)?HistoricalWorkflowDataSchema:DomainDataSchemas[kind];if(!schema)return data;return schema.parse(kind==='workflow'||kind==='operation'||kind==='checkpoint'||kind==='export'?data:{schemaVersion:1,...data});}
 
 export type AtelierSkill={id:string;path:string;stages:string[];templates:Array<'head-body'|'separate-parts'>;purpose:string;legacyAlias?:boolean};
 const activeAetherFlowSkills:AtelierSkill[]=[

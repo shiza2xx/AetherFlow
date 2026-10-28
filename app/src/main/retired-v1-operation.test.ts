@@ -1,0 +1,15 @@
+import {describe,it,expect} from 'vitest';
+import crypto from 'node:crypto';
+import {hasActiveWorkspaceOperations} from './retired-v1-operation';
+const characterId='10000000-0000-4000-8000-000000000001',workflowId='10000000-0000-4000-8000-000000000002';
+const legacy={id:'old-operation',data:{schemaVersion:1,status:'running',characterId,assetId:'old-asset',inputs:[],parameters:{mode:'old-runner'},toolVersions:{blender:'2.93'}}};
+const stages=['references','3d-candidates','segmentation','materials','assembly','rig','weight-cleanup','review-and-export'].map((key,index)=>({id:crypto.randomUUID(),key,name:key,required:true,applicable:true,prerequisites:index?[['references','3d-candidates','segmentation','materials','assembly','rig','weight-cleanup','review-and-export'][index-1]]:[],requiredSlotRoles:[],requiredChecks:[],status:'idle',candidates:[]}));
+const historicalWorkflow={schemaVersion:1,characterId,template:'head-body',stages,slots:[],partGroups:[],partInventory:[],updatedAt:'2026-10-28T00:00:00.000Z'};
+const entities:any={character:{id:characterId,kind:'character',data:{schemaVersion:1,template:'head-body',description:'published character',partInventory:[],workflowId}},workflow:{id:workflowId,kind:'workflow',data:historicalWorkflow}};
+const get=(kind:'character'|'workflow',id:string)=>entities[kind]?.id===id?entities[kind]:undefined;
+const linked=(character:string,workflow:string)=>character===characterId&&workflow===workflowId;
+describe('retired v1 operation busy classification',()=>{
+ it('resolves the published no-definitionVersion operation through the saved v1 character workflow link',()=>{expect(hasActiveWorkspaceOperations([legacy],get,linked)).toBe(false);expect(hasActiveWorkspaceOperations([{...legacy,data:{...legacy.data,status:'queued',workflowId}}],get,linked)).toBe(false);});
+ it('keeps explicit-v1 compatibility while failing closed for current, unknown, mismatched, or unlinked records',()=>{const explicit={...historicalWorkflow,definitionVersion:1};entities.workflow={id:workflowId,kind:'workflow',data:explicit};entities.character={id:characterId,kind:'character',data:{definitionVersion:1,workflowId}};expect(hasActiveWorkspaceOperations([{...legacy,data:{...legacy.data,workflowId,definitionVersion:1}}],get,linked)).toBe(false);for(const operation of [{...legacy,data:{...legacy.data,definitionVersion:2}},{...legacy,data:{...legacy.data,workflowId:'missing'}},{...legacy,data:{...legacy.data,characterId:'missing'}},{...legacy,data:{status:'running',characterId,workflowId:'missing'}},{id:'unknown',data:{schemaVersion:1,status:'queued',assetId:'unknown'}}])expect(hasActiveWorkspaceOperations([operation],get,linked)).toBe(true);entities.workflow={id:workflowId,kind:'workflow',data:{schemaVersion:1,definitionVersion:2,characterId,guided:{definitionVersion:2}}};expect(hasActiveWorkspaceOperations([{...legacy,data:{...legacy.data,workflowId}}],get,linked)).toBe(true);});
+ it('ignores terminal operation history',()=>expect(hasActiveWorkspaceOperations([{...legacy,data:{...legacy.data,status:'interrupted'}}],get)).toBe(false));
+});

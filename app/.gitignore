@@ -35,7 +35,10 @@
 !/scripts/prepare-nsis-template.mjs
 !/scripts/protect-release-key.ps1
 !/scripts/release-signing.mjs
+!/scripts/release-checksums.mjs
 !/scripts/run-installer-build.ps1
+!/scripts/run-vitest.mjs
+!/scripts/vitest-temp.test.mjs
 !/scripts/setup-container.mjs
 !/scripts/start-screen-process-identity.mjs
 !/scripts/update-launcher.mjs
@@ -148,3 +151,15 @@
 !/src/shared/icon-codec.test.ts
 
 !/scripts/verify-brand-icons.ps1
+
+!/src/main/blender-runtime.test.ts
+!/src/main/generation.test.ts
+!/src/main/guided-workflow.test.ts
+!/src/main/profile-preferences.test.ts
+!/src/main/renderer-rpc-guard.test.ts
+!/src/main/retired-v1-operation.ts
+!/src/main/retired-v1-operation.test.ts
+!/src/main/published-v1-history.test.ts
+!/src/main/mcp-registry-v2.test.ts
+!/src/main/workspace-restore-portable.test.ts
+!/src/renderer/plannerQuery.test.ts
