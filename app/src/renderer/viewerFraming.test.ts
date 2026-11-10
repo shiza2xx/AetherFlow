@@ -16,6 +16,12 @@ describe('source-preserving studio framing',()=>{
   it('keeps orthographic zoom extent when resizing instead of resetting to two world units',()=>{
     const c=new THREE.OrthographicCamera(-200,200,100,-100,.1,10000);c.zoom=1.3;resizeViewerCamera(c,.5);expect(c.left).toBe(-50);expect(c.right).toBe(50);expect(c.top).toBe(100);expect(c.zoom).toBe(1.3);
   });
+  it('updates perspective aspect without changing the user camera position or rotation',()=>{
+    const camera=new THREE.PerspectiveCamera(35,1,.01,100);camera.position.set(2,3,4);camera.rotation.set(.2,.4,.1);
+    const position=camera.position.clone(),rotation=camera.quaternion.clone();
+    resizeViewerCamera(camera,1.8);
+    expect(camera.aspect).toBe(1.8);expect(camera.position.equals(position)).toBe(true);expect(camera.quaternion.equals(rotation)).toBe(true);
+  });
   it('rejects empty and nonfinite bounds',()=>{
     expect(()=>modelFraming(new THREE.Box3(),1)).toThrow();expect(()=>modelFraming(new THREE.Box3(new THREE.Vector3(NaN,0,0),new THREE.Vector3(1,1,1)),1)).toThrow();
   });

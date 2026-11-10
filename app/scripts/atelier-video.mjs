@@ -1,11 +1,12 @@
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { spawn, execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import { fileURLToPath } from 'node:url';
 
-const execFileAsync = promisify(execFile), timeoutMs = 45000, maxBytes = 32 * 1024 * 1024;
+const execFileAsync = promisify(execFile), timeoutMs = 45000, maxBytes = 128 * 1024 * 1024;
 const defaults = { seconds: 5, fps: 30, width: 1920 }, limits = { seconds: 15, fps: 30, width: 1920, canvasPixels: 2073600 };
 const psEncoded = source => Buffer.from(source, 'utf16le').toString('base64');
 function binary(name, override, candidates = []) {
@@ -24,7 +25,7 @@ function absoluteOutput(value) { if (!value || !path.isAbsolute(value)) throw ne
 function rate(value) { const match = /^(\d+)\/(\d+)$/.exec(String(value)); return match && Number(match[2]) ? Number(match[1]) / Number(match[2]) : Number(value); }
 export function validateVideoProbe(document, bytes) {
   const stream = document?.streams?.find(item => item?.codec_type === 'video'), container = document?.format?.format_name || '', width = Number(stream?.width), height = Number(stream?.height), frames = Number(stream?.nb_read_frames), fps = rate(stream?.avg_frame_rate), duration = Number(stream?.duration ?? document?.format?.duration);
-  if (!Number.isSafeInteger(bytes) || bytes < 1 || bytes > maxBytes) throw new Error('Encoded MP4 must be nonempty and no larger than 32 MiB.');
+  if (!Number.isSafeInteger(bytes) || bytes < 1 || bytes > maxBytes) throw new Error('Encoded MP4 must be nonempty and no larger than 128 MiB.');
   if (!container.split(',').includes('mp4') || stream?.codec_name !== 'h264' || stream?.pix_fmt !== 'yuv420p') throw new Error('Encoded video must be H.264 AVC in an MP4 container with yuv420p pixels.');
   if (!Number.isInteger(width) || !Number.isInteger(height) || width < 1 || height < 1 || width > 1920 || height > 1920 || width * height > limits.canvasPixels) throw new Error('Encoded MP4 exceeds the 1920-pixel edge or 2,073,600-pixel canvas limit.');
   if (!Number.isInteger(frames) || frames < 2 || !Number.isFinite(fps) || fps <= 0 || fps > limits.fps || !Number.isFinite(duration) || duration <= 0 || duration > limits.seconds) throw new Error('Encoded MP4 must have at least two decoded frames, at most 30 fps, and a positive duration no longer than 15 seconds.');
@@ -74,12 +75,12 @@ async function transcode({ mode, inputArgs, out, seconds, fps, width, crop, capt
     const frameLimit = Math.floor(seconds * fps), cropFilter = crop ? `crop=${crop.width}:${crop.height}:${crop.x}:${crop.y},` : '', maxHeight = Math.floor(limits.canvasPixels / width);
     const filter = `${cropFilter}fps=${fps},scale=w='min(iw,${width})':h='min(ih,${maxHeight})':force_original_aspect_ratio=decrease:force_divisible_by=2,format=yuv420p`;
     const boundedInput = inputArgs.flatMap(arg => arg === '-i' ? ['-threads', '1', arg] : [arg]);
-    await runFfmpeg([...boundedInput, '-t', String(seconds), '-frames:v', String(frameLimit), '-vf', filter, '-filter_threads', '1', '-threads', '1', '-an', '-c:v', 'libx264', '-preset', 'ultrafast', '-crf', '17', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', '-fs', String(maxBytes), '-y', staged]);
+    await runFfmpeg([...boundedInput, '-t', String(seconds), '-frames:v', String(frameLimit), '-vf', filter, '-filter_threads', '1', '-threads', '1', '-an', '-c:v', 'libx264', '-preset', 'ultrafast', '-crf', '15', '-pix_fmt', 'yuv420p', '-movflags', '+faststart', '-fs', String(maxBytes), '-y', staged]);
     const stat = fs.statSync(staged); let document; try { document = await probeDocument(staged); } catch { throw new Error('FFprobe could not decode the completed MP4 output.'); }
     const facts = validateVideoProbe(document, stat.size), tolerance = Math.max(0.1, 1 / fps);
     if (Math.abs(facts.duration - expectedDuration) > tolerance) throw new Error(`Encoded video duration (${facts.duration.toFixed(3)} s) does not match the available source duration (${expectedDuration.toFixed(3)} s); refusing a partial MP4.`);
     const motionFacts = await motion(staged, facts.width, facts.height, facts.duration); if (requireMotion && !motionFacts.visibleMotion) throw new Error('Encoded MP4 does not pass the visible-motion heuristic.');
-    const receipt = { schemaVersion: 1, output: target, width: facts.width, height: facts.height, frameCount: facts.frames, frameRate: facts.fps, durationSeconds: facts.duration, bytes: facts.bytes, commandMode: mode, ...(crop ? { crop } : {}), ...motionFacts, createdAt: new Date().toISOString() };
+    const receipt = { schemaVersion: 1, output: target, width: facts.width, height: facts.height, frameCount: facts.frames, frameRate: facts.fps, durationSeconds: facts.duration, bytes: facts.bytes, commandMode: mode, ...(captureSize ? { captureSource: { clientWidth: captureSize.width, clientHeight: captureSize.height, crop: crop || null } } : {}), ...(crop ? { crop } : {}), ...motionFacts, createdAt: new Date().toISOString() };
     outputHash = hash(staged); fs.writeFileSync(stagedReceipt, JSON.stringify(receipt, null, 2), { flag: 'wx' }); fs.copyFileSync(staged, target, fs.constants.COPYFILE_EXCL); published = true; fs.copyFileSync(stagedReceipt, receiptPath, fs.constants.COPYFILE_EXCL); publishedReceipt = true; return receipt;
   } catch (error) { if (publishedReceipt) fs.rmSync(receiptPath, { force: true }); if (published && hash(target) === outputHash) fs.rmSync(target, { force: true }); throw error; }
   finally { fs.rmSync(staged, { force: true }); fs.rmSync(stagedReceipt, { force: true }); fs.rmdirSync(stageDir); }

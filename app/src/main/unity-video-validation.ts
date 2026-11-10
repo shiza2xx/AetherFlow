@@ -6,7 +6,7 @@ import { promisify } from 'node:util';
 
 const execFileAsync = promisify(execFile);
 const probeTimeoutMs = 15000;
-const maxVideoBytes = 32 * 1024 * 1024;
+const maxVideoBytes = 128 * 1024 * 1024;
 
 function ffprobePath() {
   const ffmpegOverride = process.env.AETHERFLOW_FFMPEG_PATH || process.env.ATELIER_FFMPEG_PATH;
@@ -28,7 +28,7 @@ function parseRate(value: unknown) {
 export type UnityReportVideoFacts = { width: number; height: number; frameCount: number; frameRate: number; durationMs: number; bytes: number; codec: string; pixelFormat: string; container: string };
 
 export function validateUnityReportVideoProbe(document: any, byteCount: number): UnityReportVideoFacts {
-  if (!Number.isSafeInteger(byteCount) || byteCount < 1 || byteCount > maxVideoBytes) throw new Error('Video evidence must be a nonempty MP4 no larger than 32 MiB.');
+  if (!Number.isSafeInteger(byteCount) || byteCount < 1 || byteCount > maxVideoBytes) throw new Error('Video evidence must be a nonempty MP4 no larger than 128 MiB.');
   const stream = Array.isArray(document?.streams) ? document.streams.find((item: any) => item?.codec_type === 'video') : undefined;
   const format = document?.format;
   const container = typeof format?.format_name === 'string' ? format.format_name : '';
@@ -45,7 +45,7 @@ export function validateUnityReportVideoProbe(document: any, byteCount: number):
 
 export async function validateUnityReportVideo(file: string): Promise<UnityReportVideoFacts> {
   const stat = fs.statSync(file);
-  if (!stat.isFile() || stat.size < 1 || stat.size > maxVideoBytes) throw new Error('Video evidence must be a nonempty MP4 no larger than 32 MiB.');
+  if (!stat.isFile() || stat.size < 1 || stat.size > maxVideoBytes) throw new Error('Video evidence must be a nonempty MP4 no larger than 128 MiB.');
   const args = ['-v', 'error', '-threads', '1', '-count_frames', '-select_streams', 'v:0', '-show_entries', 'stream=codec_type,codec_name,pix_fmt,width,height,avg_frame_rate,nb_read_frames,duration:format=format_name,duration', '-of', 'json', file];
   const { stdout } = await execFileAsync(ffprobePath(), args, { timeout: probeTimeoutMs, windowsHide: true, maxBuffer: 1024 * 1024 });
   let document: unknown;

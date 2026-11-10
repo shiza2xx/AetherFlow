@@ -23,7 +23,7 @@ export function SharedTooltips(){
  },[]);
  useLayoutEffect(()=>{const element=bubble.current;if(!tip||!element)return;const anchor=tip.target.getBoundingClientRect(),rect=element.getBoundingClientRect(),x=Math.max(10,Math.min(anchor.left+anchor.width/2-rect.width/2,window.innerWidth-rect.width-10)),y=anchor.top-rect.height-9>=50?anchor.top-rect.height-9:Math.min(window.innerHeight-rect.height-10,anchor.bottom+9);
   const rail=tip.group.matches('.sidebar,.codex-launcher.is-compact');element.style.left=(rail?Math.min(window.innerWidth-rect.width-10,anchor.right+10):x)+'px';element.style.top=(rail?Math.max(50,Math.min(window.innerHeight-rect.height-10,anchor.top+(anchor.height-rect.height)/2)):y)+'px';const old=previous.current?rect:null,box=element.getBoundingClientRect();previous.current=box;
-  const reduced=document.documentElement.dataset.motion==='reduced'||matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const reduced=document.documentElement.dataset.motion==='reduced';
   if(!tip.keyboard&&!reduced){element.getAnimations().forEach(animation=>animation.cancel());element.animate([{opacity:old?1:0,transform:old?`translate(${old.left-box.left}px,${old.top-box.top}px) scaleX(${old.width/box.width})`:'translateY(3px) scale(.97)'},{opacity:1,transform:'none'}],{duration:125,easing:'cubic-bezier(.23,1,.32,1)'})}
   const described=tip.target.getAttribute('aria-describedby');tip.target.setAttribute('aria-describedby',[described,'aetherflow-shared-tooltip'].filter(Boolean).join(' '));
   return()=>{if(described)tip.target.setAttribute('aria-describedby',described);else tip.target.removeAttribute('aria-describedby')};

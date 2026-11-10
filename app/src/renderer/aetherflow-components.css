@@ -70,7 +70,7 @@ html[data-theme=light] .aetherflow-sky-source{filter:brightness(.86) saturate(.7
 .journey-action-step-content>span[data-state=active]{background:var(--pink-soft);color:var(--pink)}
 .journey-action-step-content>span[data-state=complete]{color:var(--green)}.sound-setting-toggle,.sound-volume-control{display:flex;align-items:center;gap:10px;min-width:190px;justify-content:flex-end;color:var(--text);font-size:12px}.sound-setting-toggle{cursor:pointer}.sound-setting-toggle input{accent-color:var(--pink);width:17px;height:17px}.sound-volume-control input{width:min(180px,22vw);accent-color:var(--pink)}.sound-volume-control span{min-width:38px;text-align:right;color:var(--muted);font-variant-numeric:tabular-nums}
 @media(max-width:1120px){.concept-back,.character-back{padding:11px}.journey-action-stepper{padding:6px}.journey-stepper-source{padding:5px}}
-@media(prefers-reduced-motion:reduce){.aetherflow-tilted .tilted-card__body{transition:none!important}}
+@media(prefers-reduced-motion:reduce){html:not([data-motion=full]) .aetherflow-tilted .tilted-card__body{transition:none!important}}
 
 /* Final readable card surfaces and one consistent row height for the studio grids. */
 .aetherflow-create-tilt{height:300px!important;min-height:300px}.aetherflow-create-tilt .tilted-card__body{height:284px!important}

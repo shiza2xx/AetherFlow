@@ -25,7 +25,7 @@ function write(userData:string,preferences:ProfilePreferences){
 }
 export function loadProfilePreferences(userData:string,workspaceSettings:AppSettings):ProfilePreferences{
  const current=read(userData);if(current)return current;
- const seeded:ProfilePreferences={theme:workspaceSettings.theme,locale:workspaceSettings.locale,motion:workspaceSettings.motion,soundEnabled:workspaceSettings.soundEnabled??DEFAULTS.soundEnabled,soundVolume:workspaceSettings.soundVolume??DEFAULTS.soundVolume};
+ const seeded:ProfilePreferences={theme:workspaceSettings.theme==='light'?'light':DEFAULTS.theme,locale:workspaceSettings.locale==='ru'?'ru':DEFAULTS.locale,motion:workspaceSettings.motion==='reduced'?'reduced':DEFAULTS.motion,soundEnabled:workspaceSettings.soundEnabled??DEFAULTS.soundEnabled,soundVolume:workspaceSettings.soundVolume??DEFAULTS.soundVolume};
  write(userData,seeded);return seeded;
 }
 export function updateProfilePreferences(userData:string,patch:Partial<ProfilePreferences>,workspaceSettings:AppSettings):ProfilePreferences{

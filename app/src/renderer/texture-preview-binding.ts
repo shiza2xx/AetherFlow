@@ -1,5 +1,5 @@
 export type VerifiedTextureBinding={meshName:string;materialName:string;materialSlot:number;imageNodeName:string;imageName?:string;uvSet:string;uvIndex:number;uvDigest:string;displayUvSignature:string};
-export type TexturePreviewProof={materials?:Array<{material:string;maps?:{baseColor?:{image:string;width:number;height:number;decodedPixelHash:string;decoded?:boolean}|null}}>;uv?:Array<{object:string;layers?:string[]}>};
+export type TexturePreviewProof={proxyOutputHash?:string;assetProxyMaterials?:Array<{material:string;maps?:{baseColor?:{image:string;width:number;height:number;decodedPixelHash:string;decoded?:boolean}|null}}>;assetSourceMaterials?:Array<{material:string;maps?:{baseColor?:{image:string;width:number;height:number;decodedPixelHash:string;decoded?:boolean}|null}}>;materials?:Array<{material:string;maps?:{baseColor?:{image:string;width:number;height:number;decodedPixelHash:string;decoded?:boolean}|null}}>;uv?:Array<{object:string;layers?:string[]}>};
 export type TexturePreviewBindingCheck={binding:VerifiedTextureBinding;meshName:string;materialName:string;materialSlot:number;imageName:string;expectedImageName:string;uvAttributePresent:boolean;uvSignature:string;previewId:string;previewHash:string;sourceHash:string;expectedPreviewId:string;expectedPreviewHash:string;expectedSourceHash:string;previewProof?:TexturePreviewProof;imageWidth:number;imageHeight:number;decodedPixelHash:string};
 export const TEXTURE_PREVIEW_BINDING_ERROR_PREFIX='TEXTURE_PREVIEW_BINDING_FAILURE:';
 
@@ -17,12 +17,13 @@ export function texturePreviewBindingErrorMessage(error:string,locale:'en'|'ru')
 export function texturePreviewBindingFailure(input:TexturePreviewBindingCheck):string|null{
  const b=input.binding;
  if(input.meshName!==b.meshName||input.materialName!==b.materialName||input.materialSlot!==b.materialSlot)return 'The displayed mesh, material, or slot does not match the verified source binding.';
- if(input.imageName!==input.expectedImageName)return 'The displayed base-color image name does not match the verified source image.';
+ if(!input.previewProof?.assetSourceMaterials&&input.imageName!==input.expectedImageName)return 'The displayed base-color image name does not match the verified source image.';
  if(!input.uvAttributePresent)return `The displayed model does not contain the verified ${b.uvSet} UV channel.`;
  if(!b.uvDigest||!b.imageNodeName||input.uvSignature!==b.displayUvSignature)return 'The displayed UV coordinates do not match the verified Blender source.';
  if(input.previewId!==input.expectedPreviewId||input.previewHash!==input.expectedPreviewHash||input.sourceHash!==input.expectedSourceHash)return 'The displayed preview identity or source hash does not match the extracted texture targets.';
- const material=input.previewProof?.materials?.find(row=>row.material===b.materialName),image=material?.maps?.baseColor,uv=input.previewProof?.uv?.find(row=>row.object===b.meshName);
+ const material=(input.previewProof?.assetSourceMaterials||input.previewProof?.materials)?.find(row=>row.material===b.materialName),image=material?.maps?.baseColor,uv=input.previewProof?.uv?.find(row=>row.object===b.meshName);
  if(!image)return 'This GLB version has no verified material image proof; choose the matching verified preview version.';
+ if(input.previewProof?.assetSourceMaterials){const proxy=input.previewProof.assetProxyMaterials?.find(row=>row.material===b.materialName)?.maps?.baseColor;if(input.previewProof.proxyOutputHash!==input.previewHash||!proxy||proxy.decoded!==true||proxy.image!==input.imageName||!proxy.decodedPixelHash||Math.max(proxy.width,proxy.height)>1024)return 'The displayed proxy texture does not match the verified GLB export.';if(image.image!==input.expectedImageName||image.width!==input.imageWidth||image.height!==input.imageHeight||image.decodedPixelHash!==input.decodedPixelHash||image.decoded!==true)return 'The verified source image proof does not match the extracted original texture.';if(!uv?.layers?.includes(b.uvSet))return `The verified GLB preview does not prove the ${b.uvSet} channel for ${b.meshName}.`;return null;}
  if(image.image!==input.imageName||image.width!==input.imageWidth||image.height!==input.imageHeight||image.decodedPixelHash!==input.decodedPixelHash||image.decoded!==true)return 'The verified GLB image proof does not match the extracted source image dimensions and pixels.';
  if(!uv?.layers?.includes(b.uvSet))return `The verified GLB preview does not prove the ${b.uvSet} channel for ${b.meshName}.`;
  return null;

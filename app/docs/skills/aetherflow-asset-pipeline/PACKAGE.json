@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "include": [
+    "SKILL.md",
+    "references/composition.md",
+    "references/image-generation.md",
+    "references/depth-generation.md",
+    "references/depth-style-example.png",
+    "references/geometry-and-segmentation.md",
+    "references/materials-and-foliage.md",
+    "references/assembly-and-export.md",
+    "references/verification-and-recovery.md",
+    "scripts/asset_mesh_helpers.py",
+    "scripts/asset_surface.py",
+    "scripts/asset_editable_baseline.py",
+    "scripts/asset_safe_import.py",
+    "scripts/asset_preview.py"
+  ]
+}

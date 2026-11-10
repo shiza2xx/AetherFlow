@@ -149,6 +149,7 @@
 
 !/src/main/window-icon.test.ts
 !/src/shared/icon-codec.test.ts
+!/src/renderer/theme-init.test.ts
 
 !/scripts/verify-brand-icons.ps1
 
@@ -171,3 +172,47 @@
 !/src/main/app-updater.test.ts
 
 !/src/renderer/useSidebarMotion.test.ts
+!/src/main/asset-job-session-persistence.test.ts
+!/src/main/asset-production-mcp.test.ts
+!/src/main/asset-agent-context.test.ts
+!/scripts/mcp-stdio-bridge.test.mjs
+!/src/main/asset-prompt-controller.test.ts
+!/src/main/asset-batch-review.test.ts
+!/src/main/asset-production-depth.test.ts
+!/src/renderer/asset-guidance.test.ts
+!/src/renderer/asset-navigation.test.ts
+!/src/renderer/asset-preview-selection.test.ts
+!/src/shared/asset-prompt.test.ts
+!/src/renderer/asset-slot-candidates.test.ts
+!/src/main/asset-job-lifecycle.test.ts
+!/src/renderer/notification-errors.test.ts
+!/src/main/startup-window.test.ts
+!/src/main/workspace-lock-conflict.test.ts
+!/src/main/asset-photos-export.test.ts
+!/src/main/asset-operations-mcp.test.ts
+!/src/renderer/asset-geometry-flow.test.ts
+!/src/renderer/asset-stage4-presentation.test.ts
+!/src/renderer/asset-validation-copy.test.ts
+!/src/main/asset-return.test.ts
+!/src/main/asset-handoff.test.ts
+!/src/main/asset-stage-migration.test.ts
+!/src/shared/asset-stage-migration.test.ts
+!/src/renderer/asset-model-import-status.test.ts
+!/src/renderer/asset-model-import-copy.test.ts
+
+# Exclude generated QA captures and one-off renderer builds nested under source.
+/src/main/electron-*-qa.mjs
+/src/renderer/qa-dual-viewer.html
+/src/renderer/qa-dual-viewer.tsx
+/src/renderer/qa-typing-followup.tsx
+
+/src/renderer/qa-prepared-model-cache*
+/src/renderer/.out-*/
+/src/renderer/out-*/
+/src/renderer/evidence/
+
+# Keep the relevant, synthetic asset assembly and installer build regressions publishable.
+!/src/renderer/asset-assembly-stage.test.tsx
+!/src/renderer/asset-assembly-status.test.ts
+!/src/renderer/prepared-model-cache.test.ts
+!/scripts/installer-build.test.mjs

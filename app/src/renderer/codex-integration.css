@@ -20,3 +20,8 @@
 .af-start-content:has(>.codex-setup-card){flex:1 0 auto;min-height:auto;justify-content:flex-start}
 .af-start-content>.codex-setup-card{margin-top:20px;flex-shrink:0}
 .af-start:has(.codex-setup-card)>.af-titlebar,.af-start:has(.codex-setup-card)>.af-bottom{flex-shrink:0}
+
+.af-start:not(.af-light) .codex-setup-card button:hover:enabled{border-color:var(--af-line-strong);background:var(--af-raised);color:var(--af-text)}
+.af-start:not(.af-light) .codex-setup-card button.primary-button{border-color:var(--af-accent);background:var(--af-accent);color:var(--af-bg)}
+.af-start:not(.af-light) .codex-setup-card button.primary-button:hover:enabled{border-color:var(--af-accent-strong);background:var(--af-accent-strong);color:var(--af-bg)}
+.af-start:not(.af-light) .codex-setup-card button:focus-visible,.af-start:not(.af-light) .codex-setup-paths summary:focus-visible{outline-color:var(--af-accent)}

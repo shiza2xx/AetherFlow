@@ -1,5 +1,5 @@
 import {ArrowDown,BookOpen,Check,ChevronDown} from 'lucide-react';
-import {useEffect,useState} from 'react';
+import {useEffect,useState,type ReactNode} from 'react';
 import type {Locale} from '../shared/i18n';
 import {guideCopy} from './journeyGuideContent';
 // Supplied React Bits Stepper, scoped to actions within the selected production stage.
@@ -79,7 +79,7 @@ export function getGuideActionCompletion(p:GuideState,actions:string[]):boolean[
  };
  const values=actionsFor[p.stepKey];return Array.from({length:p.stepKey==='receive-materials'?values?.length||0:actions.length},(_,index)=>values?.[index]===true);
 }
-export default function JourneyStepGuide(p:GuideState&{compactOnly?:boolean;manualOnly?:boolean}){
+export default function JourneyStepGuide(p:GuideState&{compactOnly?:boolean;manualOnly?:boolean;stageContent?:ReactNode}){
  const [selectedAction,setSelectedAction]=useState(0),progressSignature=getGuideActionCompletion(p,guideCopy(p.stepKey,p.locale)?.actions||[]).join(',');useEffect(()=>setSelectedAction(0),[p.stepKey,progressSignature]);
  const copy=guideCopy(p.stepKey,p.locale);if(!copy)return null;
  const ru=p.locale==='ru',t=(en:string,rus:string)=>ru?rus:en,next=nextGuideAction(p);
@@ -117,7 +117,7 @@ export default function JourneyStepGuide(p:GuideState&{compactOnly?:boolean;manu
   {!p.manualOnly&&<>
   <div className="journey-action-stepper" data-action-stepper={p.stepKey} aria-label={t('Actions in this stage','Действия текущего этапа')}>
    <StepperSource className="journey-stepper-source journey-action-stepper-source" stepLabel={ru?'Шаг':'Step'} step={focusedAction} initialStep={currentAction} keepLabels onStepChange={setSelectedAction} getStepStatus={(number:number)=>actionState[number-1]||'upcoming'} indicator="numbers" orientation="horizontal" transition="slide" showFooter={false} theme={typeof document!=='undefined'&&document.documentElement.dataset.theme==='light'?'light':'dark'} accentColor="var(--pink)" frame={false} radius={20} width="100%">
-    {actionSteps.map((action,i)=><StepperStep key={`${p.stepKey}-${i}`} title={action.title} description={action.done?t('Requirement met','Требование выполнено'):i+1===currentAction?t('Current action','Текущее действие'):t('Still to do','Ещё предстоит')}><div className="journey-action-step-content">{i+1===focusedAction&&<div className="journey-action-cta"><p>{i+1===currentAction?next.text:action.label}</p><button type="button" className="journey-guide-jump" disabled={p.busy} onClick={event=>jump(focusedTarget,event.currentTarget)}><ArrowDown size={15}/><span>{targetLabel(focusedTarget)}</span></button></div>}</div></StepperStep>)}
+    {actionSteps.map((action,i)=><StepperStep key={`${p.stepKey}-${i}`} title={action.title} description={action.done?t('Requirement met','Требование выполнено'):i+1===currentAction?t('Current action','Текущее действие'):t('Still to do','Ещё предстоит')}><div className="journey-action-step-content">{i+1===focusedAction&&<><div className="journey-action-cta"><p>{i+1===currentAction?next.text:action.label}</p><button type="button" className="journey-guide-jump" disabled={p.busy} onClick={event=>jump(focusedTarget,event.currentTarget)}><ArrowDown size={15}/><span>{targetLabel(focusedTarget)}</span></button></div>{p.stageContent&&<div className="journey-stepper-stage-content">{p.stageContent}</div>}</>}</div></StepperStep>)}
    </StepperSource>
   </div>
   </>}

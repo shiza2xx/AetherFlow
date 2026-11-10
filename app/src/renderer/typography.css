@@ -1,0 +1,23 @@
+@font-face {
+  font-family: 'Obel Mono';
+  src: url('./assets/fonts/obel-mono/ObelMono-VF.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Obel Mono';
+  src: url('./assets/fonts/obel-mono/ObelMono-Italic-VF.woff2') format('woff2');
+  font-style: italic;
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+:root {
+  --font-ui: 'Obel Mono', 'Segoe UI', monospace;
+  --font-mono: 'Obel Mono', 'Cascadia Mono', Consolas, monospace;
+}
+
+/* Masking and alternate letterforms remain opt-in. */
+html { font-feature-settings: 'ss01' 0, 'ss02' 0; }

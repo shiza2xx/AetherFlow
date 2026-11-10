@@ -143,7 +143,7 @@ const TiltedCard = ({
     const body = bodyRef.current;
     if (!figure || !body) return;
 
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const reduced = document.documentElement.dataset.motion === 'reduced';
     const coarse = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
     const state = {
       rx: 0,

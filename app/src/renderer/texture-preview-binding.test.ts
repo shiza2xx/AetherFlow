@@ -31,3 +31,7 @@ describe('source-to-preview material and UV binding',()=>{
   expect(texturePreviewBindingFailure({...valid,previewId:'foreign-preview'})).toMatch(/identity or source hash/i);
  });
 });
+
+it('binds separately audited original and proxy images without pretending their hashes are equal',()=>{
+ const valid=check(captured[0]),source=proof.materials[0],proxy={material:source.material,maps:{baseColor:{image:'proxy-image',width:1024,height:1024,decodedPixelHash:'a'.repeat(64),decoded:true}}},previewProof={assetSourceMaterials:[source],assetProxyMaterials:[proxy],proxyOutputHash:viewerHash,uv:proof.uv},asset={...valid,imageName:'proxy-image',previewProof};expect(texturePreviewBindingFailure(asset)).toBeNull();expect(texturePreviewBindingFailure({...asset,decodedPixelHash:'f'.repeat(64)})).toMatch(/source image proof/i);expect(texturePreviewBindingFailure({...asset,previewProof:{...previewProof,proxyOutputHash:'b'.repeat(64)}})).toMatch(/proxy texture/i);expect(texturePreviewBindingFailure({...asset,previewProof:{...previewProof,assetProxyMaterials:[{...proxy,maps:{baseColor:{...proxy.maps.baseColor,width:2048}}}]}})).toMatch(/proxy texture/i);
+});

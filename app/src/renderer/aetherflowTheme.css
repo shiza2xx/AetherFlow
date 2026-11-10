@@ -1,0 +1,474 @@
+/* AetherFlow's workbench uses quiet surfaces; artwork and model materials stay
+   responsible for the color that belongs to the work itself. */
+:root {
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 32px;
+  --radius-control: 8px;
+  --radius-inset: 8px;
+  --radius-panel: 12px;
+  --radius-overlay: 16px;
+  --ease-ui: cubic-bezier(.22, 1, .36, 1);
+  --duration-press: 140ms;
+  --duration-overlay: 180ms;
+  --border: var(--line);
+  --success: var(--green);
+  --danger: var(--error);
+  --text-muted: var(--muted);
+}
+
+html:not([data-theme="light"]) {
+  color-scheme: dark;
+  --bg: #0d0d0d;
+  --panel: #151515;
+  --raised: #1e1e1e;
+  --raised-2: #292929;
+  --line: #333333;
+  --line-strong: #4a4a4a;
+  --text: #eeeeee;
+  --muted: #b5b5b5;
+  --dim: #898989;
+  --pink: #d1d1d1;
+  --pink-strong: #e0e0e0;
+  --pink-soft: #292929;
+  --primary-text: #111111;
+  --green: #73c9a1;
+  --green-soft: #1c332c;
+  --error: #e07a7a;
+  --amber: #d7b273;
+  --amber-soft: #30291e;
+  --shadow: 0 18px 50px #00000070;
+  --studio-ink: #0d0d0d;
+  --studio-plum: #151515;
+  --studio-raised: #1e1e1e;
+  --studio-border: #333333;
+  --studio-rose: #d1d1d1;
+  --studio-text: #eeeeee;
+  --studio-muted: #b5b5b5;
+  --surface-rim: #ffffff08;
+  --elevation-control: inset 0 1px 0 #ffffff08, 0 1px 2px #00000040;
+  --elevation-menu: 0 2px 6px #00000045, 0 12px 28px #00000065;
+  --elevation-floating: 0 4px 8px #00000040, 0 20px 52px #00000070;
+}
+
+html[data-theme="light"] {
+  --dim: #586e86;
+  --pink: #216da9;
+  --pink-strong: #1765aa;
+  --border: var(--line);
+  --success: var(--green);
+  --danger: var(--error);
+  --text-muted: var(--muted);
+}
+
+body {
+  letter-spacing: 0;
+}
+
+/* Main studio, dashboard pages, and overlays use opaque, neutral materials. */
+.studio-shell {
+  background: var(--bg) !important;
+  background-image: none !important;
+}
+
+.studio-shell .aetherflow-sky-source {
+  display: none !important;
+}
+
+.studio-shell .main-area {
+  background: var(--bg) !important;
+  background-image: none !important;
+}
+
+.studio-shell .main-area > .topline {
+  background: var(--panel) !important;
+  background-image: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.studio-shell .page-content {
+  padding: 24px 28px 32px;
+}
+
+.studio-shell .main-area :is(.dashboard-header p, .page-heading p) {
+  font-size: 13px;
+  line-height: 20px;
+}
+
+.studio-shell :is(.dashboard-header h1, .page-heading h1) {
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.studio-shell .main-area :is(.section-title h2, .settings-section h2, .journey-heading h2) {
+  font-weight: 600;
+}
+
+.studio-shell .sidebar {
+  padding-inline: 12px;
+}
+
+.studio-shell .sidebar nav {
+  gap: 4px;
+}
+
+.studio-shell .sidebar .nav-item {
+  height: 36px;
+  min-height: 36px;
+  padding-inline: 12px;
+  gap: 8px;
+  border-radius: 8px;
+  font-weight: 500;
+}
+
+.studio-shell .sidebar .nav-item > svg {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+}
+
+.studio-shell :is(.primary-button, .subtle-button) {
+  min-height: 36px;
+  height: auto;
+  padding: 8px 12px;
+  border-radius: var(--radius-control);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.studio-shell .icon-button {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-inset);
+}
+
+.studio-shell .text-button {
+  min-height: 32px;
+  font-size: 13px;
+}
+
+.studio-shell .main-area :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]), textarea, select),
+.studio-shell .overlay :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]), textarea, select),
+.studio-shell .modal-overlay :is(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]), textarea, select) {
+  border-radius: 8px;
+  color: var(--text);
+}
+
+.studio-shell :is(input, textarea, select)::placeholder {
+  color: var(--dim);
+  opacity: 1;
+}
+
+.studio-shell :is(input, textarea, select):focus-visible,
+.studio-shell button:focus-visible,
+.studio-shell [role="button"]:focus-visible,
+.studio-shell [role="tab"]:focus-visible {
+  outline: 2px solid var(--pink);
+  outline-offset: 3px;
+}
+
+.studio-shell :is(.studio-next, .urd-summary, .journey-step-guide, .journey-action-stepper, .journey-source-populated-hint, .codex-dock-title) {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.studio-shell .main-area :is(.studio-next, .journey-step-guide) {
+  background: var(--panel) !important;
+  background-image: none !important;
+}
+
+/* Keep the guide and Stepper corner chain coherent without flattening its tabs.
+   Guide: 24px outer radius − 12px padding − 1px border = 11px track.
+   Track: 11px − 4px padding − 1px border = 6px inner tabs and active glider. */
+.studio-shell .guided-character-editor .journey-step-guide {
+  --aetherflow-step-guide-radius: 24px;
+  border-radius: var(--aetherflow-step-guide-radius);
+}
+
+.studio-shell .guided-character-editor .journey-step-guide .journey-stepper-source .stepper__track {
+  --stepper-well-radius: calc(var(--aetherflow-step-guide-radius) - 12px - 1px);
+  --stepper-tile-radius: calc(var(--stepper-well-radius) - 4px - 1px);
+  border-radius: var(--stepper-well-radius);
+}
+
+.studio-shell .guided-character-editor .journey-step-guide .journey-stepper-source :is(.stepper__segment, .stepper__glider) {
+  border-radius: var(--stepper-tile-radius);
+}
+
+/* Allow multi-line step labels to determine the row height at every window size. */
+.studio-shell :is(.guided-character-editor, .asset-studio) .journey-stepper-source .stepper__track {
+  box-sizing: border-box;
+  max-width: 100%;
+}
+.studio-shell .main-area .asset-studio .asset-stage-guide .journey-stepper-source {
+  box-sizing: border-box;
+  padding: 6px !important;
+}
+html[data-theme] .studio-shell .guided-character-editor .journey-step-guide .journey-stepper-source .stepper__segment,
+html[data-theme] .studio-shell .main-area .asset-studio .asset-stage-guide .journey-stepper-source .stepper__segment {
+  box-sizing: border-box;
+  height: auto !important;
+  min-height: 44px !important;
+  padding: 8px !important;
+  align-self: stretch;
+}
+.studio-shell :is(.guided-character-editor, .asset-studio) .journey-stepper-source .stepper__segment:focus-visible {
+  outline-offset: -2px;
+}
+html[data-theme] .studio-shell .guided-character-editor .journey-step-guide .journey-stepper-source .stepper__title,
+html[data-theme] .studio-shell .main-area .asset-studio .asset-stage-guide .journey-stepper-source .stepper__title {
+  overflow: visible !important;
+  white-space: normal !important;
+  overflow-wrap: anywhere;
+  line-height: 1.35 !important;
+}
+
+/* The project menu panel is 12px with 6px padding and a 1px hairline. */
+.studio-shell .main-area .menu-select-popover button {
+  border-radius: max(0px, calc(var(--radius-panel) - 6px - 1px));
+}
+
+/* Character route options sit 6px inside a 12px menu with a 1px border. */
+.studio-shell .guided-character-editor .journey-route > button {
+  border-radius: max(0px, calc(var(--radius-panel) - 6px - 1px));
+}
+
+.studio-shell .guided-character-editor .journey-step-guide > .journey-guide-glass,
+.studio-shell .aetherflow-tilted .tilted-card-glass,
+.studio-shell .aetherflow-glass-button > .button-glass-layer {
+  display: none !important;
+}
+
+.studio-shell .main-area .journey-action-stepper {
+  background: var(--raised);
+  border-color: var(--line);
+}
+
+html:not([data-theme="light"]) .studio-shell .journey-stepper-source {
+  --stepper-solid: var(--pink) !important;
+  --stepper-solid-ink: var(--primary-text) !important;
+  --stepper-tile: var(--raised-2) !important;
+  --stepper-tile-edge: var(--line-strong) !important;
+  --stepper-tile-highlight: #ffffff0d !important;
+  --stepper-tile-shadow: none !important;
+  --stepper-ink: var(--text) !important;
+  --stepper-muted: var(--muted) !important;
+}
+
+.studio-shell .main-area :is(.aetherflow-glass, .glass-surface) {
+  background: var(--panel) !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.studio-shell .main-area :is(.concept-back .tile-actions button:not(.pink-text):not(.primary-button), .character-back > button:not(.primary-button)) {
+  background: var(--raised) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.studio-shell .main-area .character-back > .primary-button.aetherflow-glass-button {
+  text-shadow: none;
+  box-shadow: var(--elevation-control);
+}
+
+.studio-shell .main-area .border-glow::after {
+  display: none !important;
+}
+
+.studio-shell :is(.brand-mark, .project-avatar)::before,
+.studio-shell .brand-mark {
+  border-color: var(--line-strong) !important;
+  background-color: var(--raised) !important;
+  box-shadow: none !important;
+}
+
+.studio-shell .brand-mark {
+  background-image: none !important;
+}
+
+.studio-shell :is(.brand-mark, .project-avatar)::before {
+  background-image: url("./assets/aetherflow-dark.png") !important;
+}
+
+html[data-theme="light"] .studio-shell .project-avatar::before {
+  background-image: url("./assets/aetherflow-light.png") !important;
+}
+
+.studio-shell .main-area :is(.notebook-concealed, .notebook-page) {
+  background: var(--panel) !important;
+  background-image: none !important;
+}
+
+.studio-shell .main-area .notebook-confirm-scrim {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.studio-shell .main-area .notebook-paper {
+  background: var(--raised) !important;
+  background-image: none !important;
+}
+
+.studio-shell .shared-tool-tip,
+.studio-shell .codex-dock-title {
+  background: var(--raised-2) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+html:not([data-theme="light"]) .studio-shell .main-area .codex-setup-card button.primary-button {
+  background: var(--pink) !important;
+  border-color: var(--pink) !important;
+  color: var(--primary-text) !important;
+}
+
+html:not([data-theme="light"]) .studio-shell .main-area .codex-setup-card button.primary-button:hover:enabled {
+  background: var(--pink-strong) !important;
+  border-color: var(--pink-strong) !important;
+}
+
+.studio-shell .main-area .asset-studio button.primary,
+.studio-shell .main-area .asset-studio button.primary-button {
+  color: var(--primary-text) !important;
+  min-height: 40px;
+}
+
+/* Asset primary actions must change their background together with their ink. */
+.studio-shell .main-area .asset-studio button.primary:not(:disabled) {
+  background: var(--pink) !important;
+  border-color: var(--pink) !important;
+  color: var(--primary-text) !important;
+}
+.studio-shell .main-area .asset-studio button.primary:not(:disabled):is(:hover, :active) {
+  background: var(--pink-strong) !important;
+  border-color: var(--pink-strong) !important;
+  color: var(--primary-text) !important;
+}
+html[data-theme] .studio-shell .main-area .asset-studio :is(button.primary, button.primary-button, button.journey-guide-jump):not(:disabled):is(:hover, :active),
+html[data-theme] .studio-shell .main-area .asset-studio :is(button.primary, button.primary-button, button.journey-guide-jump):not(:disabled):is(:hover, :active) .glass-button-label {
+  color: var(--primary-text) !important;
+}
+
+.studio-shell .main-area .asset-studio :is(button.primary, button.primary-button):disabled {
+  border-color: var(--line-strong) !important;
+  background: var(--raised) !important;
+  color: var(--muted) !important;
+  opacity: 1;
+}
+
+html:not([data-theme="light"]) .studio-shell .main-area .atelier-model-viewer .viewer-stage {
+  background: var(--bg);
+}
+
+html:not([data-theme="light"]) .studio-shell .urd-video-pair-pane :is(.urd-video-stage, .urd-video-stage > video) {
+  background-color: var(--bg) !important;
+}
+
+html[data-theme="light"] .studio-shell .main-area .urd-video-pair-pane .urd-video-stage {
+  --text: #f2f5f9;
+  --muted: #c2ccdb;
+}
+
+html[data-theme="light"] .studio-shell .main-area .urd-video-pair-pane .urd-video-stage .urd-empty > .subtle-button {
+  --text: #172a42;
+}
+
+html:not([data-theme="light"]) .studio-shell .main-area .texture-repair-backdrop {
+  background: color-mix(in srgb, var(--bg) 84%, transparent);
+}
+
+/* The workspace chooser keeps its orbit and real logo; only the chrome is
+   flattened and the labels are brought up to interface size. */
+.af-start:not(.af-light) {
+  --af-bg: #0d0d0d;
+  --af-panel: #151515;
+  --af-raised: #1e1e1e;
+  --af-line: #333333;
+  --af-line-strong: #4a4a4a;
+  --af-text: #eeeeee;
+  --af-muted: #b5b5b5;
+  --af-dim: #898989;
+  --af-accent: #d1d1d1;
+  --af-accent-strong: #e0e0e0;
+  --af-error: #e07a7a;
+  letter-spacing: 0;
+}
+
+.af-start.af-light {
+  --af-dim: #586e86;
+  --af-accent: #216da9;
+  --af-accent-strong: #1765aa;
+}
+
+.af-start:not(.af-light) .af-logo-frame,
+.af-start:not(.af-light) .af-hero-logo-frame {
+  background: var(--af-raised);
+  box-shadow: none;
+}
+
+.af-start:not(.af-light) .af-project-panel {
+  border-color: var(--af-line);
+  border-radius: 16px;
+  box-shadow: 0 12px 28px #00000050;
+}
+
+.af-start:not(.af-light) .af-hero-logo-frame {
+  border-color: var(--af-line-strong);
+  border-radius: 20px;
+}
+
+.af-start .af-panel-head > div:first-child > p,
+.af-start .af-card-top {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+}
+
+.af-start .af-panel-head small,
+.af-start .af-project-card > button:first-child > small,
+.af-start .af-create-card small {
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.af-start .af-panel-actions button,
+.af-start .af-empty button {
+  min-height: 36px;
+  height: auto;
+  font-size: 13px;
+}
+
+.af-start .af-modal label,
+.af-start .af-modal > header small,
+.af-start .af-modal form > p:not(.af-error),
+.af-start .af-modal form > footer button,
+.af-start .af-confirm > footer button {
+  font-size: 12px;
+  letter-spacing: 0;
+}
+
+.af-start:not(.af-light) .af-modal-backdrop {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+@media (max-width: 1300px) {
+  .studio-shell .page-content {
+    padding: 24px !important;
+  }
+}
+
+@media (max-width: 1050px) {
+  .studio-shell .page-content {
+    padding: 20px 16px 28px !important;
+  }
+}

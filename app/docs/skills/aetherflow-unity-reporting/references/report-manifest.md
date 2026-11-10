@@ -50,7 +50,7 @@ The app imports each clip sequentially after preflighting the complete report. A
 
 Legacy `video` and `gif` requests remain supported with their original validation and idempotency behavior. A single legacy `videoArtifactId` is displayed only as After, with Before missing. It never provides a baseline, and cannot override an explicitly missing canonical After. Do not mix legacy and paired video roles in new manifests.
 
-Images must decode correctly, retaining their original bytes. MP4 must contain H.264/yuv420p, at least2 decoded frames, positive duration up to15seconds, up to30fps,1920px maximum edge and2,073,600canvaspixels. Maximum32MiB per file. Sources are copied into managed storage and assigned to named roles; keep originals until publication succeeds. Metadata and playback must both pass; no multi-second stalls.
+Images must decode correctly, retaining their original bytes. MP4 must contain H.264/yuv420p, at least2 decoded frames, positive duration up to15seconds, up to30fps,1920px maximum edge and2,073,600canvaspixels. MP4 files may be up to128MiB; other evidence files remain limited to32MiB. Sources are copied into managed storage and assigned to named roles; keep originals until publication succeeds. Metadata and playback must both pass; no multi-second stalls.
 
 An exact retry with the same key returns the same report. Reusing that key with changed content is an error; publish a genuine follow-up with a new key. An offline attempt leaves the original manifest for retry. A completed report does not alter task progress or grant human acceptance.
 

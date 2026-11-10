@@ -12,6 +12,34 @@ function httpStatus(error) {
   return undefined;
 }
 
+function startupTransient(error) {
+  if (httpStatus(error) !== undefined) return false;
+  for (let current = error, depth = 0; current && depth < 8; current = current.cause, depth++) {
+    if (['MCP_TOKEN_NOT_READY', 'ECONNREFUSED', 'ECONNRESET', 'EPIPE', 'UND_ERR_SOCKET'].includes(String(current.code || ''))) return true;
+  }
+  return false;
+}
+
+// Startup may race token publication or the loopback listener. Never retry auth,
+// configuration or protocol errors, and do not replay mutations here.
+export async function waitForMcpStartup(bridge, { timeoutMs = 5000, intervalMs = 250, now = () => Date.now(), signal, sleep = (ms, signal) => new Promise((resolve, reject) => {
+  if (signal?.aborted) return reject(signal.reason || new Error('MCP startup cancelled.'));
+  const timer = setTimeout(() => { signal?.removeEventListener('abort', cancel); resolve(); }, ms);
+  const cancel = () => { clearTimeout(timer); reject(signal.reason || new Error('MCP startup cancelled.')); };
+  signal?.addEventListener('abort', cancel, { once: true });
+}) } = {}) {
+  const deadline = now() + timeoutMs;
+  while (true) {
+    if (signal?.aborted) throw signal.reason || new Error('MCP startup cancelled.');
+    try { return await bridge.listTools(); }
+    catch (error) {
+      const remaining = deadline - now();
+      if (!startupTransient(error) || remaining <= 0) throw error;
+      await sleep(Math.min(intervalMs, remaining), signal);
+    }
+  }
+}
+
 function canSafelyRetry(error, toolName, safeReads) {
   if (httpStatus(error) === 401) return true;
   if (!safeReads.has(toolName)) return false;

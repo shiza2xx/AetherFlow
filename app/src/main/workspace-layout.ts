@@ -6,7 +6,7 @@ import type {Entity} from '../shared/contracts';
 import {isPathWithin} from './path-containment';
 
 export const STORAGE_LAYOUT_VERSION=1;
-export type StorageOwner={kind:'character'|'project';id:string;name:string};
+export type StorageOwner={kind:'character'|'project'|'assetJob';id:string;name:string};
 const uuid=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 export function safeStorageName(value:string,fallback='file'){
@@ -25,10 +25,11 @@ export function workspaceLayout(root:string){
  };
  const ownerRoot=(owner:StorageOwner)=>{
   if(!uuid.test(owner.id))throw new Error('Storage owner id is invalid.');
-  return assertSafe(path.join(workspace,'work',owner.kind==='character'?'characters':'projects',owner.id));
+  return assertSafe(path.join(workspace,'work',owner.kind==='character'?'characters':owner.kind==='assetJob'?'assets':'projects',owner.id));
  };
  const character=(id:string,name='Character')=>ownerRoot({kind:'character',id,name});
  const project=(id:string,name='Project')=>ownerRoot({kind:'project',id,name});
+ const assetJob=(id:string,name='Asset job')=>ownerRoot({kind:'assetJob',id,name});
  const internal=(owner:StorageOwner)=>assertSafe(path.join(ownerRoot(owner),'.aetherflow'));
  const run=(owner:StorageOwner,operationId:string)=>{
   if(!uuid.test(operationId))throw new Error('Storage operation id is invalid.');
@@ -46,7 +47,7 @@ export function workspaceLayout(root:string){
   if(!isPathWithin(workspace,result))throw new Error('Storage path escapes this workspace.');
   return assertSafe(result);
  };
- return {version:STORAGE_LAYOUT_VERSION,workspace,ownerRoot,character,project,internal,run,triageRun,category,stage,resolve};
+ return {version:STORAGE_LAYOUT_VERSION,workspace,ownerRoot,character,project,assetJob,internal,run,triageRun,category,stage,resolve};
 }
 
 export function productionOutputDirectory(root:string,characterId:string,stageName:string){
@@ -59,13 +60,14 @@ export function productionOutputDirectory(root:string,characterId:string,stageNa
 }
 export function ownerForArtifact(store:AtelierStore,artifact:Entity):StorageOwner|null{
  const owners=new Map<string,StorageOwner>(),visited=new Set<string>(),pending=[artifact.id];let ambiguous=false;
- const addOwner=(kind:'character'|'project',id:unknown)=>{if(typeof id!=='string')return;const entity=store.get(kind,id);if(!entity){ambiguous=true;return;}owners.set(`${kind}:${id}`,{kind,id,name:entity.name});};
+ const addOwner=(kind:'character'|'project'|'assetJob',id:unknown)=>{if(typeof id!=='string')return;const entity=store.get(kind,id);if(!entity){ambiguous=true;return;}owners.set(`${kind}:${id}`,{kind,id,name:entity.name});};
  const lineageKeys=['parentId','parentArtifactId','sourceParentId','sourceVersionId','versionOf','derivedFrom','derivedFromArtifactId','sourceArtifactId','originalArtifactId','previousVersionId'];
  while(pending.length){const id=pending.pop()!;if(visited.has(id))continue;visited.add(id);const item=store.get('artifact',id);if(!item){ambiguous=true;continue;}
+  if(item.data.assetJobId!==undefined)addOwner('assetJob',item.data.assetJobId);if(item.data.parentId){const parent=store.getAny(String(item.data.parentId));if(parent?.kind==='assetJob')addOwner('assetJob',parent.id);if(parent?.kind==='assetItem')addOwner('assetJob',parent.data.jobId);}
   if(item.data.characterId!==undefined)addOwner('character',item.data.characterId);if(item.data.projectId!==undefined)addOwner('project',item.data.projectId);
   for(const key of lineageKeys){const value=item.data[key];if(typeof value==='string'&&store.get('artifact',value))pending.push(value);}
   const provenance=item.data.provenance;if(provenance&&typeof provenance==='object'&&!Array.isArray(provenance)){for(const key of ['artifactId','sourceArtifactId','sourceVersionId','parentArtifactId']){const value=(provenance as any)[key];if(typeof value==='string'&&store.get('artifact',value))pending.push(value);}}
-  for(const link of store.links(id)){const other=store.getAny(link.from_id===id?link.to_id:link.from_id);if(other?.kind==='character')addOwner('character',other.id);else if(other?.kind==='project')addOwner('project',other.id);else if(other?.kind==='artifact')pending.push(other.id);}
+  for(const link of store.links(id)){const other=store.getAny(link.from_id===id?link.to_id:link.from_id);if(other?.kind==='assetJob')addOwner('assetJob',other.id);else if(other?.kind==='assetItem')addOwner('assetJob',other.data.jobId);else if(other?.kind==='character')addOwner('character',other.id);else if(other?.kind==='project')addOwner('project',other.id);else if(other?.kind==='artifact')pending.push(other.id);}
  }
  if(ambiguous||owners.size!==1)return null;return [...owners.values()][0];
 }
@@ -74,7 +76,7 @@ export function operationWorkspace(store:AtelierStore,operationId:string,artifac
  const layout=workspaceLayout(store.root),owners=new Map<string,StorageOwner>();
  for(const link of store.links(operationId)){const related=store.getAny(link.from_id===operationId?link.to_id:link.from_id);if(related?.kind==='artifact'){const owner=ownerForArtifact(store,related);if(owner)owners.set(`${owner.kind}:${owner.id}`,owner);}}
  for(const id of artifactIds){const artifact=store.get('artifact',id);if(!artifact)continue;const owner=ownerForArtifact(store,artifact);if(owner)owners.set(`${owner.kind}:${owner.id}`,owner);}
- const operation=store.get('operation',operationId),ownerId=String(operation?.data.characterId||operation?.data.projectId||'');
+ const operation=store.get('operation',operationId),assetJobId=String(operation?.data.assetJobId||''),ownerId=String(operation?.data.characterId||operation?.data.projectId||'');if(assetJobId){const job=store.get('assetJob',assetJobId);if(job)owners.set(`assetJob:${job.id}`,{kind:'assetJob',id:job.id,name:job.name});}
  const operationAssetId=String(operation?.data.assetId||'');if(operationAssetId){const artifact=store.get('artifact',operationAssetId),owner=artifact&&ownerForArtifact(store,artifact);if(owner)owners.set(`${owner.kind}:${owner.id}`,owner);}
  if(ownerId){const character=store.get('character',ownerId),project=store.get('project',ownerId),entity=character||project;if(entity)owners.set(`${entity.kind}:${entity.id}`,{kind:entity.kind as 'character'|'project',id:entity.id,name:entity.name});}
  if(owners.size===1)return layout.run([...owners.values()][0],operationId);

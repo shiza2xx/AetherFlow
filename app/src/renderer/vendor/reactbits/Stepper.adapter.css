@@ -422,9 +422,9 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .journey-stepper-source .stepper__bar-fill,
-  .journey-stepper-source .stepper__dot-mark,
-  .journey-stepper-source .stepper__footer-wrap {
+  html:not([data-motion="full"]) .journey-stepper-source .stepper__bar-fill,
+  html:not([data-motion="full"]) .journey-stepper-source .stepper__dot-mark,
+  html:not([data-motion="full"]) .journey-stepper-source .stepper__footer-wrap {
     transition-duration: 0.01ms;
   }
 }

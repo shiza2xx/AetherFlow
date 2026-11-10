@@ -1,6 +1,32 @@
 # Third-party visual reference notices
 
-The interface includes hand-authored visual adaptations of the public examples below. No source package, photo or brand asset is redistributed.
+The interface includes the visual adaptations and third-party components described below.
+
+## useAnimations
+
+Selected animated interface icons use `react-useanimations`, distributed under the MIT license. Its copyright and permission notice are preserved in [docs/licenses/useanimations-MIT.txt](docs/licenses/useanimations-MIT.txt).
+
+MIT License
+
+Copyright (c) 2018-2026 useAnimations (https://useanimations.com)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 
 ## Bencho Eye Tracker
 
@@ -93,3 +119,10 @@ Original license, source notices and the author's English translation are preser
 ## Sonner
 
 The application uses Sonner for update and import notifications. Sonner is distributed under the MIT license; its license is included with the installed dependency.
+
+
+## Obel Mono
+
+The interface and embedded terminal bundle the unmodified Obel Mono 1.000 variable WOFF2 fonts (Roman and Italic), from Typographic Systems: https://typographic.systems/obel-mono.
+
+Copyright 2026 The Obel Mono Project Authors. Licensed under SIL Open Font License 1.1; the original license and author notice are preserved in [docs/licenses/obel-mono](docs/licenses/obel-mono/OFL.txt).

@@ -15,6 +15,7 @@ function target(options:{event?:string;nav?:boolean;button?:boolean;label?:strin
 
 describe('semantic studio sound events',()=>{
  it('prioritizes named events, then navigation, then button feedback',()=>{
+  expect(soundForActivation(target({event:'silent',nav:true,button:true}))).toBeNull();
   expect(soundForActivation(target({event:'drawer',nav:true,button:true}))).toBe('drawer');
   expect(soundForActivation(target({nav:true,button:true}))).toBe('pluck');
   expect(soundForActivation(target({button:true,label:'Delete concept'}))).toBe('drawer');

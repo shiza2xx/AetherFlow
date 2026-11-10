@@ -26,7 +26,7 @@ button:focus-visible,[role=separator]:focus-visible{outline:2px solid var(--pink
 .language-choice>button:disabled{opacity:.55;cursor:wait}
 .sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
 [data-sonner-toaster]{z-index:var(--layer-toast)!important;font-family:inherit!important}
-.update-toast{display:flex;align-items:flex-start;gap:12px;width:min(410px,calc(100vw - 36px));padding:18px 42px 18px 16px;background:var(--panel);color:var(--text);border:1px solid var(--line-strong);border-radius:var(--radius-panel);box-shadow:var(--elevation-floating);position:relative;font-family:'Manrope Variable','Segoe UI',sans-serif;font-size:13px}
+.update-toast{display:flex;align-items:flex-start;gap:12px;width:min(410px,calc(100vw - 36px));padding:18px 42px 18px 16px;background:var(--panel);color:var(--text);border:1px solid var(--line-strong);border-radius:var(--radius-panel);box-shadow:var(--elevation-floating);position:relative;font-family:'Obel Mono','Segoe UI',monospace;font-size:13px}
 .update-toast-icon{display:grid;place-items:center;flex:none;width:34px;height:34px;border-radius:10px;background:var(--pink-soft);color:var(--pink)}
 .update-toast-copy{flex:1;min-width:0}.update-toast-copy>strong{display:block;font-size:13px;font-weight:750;line-height:1.5}.update-toast-copy p{margin:6px 0 0;font-size:12px;line-height:1.65;color:var(--muted)}.update-toast-copy small{display:block;margin-top:6px;font-size:11px;color:var(--muted)}
 .update-toast-actions{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:12px}.update-toast-actions:empty{display:none}
@@ -41,14 +41,14 @@ button:focus-visible,[role=separator]:focus-visible{outline:2px solid var(--pink
 @media(hover:hover) and (pointer:fine){:is(.primary-button,.subtle-button,.icon-button,.codex-launcher,.codex-icon-button):hover:enabled{transition-duration:0ms}.language-choice>button:hover{background:var(--pink-soft);border-color:var(--pink)}:is(.primary-button,.subtle-button,.icon-button,.codex-launcher,.codex-icon-button,.language-choice>button):active:enabled{transform:scale(.98)}}
 @keyframes ui-activity-dot{0%,60%,100%{opacity:.35;transform:translateY(0)}30%{opacity:1;transform:translateY(-2px)}}
 @keyframes ui-progress-sweep{from{transform:translateX(-110%)}to{transform:translateX(440%)}}
-@media(prefers-reduced-motion:reduce){.activity-dots>i,.update-transfer-track>i.indeterminate{animation:none}.shared-tool-tip,.language-choice>button,.codex-floating-panel{transition:none!important}}
+@media(prefers-reduced-motion:reduce){html:not([data-motion=full]) .activity-dots>i,html:not([data-motion=full]) .update-transfer-track>i.indeterminate{animation:none}html:not([data-motion=full]) :is(.shared-tool-tip,.language-choice>button,.codex-floating-panel){transition:none!important}}
 html[data-motion=reduced] .activity-dots>i,html[data-motion=reduced] .update-transfer-track>i.indeterminate{animation:none}
 
 .atelier-model-viewer .viewer-loading{display:grid;place-content:center;justify-items:center;gap:16px;background:var(--bg);backdrop-filter:none;color:var(--muted);font-size:13px}
 .preview-skeleton{position:relative;display:grid;place-items:center;width:180px;height:120px;overflow:hidden;isolation:isolate;border:1px solid var(--line);border-radius:var(--radius-panel);background:var(--raised);color:var(--dim)}
 .preview-skeleton>i{position:absolute;inset:-20% -45%;background:linear-gradient(105deg,transparent 32%,color-mix(in srgb,var(--text) 8%,transparent) 50%,transparent 68%);animation:preview-shimmer 1.5s linear infinite;pointer-events:none}
 @keyframes preview-shimmer{from{transform:translateX(-60%)}to{transform:translateX(60%)}}
-@media(prefers-reduced-motion:reduce){.preview-skeleton>i{animation:none;display:none}}
+@media(prefers-reduced-motion:reduce){html:not([data-motion=full]) .preview-skeleton>i{animation:none;display:none}}
 html[data-motion=reduced] .preview-skeleton>i{animation:none;display:none}
 .import-progress-toast .import-progress-name{font-size:13px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
@@ -73,7 +73,7 @@ html[data-theme] .studio-shell .guided-character-editor .journey-step-guide .jou
 
 /* Notifications clear the native window status strip and settle quickly. */
 [data-sonner-toast]{transition-duration:180ms!important}
-@media(prefers-reduced-motion:reduce){[data-sonner-toast]{transition-duration:0ms!important}}
+@media(prefers-reduced-motion:reduce){html:not([data-motion=full]) [data-sonner-toast]{transition-duration:0ms!important}}
 html[data-motion=reduced] [data-sonner-toast]{transition-duration:0ms!important}
 
 /* Compact reports scroll their document rather than squeezing video into a strip. */
@@ -96,7 +96,8 @@ html{--studio-navigation-width:232px;--studio-compact-width:72px}
 .sidebar-collapsed .sidebar .project-card>div:not(.project-avatar),.sidebar-collapsed .sidebar .project-card>svg{display:none}
 .sidebar-collapsed .sidebar .project-avatar{flex:none}
 .sidebar-collapsed .sidebar .branched-nav{gap:12px;margin-top:8px}
-.sidebar-collapsed .sidebar .branch-trigger{display:none}
+.sidebar-collapsed .sidebar .branch-trigger,
+.app-shell.studio-shell.sidebar-collapsed>#studio-sidebar .branch-group>.branch-trigger{display:none!important}
 .sidebar-collapsed .sidebar .branch-items{display:grid;margin:0!important;padding:0!important;gap:6px;animation:none}
 .sidebar-collapsed .sidebar .nav-item{justify-content:center;width:100%;height:40px;padding:0;gap:0;border-radius:10px}
 .sidebar-collapsed .sidebar .nav-item>span{display:none!important}
@@ -138,8 +139,15 @@ html[data-motion=reduced] .app-shell.studio-shell>.sidebar,html[data-motion=redu
 .studio-shell .guided-character-editor .journey-stepper-source{padding:0;--stepper-well:var(--raised)!important;--stepper-tile:var(--pink-soft)!important;--stepper-tile-edge:var(--line-strong)!important;--stepper-tile-shadow:none!important;--stepper-muted:var(--muted)!important;--stepper-ink:var(--text)!important;--stepper-faint:var(--dim)!important}
 .studio-shell .guided-character-editor .journey-stepper-source .stepper__track{padding:4px;gap:6px;border:1px solid var(--line);border-radius:12px;background:var(--raised)}
 .studio-shell .guided-character-editor .journey-stepper-source .stepper__body{padding:0}
+.studio-shell .guided-character-editor .journey-stepper-source{height:auto!important;max-height:none!important;overflow:visible!important}
 .studio-shell .guided-character-editor .journey-stepper-source .stepper__viewport{margin:0}
 .studio-shell .guided-character-editor .journey-stepper-source .stepper__pane{padding:10px 0 0}
+/* An expanded native details block must grow the current step instead of being
+   clipped by the Stepper's slide viewport. The editor remains the single
+   page-level scroll container for this additional content. */
+.studio-shell .guided-character-editor .journey-stepper-source .stepper__viewport:has(.journey-guidance[open]),
+.studio-shell .guided-character-editor .journey-stepper-source .stepper__pane:has(.journey-guidance[open]),
+.studio-shell .guided-character-editor .journey-stepper-stage-content:has(>.journey-guidance[open]){height:auto!important;min-height:0!important;overflow:visible!important}
 .studio-shell .guided-character-editor .journey-action-step-content{width:100%;max-width:none;padding:0}
 .studio-shell .guided-character-editor .journey-step-guide .journey-action-cta{display:grid!important;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px;margin:0!important;padding:0 4px!important;border:0;border-radius:0;background:transparent}
 .studio-shell .guided-character-editor .journey-step-guide .journey-action-cta>p{display:block!important;grid-column:1;grid-row:1;margin:0;max-width:none;min-width:0;font-size:12px!important;line-height:1.45!important;overflow:visible!important;-webkit-line-clamp:unset!important}
@@ -151,3 +159,37 @@ html[data-motion=reduced] .app-shell.studio-shell>.sidebar,html[data-motion=redu
 .codex-launcher.is-compact>span{display:none}
 .codex-launcher.is-compact>.codex-process-dot{position:absolute;right:6px;top:6px}
 .codex-launcher.is-compact[data-tooltip]::after{display:none!important}
+
+/* Keep the navigation rail's live width separate from the Codex console. */
+html{--studio-nav-width:232px;--studio-side-width:232px;--studio-navigation-width:232px;--studio-compact-width:72px}
+@media(max-width:960px){html{--studio-nav-width:200px;--studio-side-width:200px;--studio-navigation-width:200px}}
+.app-shell.studio-shell{grid-template:44px minmax(0,1fr) 26px/var(--studio-nav-width,232px) minmax(0,1fr)!important;grid-template-columns:var(--studio-nav-width,232px) minmax(0,1fr)!important}
+.app-shell.studio-shell.sidebar-collapsed{--studio-nav-width:var(--studio-compact-width,72px)}
+.app-shell.studio-shell>.sidebar{width:var(--studio-nav-width,232px)!important;max-width:var(--studio-nav-width,232px)!important;min-width:0!important}
+.app-shell.studio-shell>.guided-character-editor{left:var(--studio-nav-width,232px)!important}
+.model-workbench-document{left:var(--studio-nav-width,232px)!important}
+.sidebar-edge-handle{transform:translateX(max(0px,calc(var(--studio-nav-width,232px) - 12px)))}
+.sidebar-edge-handle:active{transform:translateX(max(0px,calc(var(--studio-nav-width,232px) - 12px)))}
+.studio-shell .notification-toast-stack{width:min(330px,calc(100vw - var(--studio-nav-width,232px) - 32px))}
+body:has(.asset-studio .asset-stage4-step.is-active) .notification-toast-stack,
+body:has(.asset-studio .asset-assembly-workflow) .notification-toast-stack{width:min(250px,calc(100vw - var(--studio-nav-width,232px) - 32px))}
+.studio-shell .inspector.task-inspector{width:min(560px,calc(100vw - var(--studio-nav-width,232px) - 40px));max-width:calc(100vw - var(--studio-nav-width,232px) - 40px)}
+.studio-shell>.titlebar{position:relative;z-index:60}
+
+/* Keep stage information inside the active step and give its lower panels one finish. */
+.studio-shell .guided-character-editor .journey-stepper-stage-content{width:100%;min-width:0;margin-top:14px}
+.studio-shell .guided-character-editor .journey-stepper-stage-content>.journey-guidance{margin:0;border:1px solid var(--line);border-radius:14px;background:var(--panel);overflow:visible}
+.studio-shell .guided-character-editor .journey-stepper-stage-content>.journey-guidance>summary{min-height:42px;padding:11px 14px;color:var(--text);font-size:12px;font-weight:700;cursor:pointer}
+.studio-shell .guided-character-editor .journey-guidance-content{padding:12px 14px 14px;border-top:1px solid var(--line)}
+.studio-shell .guided-character-editor .journey-context-line{padding:0 0 10px;margin:0 0 12px;border-bottom:1px solid var(--line)}
+.studio-shell .guided-character-editor .guided-history{display:flex;flex-wrap:wrap;column-gap:16px;row-gap:4px;min-width:0}
+.studio-shell .guided-character-editor .guided-history>span{min-width:0;overflow-wrap:anywhere}
+.studio-shell .guided-character-editor .journey-details,.studio-shell .guided-character-editor .journey-blockers{margin:8px 0 0;padding:0 12px;border:1px solid var(--line);border-radius:12px;background:var(--panel);color:var(--muted);overflow:visible}
+.studio-shell .guided-character-editor .journey-details>summary,.studio-shell .guided-character-editor .journey-blockers>summary{min-height:40px;display:flex;align-items:center;padding:8px 0;color:var(--text);font-size:12px;font-weight:650;cursor:pointer}
+.studio-shell .guided-character-editor .journey-details[open]>summary,.studio-shell .guided-character-editor .journey-blockers[open]>summary{border-bottom:1px solid var(--line)}
+.studio-shell .guided-character-editor .journey-session-actions{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0 12px}
+.studio-shell .guided-character-editor .journey-footer{position:static!important;bottom:auto!important;z-index:auto;margin-top:10px;padding:8px 0;background:transparent!important;border:0!important}
+.studio-shell .guided-character-editor .journey-footer>div{min-width:0;flex:1}
+.studio-shell .guided-character-editor .journey-ready{min-height:42px;display:flex;align-items:center;padding:9px 13px;border:1px solid var(--line);border-radius:12px;background:var(--panel);color:var(--muted)}
+.studio-shell .guided-character-editor .journey-blockers ul{margin:0;padding:8px 0 12px 18px;line-height:1.55}
+.studio-shell .guided-character-editor .journey-continue{flex:none;min-height:42px;border-radius:12px}

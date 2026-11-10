@@ -1,0 +1,7 @@
+.animated-action-button>[data-useanimations]{vertical-align:middle;line-height:0}
+
+/* The app's explicit motion setting takes precedence over the system setting. */
+@media (prefers-reduced-motion:reduce) and (hover:hover){
+ html[data-motion="full"] .animated-action-button>[data-useanimations]{transition:transform 160ms ease}
+ html[data-motion="full"] .animated-action-button:hover>[data-useanimations],html[data-motion="full"] .animated-action-button:focus-visible>[data-useanimations]{transform:scale(1.12)}
+}

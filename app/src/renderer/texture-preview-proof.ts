@@ -5,7 +5,7 @@ export function hasVerifiedTextureBindingProof(preview:ArtifactLike,sourceId:str
  const related=data.versionOf===sourceId||data.sourceParentId===sourceId||data.parentArtifactId===sourceId;
  return related&&data.sourceInputHash===sourceHash&&/\.glb$/i.test(String(data.sourceName||preview?.data?.logicalPath||preview?.data?.sourceName||''))&&
   checks.outputHashVerified===true&&checks.sourceUnmodified===true&&
-  Array.isArray(proof?.materials)&&proof.materials.length>0&&Array.isArray(proof?.uv)&&proof.uv.length>0;
+  (Array.isArray(proof?.materials)&&proof.materials.length>0||checks.assetGuardedImport===true&&Array.isArray(proof?.assetSourceMaterials)&&proof.assetSourceMaterials.length>0&&Array.isArray(proof?.assetProxyMaterials)&&proof.assetProxyMaterials.length>0&&proof.proxyOutputHash===data.hash)&&Array.isArray(proof?.uv)&&proof.uv.length>0;
 }
 
 /** Prefer a proof-bearing exact-source derivative; preserve the order of all remaining history. */

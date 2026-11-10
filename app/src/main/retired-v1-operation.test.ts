@@ -12,4 +12,11 @@ describe('retired v1 operation busy classification',()=>{
  it('resolves the published no-definitionVersion operation through the saved v1 character workflow link',()=>{expect(hasActiveWorkspaceOperations([legacy],get,linked)).toBe(false);expect(hasActiveWorkspaceOperations([{...legacy,data:{...legacy.data,status:'queued',workflowId}}],get,linked)).toBe(false);});
  it('keeps explicit-v1 compatibility while failing closed for current, unknown, mismatched, or unlinked records',()=>{const explicit={...historicalWorkflow,definitionVersion:1};entities.workflow={id:workflowId,kind:'workflow',data:explicit};entities.character={id:characterId,kind:'character',data:{definitionVersion:1,workflowId}};expect(hasActiveWorkspaceOperations([{...legacy,data:{...legacy.data,workflowId,definitionVersion:1}}],get,linked)).toBe(false);for(const operation of [{...legacy,data:{...legacy.data,definitionVersion:2}},{...legacy,data:{...legacy.data,workflowId:'missing'}},{...legacy,data:{...legacy.data,characterId:'missing'}},{...legacy,data:{status:'running',characterId,workflowId:'missing'}},{id:'unknown',data:{schemaVersion:1,status:'queued',assetId:'unknown'}}])expect(hasActiveWorkspaceOperations([operation],get,linked)).toBe(true);entities.workflow={id:workflowId,kind:'workflow',data:{schemaVersion:1,definitionVersion:2,characterId,guided:{definitionVersion:2}}};expect(hasActiveWorkspaceOperations([{...legacy,data:{...legacy.data,workflowId}}],get,linked)).toBe(true);});
  it('ignores terminal operation history',()=>expect(hasActiveWorkspaceOperations([{...legacy,data:{...legacy.data,status:'interrupted'}}],get)).toBe(false));
+ it('does not treat a durable queued viewer command as active work, but blocks acknowledged or malformed commands',()=>{
+  const queued={id:'queued-viewer',data:{viewerCommand:true,status:'running',viewerStatus:'queued',command:'viewer_set_view'}};
+  expect(hasActiveWorkspaceOperations([queued],get)).toBe(false);
+  expect(hasActiveWorkspaceOperations([{...queued,data:{...queued.data,viewerStatus:'running'}}],get)).toBe(true);
+  expect(hasActiveWorkspaceOperations([{...queued,data:{...queued.data,viewerStatus:undefined}}],get)).toBe(true);
+  expect(hasActiveWorkspaceOperations([{...queued,data:{...queued.data,viewerCommand:false}}],get)).toBe(true);
+ });
 });

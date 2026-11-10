@@ -9,7 +9,7 @@ html[data-motion=reduced] .codex-dock button{transition:none}
 .codex-recovery-actions,.codex-new-session-confirm{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:0 9px 6px;padding:0 2px;color:var(--muted);font-size:10px}.codex-recovery-actions button,.codex-new-session-confirm button{font:inherit;color:var(--text);background:var(--raised);border:1px solid var(--line-strong);border-radius:5px;padding:4px 7px}.codex-recovery-actions button:hover:enabled,.codex-new-session-confirm button:hover:enabled{border-color:var(--pink);color:var(--pink)}.codex-new-session-confirm span{flex:1;min-width:140px}.codex-recovery-actions button:disabled,.codex-new-session-confirm button:disabled{opacity:.45}
 .codex-recovery-details{font-size:10px;color:var(--dim);padding:4px 8px}
 .codex-recovery-details summary{cursor:pointer}
-.codex-recovery-details pre{white-space:pre-wrap;overflow-wrap:anywhere;max-height:120px;overflow:auto;margin:4px 0;color:var(--dim);font:10px/1.35 ui-monospace,Consolas,monospace}
+.codex-recovery-details pre{white-space:pre-wrap;overflow-wrap:anywhere;max-height:120px;overflow:auto;margin:4px 0;color:var(--dim);font:10px/1.35 'Obel Mono',Consolas,monospace}
 
 /* Independent window-layer terminal. Geometry never participates in the studio grid. */
 @media(max-width:960px){html{--studio-side-width:200px}}

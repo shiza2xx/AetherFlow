@@ -159,7 +159,7 @@
 /* Settings sections are a segmented navigation with a clear current tab. */
 .studio-shell .main-area .settings-layout{display:block!important}
 .studio-shell .main-area .settings-nav{display:flex!important;flex-direction:row!important;align-items:center;flex-wrap:wrap;gap:5px;width:max-content;max-width:100%;padding:5px;border:1px solid var(--line-strong);border-radius:13px;background:color-mix(in srgb,var(--panel),transparent 3%)}
-.studio-shell .main-area .settings-nav button{display:block;width:auto!important;flex:0 0 auto;min-width:0;min-height:36px;padding:0 13px;border:1px solid transparent;border-radius:9px;background:transparent;color:var(--muted);font-size:12px;font-weight:650;white-space:nowrap;text-align:center}
+.studio-shell .main-area .settings-nav button{display:block;width:auto!important;flex:0 0 auto;min-width:0;min-height:36px;padding:0 13px;border:1px solid transparent;border-radius:7px;background:transparent;color:var(--muted);font-size:12px;font-weight:650;white-space:nowrap;text-align:center}
 .studio-shell .main-area .settings-nav button:hover{background:var(--raised);color:var(--text)}
 .studio-shell .main-area .settings-nav button[aria-selected=true],.studio-shell .main-area .settings-nav button[aria-pressed=true]{border-color:color-mix(in srgb,var(--pink),transparent 15%);background:var(--pink-soft);color:var(--pink);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--pink),transparent 58%)}
 .studio-shell .main-area .settings-nav button:focus-visible{outline:2px solid var(--pink);outline-offset:2px}
@@ -348,16 +348,16 @@ html{--studio-side-width:232px;--studio-terminal-width:232px;--studio-terminal-h
   .studio-shell .guided-character-editor .journey-guide-manual>summary{min-height:18px;padding:1px 0}
   .studio-shell .guided-character-editor .journey-context-line{gap:6px;padding-bottom:5px;margin-bottom:7px;font-size:10px}
   .studio-shell .guided-character-editor .journey-session-link{min-height:24px;padding:0 5px;font-size:10px}
-  .studio-shell .guided-character-editor .model-workbench{grid-template-columns:minmax(0,1fr) 190px;gap:8px}
+  .studio-shell .guided-character-editor .model-workbench{grid-template-columns:minmax(0,1fr) minmax(230px,clamp(230px,21vw,280px));gap:12px}
   .studio-shell .guided-character-editor .journey-main-art>.atelier-model-viewer{height:100%!important;min-height:0!important}
-  .studio-shell .guided-character-editor .journey-result-rail{max-height:225px;overflow-y:auto;overscroll-behavior:contain}
-  .studio-shell .guided-character-editor .journey-slot-list{gap:1px}
-  .studio-shell .guided-character-editor .journey-slot-list>button{gap:5px;padding:3px 4px}
-  .studio-shell .guided-character-editor .journey-slot-list>button>svg{width:14px;height:14px;flex:0 0 14px}
-  .studio-shell .guided-character-editor .journey-slot-list strong{font-size:10px;line-height:1.15}
-  .studio-shell .guided-character-editor .journey-slot-list small{margin-top:1px;font-size:9px;line-height:1.1}
+  .studio-shell .guided-character-editor .journey-result-rail{max-height:min(62dvh,460px);overflow-y:auto;overscroll-behavior:contain}
+  .studio-shell .guided-character-editor .model-workbench .journey-slot-list{gap:6px}
+  .studio-shell .guided-character-editor .model-workbench .journey-slot-list>button{gap:7px;min-height:42px;padding:7px 8px}
+  .studio-shell .guided-character-editor .model-workbench .journey-slot-list>button>svg{width:16px;height:16px;flex:0 0 16px}
+  .studio-shell .guided-character-editor .model-workbench .journey-slot-list strong{font-size:11px;line-height:1.3}
+  .studio-shell .guided-character-editor .model-workbench .journey-slot-list small{margin-top:2px;font-size:10px;line-height:1.3}
   .studio-shell .guided-character-editor .journey-candidate-history{padding:5px 7px}
-  .studio-shell .guided-character-editor .journey-upload{min-height:28px;margin-top:4px;padding:4px 7px}
+  .studio-shell .guided-character-editor .model-workbench .journey-upload{min-height:36px;margin-top:8px;padding:7px 9px;font-size:11px;line-height:1.3}
   .studio-shell .guided-character-editor .journey-operations{margin:5px 0;padding:6px 8px}
   .studio-shell .guided-character-editor .journey-operations h3{margin:0 0 2px;font-size:12px}
   .studio-shell .guided-character-editor .journey-operations .guided-operation-actions{gap:4px;align-items:center}
@@ -450,6 +450,7 @@ html{--studio-side-width:232px;--studio-terminal-width:232px;--studio-terminal-h
 
 .task-archived-label,.record-archived-badge{display:inline-flex;align-items:center;width:max-content;padding:3px 7px;border:1px solid var(--line);border-radius:999px;color:var(--muted);background:var(--raised);font-size:10px;font-weight:700}
 .task-archived-label{margin:8px 12px 0}
+.task-board-card:not(.is-open)>.task-archived-label{display:none}
 .archive-record-action{min-height:38px;margin:12px 0;padding:8px 11px;border:1px solid var(--line-strong);border-radius:8px;background:var(--raised);color:var(--text);font:inherit;cursor:pointer}
 .archive-record-action:hover{border-color:var(--pink);color:var(--pink)}
 .archive-impact-preview{display:grid;gap:7px;margin:12px 0;padding:12px;border:1px solid var(--line);border-radius:9px;background:var(--raised);font-size:12px;color:var(--muted)}
@@ -604,7 +605,7 @@ html[data-theme] .studio-shell .main-area .searchbox input:not([type="checkbox"]
 .document-tab button:last-child:hover{background:var(--raised-2);color:var(--text)}
 .document-tab:focus-within{outline:2px solid var(--pink);outline-offset:2px}
 .menu-select-popover{overscroll-behavior:contain;scrollbar-gutter:stable;touch-action:pan-y;z-index:100}
-.menu-select-popover button{height:auto;min-height:32px;padding:6px 9px;border-radius:6px;text-align:left;white-space:normal}
+.menu-select-popover button{height:auto;min-height:32px;padding:6px 9px;border-radius:var(--radius-control);text-align:left;white-space:normal}
 .menu-select-popover button:focus-visible{outline-offset:-2px}
 .guided-character-editor [data-tooltip]::after,.model-workbench-document [data-tooltip]::after{content:none!important}
 .viewport-tooltip{position:fixed;z-index:2147483600;max-width:min(320px,calc(100vw - 24px));padding:8px 10px;border:1px solid var(--line-strong);border-radius:9px;background:var(--raised-2);box-shadow:0 10px 30px #0006;color:var(--text);font-size:12px;font-weight:550;line-height:1.45;white-space:normal;overflow-wrap:anywhere;pointer-events:none}
@@ -706,3 +707,36 @@ html[data-theme] .studio-shell .main-area .searchbox input:not([type="checkbox"]
   .studio-shell .guided-character-editor .journey-workbench.model-workbench .journey-main-art:has(>.three-viewer.atelier-model-viewer)>.three-viewer.atelier-model-viewer .viewer-stage{min-height:322px}
   .studio-shell .guided-character-editor .atelier-model-viewer>.viewer-notices .viewer-message{min-height:28px;padding:4px 8px}
 }
+
+/* The planner's first card opens the same task form as the former page action. */
+.task-board-create-card-shell{width:100%;min-width:0}
+.studio-shell .main-area .task-board-create-card{box-sizing:border-box;width:100%;height:66px;min-height:66px;display:flex;align-items:center;gap:12px;padding:12px 16px;border:1px solid transparent;border-radius:var(--radius-panel,14px);background:transparent;color:var(--text);text-align:left;transition:background .16s,border-color .16s}
+.studio-shell .main-area .task-board-create-card:hover{background:var(--raised);border-color:var(--line)}
+.studio-shell .main-area .task-board-create-card:focus-visible{outline:2px solid var(--pink);outline-offset:2px}
+.task-board-create-mark{flex:none;width:26px;height:26px;display:grid;place-items:center;border-radius:50%;background:var(--raised);color:var(--pink)}
+.task-board-create-card>span:nth-child(2){display:flex;flex:1;flex-direction:column;gap:5px;min-width:0}
+.task-board-create-card strong{font-size:14px;line-height:1.45;font-weight:700}
+.task-board-create-card small{font-size:11px;line-height:1.4;color:var(--muted)}
+.task-board-create-chevron{flex:none;width:22px;height:22px;padding:4px;border-radius:50%;background:var(--raised);color:var(--muted)}
+.studio-shell .main-area .task-board-card.is-open .chk-add{box-sizing:border-box;width:calc(100% + 28px)!important;margin-inline:-14px!important;padding:5px 0!important}
+.studio-shell .main-area .task-board-card.is-open .chk-add :is(.chk-new,.chk-field){box-sizing:border-box;flex:1;width:100%;min-width:0}
+.studio-shell .main-area .task-board-card.is-open .chk-add .chk-new{justify-content:flex-start;padding:3px 14px}
+
+/* Model inspection needs vertical room even when the rest of the stage scrolls. */
+.studio-shell .guided-character-editor .character-journey .journey-workbench.model-workbench .journey-main-art:has(>.three-viewer.atelier-model-viewer){height:clamp(720px,90dvh,1080px)!important;min-height:720px!important;max-height:none!important}
+.studio-shell .guided-character-editor .journey-workbench.model-workbench .journey-main-art>.three-viewer.atelier-model-viewer .viewer-stage{min-height:500px}
+.studio-shell .guided-character-editor .journey-fit-preview:has(>.three-viewer.atelier-model-viewer){height:clamp(680px,85dvh,1000px)!important;min-height:680px!important;max-height:none!important}
+.studio-shell .main-area .asset-studio .asset-canvas:has(>.three-viewer.atelier-model-viewer){height:clamp(720px,90dvh,1080px)!important;min-height:720px!important;max-height:none!important}
+@media(max-height:820px){.studio-shell .guided-character-editor .journey-fit-preview:has(>.three-viewer.atelier-model-viewer){position:relative;top:auto}}
+
+/* Keep Unity report actions with the report identity and its preview controls. */
+.unity-report-list-page>.toolbar{justify-content:flex-start;gap:10px;margin:14px 0 16px}
+.unity-report-list-page>.toolbar .searchbox{width:min(420px,100%);flex:0 1 420px;margin-right:0}
+.unity-report-list-page>.toolbar .segmented{flex:0 0 auto}
+.urd-heading{justify-content:flex-start;align-items:flex-end;flex-wrap:wrap;gap:12px 18px;margin-bottom:14px}
+.urd-title{flex:0 1 auto;max-width:min(80ch,100%)}
+.urd-heading-actions{gap:6px;margin-left:4px;padding-bottom:1px}
+.urd-toolbar{justify-content:flex-start;align-items:center;gap:8px;margin-bottom:10px}
+.urd-toolbar-choices{display:flex;align-items:center;flex-wrap:wrap;gap:8px;min-width:0}
+.urd-scale{flex:0 0 auto;margin-left:0}
+@media(max-width:850px){.urd-heading{align-items:flex-start;gap:10px}.urd-heading-actions{margin-left:0}}

@@ -17,5 +17,14 @@ export function isRetiredV1Operation(operation:OperationRecord,getEntity:(kind:'
 }
 
 export function hasActiveWorkspaceOperations(operations:OperationRecord[],getEntity:(kind:'character'|'workflow',id:string)=>HistoricalEntity,hasWorkflowLink:HistoricalWorkflowLink=()=>false){
- return operations.some(operation=>['running','queued'].includes(String(operation?.data?.status||''))&&!isRetiredV1Operation(operation,getEntity,hasWorkflowLink));
+ return operations.some(operation=>{
+  const data=operation?.data;
+  if(!['running','queued'].includes(String(data?.status||'')))return false;
+  // Viewer commands are durable requests for an interactive renderer. A queued
+  // request is not executing and is safe to leave attached to its artifact while
+  // switching workspaces; a renderer acknowledgement changes viewerStatus to
+  // running and continues to hold the workspace lock.
+  if(data?.viewerCommand===true&&data.viewerStatus==='queued')return false;
+  return !isRetiredV1Operation(operation,getEntity,hasWorkflowLink);
+ });
 }

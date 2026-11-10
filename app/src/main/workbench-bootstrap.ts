@@ -16,11 +16,12 @@ const specs=[
 
 export function ensureWorkbenchSkills(appRoot:string,work:string,locale:Locale='en',owner:WorkspaceAgentOwner={kind:'character'}){
  const root=path.resolve(work);fs.mkdirSync(root,{recursive:true});
+ const selectedSpecs=owner.kind==='assetJob'?[['aetherflow-asset-pipeline','docs/skills/aetherflow-asset-pipeline']] as const:specs;
  for(const directory of [root,path.join(root,'.agents'),path.join(root,'.agents','skills')]){
   if(fs.existsSync(directory)&&(fs.lstatSync(directory).isSymbolicLink()||!fs.statSync(directory).isDirectory()||fs.realpathSync.native(directory)!==path.resolve(directory)))throw new Error('Character Skill directory is unsafe.');
   if(!fs.existsSync(directory))fs.mkdirSync(directory);
  }
- for(const [id,skillPath] of specs){
+ for(const [id,skillPath] of selectedSpecs){
   const source=path.join(appRoot,...skillPath.split('/')),target=path.join(root,'.agents','skills',id);
   if(!fs.existsSync(source))throw new Error(`Required workbench Skill is missing: ${id}.`);
   if(fs.existsSync(target)){
@@ -46,5 +47,5 @@ export function ensureWorkbenchSkills(appRoot:string,work:string,locale:Locale='
   else content=`${content.trimEnd()}\n\n${bootstrap}\n`;
   fs.writeFileSync(bootstrapPath,content,{flag:'w'});
  }else fs.writeFileSync(bootstrapPath,`${bootstrap}\n`,{flag:'wx',mode:0o600});
- return {workspace:root,skills:specs.map(([id])=>id),bootstrap:bootstrapPath};
+ return {workspace:root,skills:selectedSpecs.map(([id])=>id),bootstrap:bootstrapPath};
 }

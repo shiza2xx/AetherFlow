@@ -4,4 +4,4 @@ export function constrainPanel(value:PanelGeometry,viewport:{width:number;height
  const width=Math.min(maxWidth,Math.max(Math.min(360,maxWidth),value.width)),height=Math.min(maxHeight,Math.max(Math.min(220,maxHeight),value.height));
  return {width,height,x:Math.max(margin,Math.min(value.x,viewport.width-width-margin)),y:Math.max(top,Math.min(value.y,viewport.height-height-bottom))};
 }
-export function initialPanel(viewport:{width:number;height:number}):PanelGeometry{return constrainPanel({x:18,y:viewport.height-440,width:640,height:390},viewport);}
+export function initialPanel(viewport:{width:number;height:number}):PanelGeometry{return constrainPanel({x:18,y:viewport.height-390,width:560,height:340},viewport);}

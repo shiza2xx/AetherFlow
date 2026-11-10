@@ -7,6 +7,7 @@ import type { AtelierStore } from './store';
 import type { Entity } from '../shared/contracts';
 
 const MAX_EVIDENCE_BYTES = 32 * 1024 * 1024;
+const MAX_VIDEO_EVIDENCE_BYTES = 128 * 1024 * 1024;
 const categories = ['General', 'Shader', 'Mechanic', 'Scene', 'Bug fix', 'Performance', 'Other'];
 const roles = ['before', 'after', 'gif', 'video', 'beforeVideo', 'afterVideo'] as const;
 type Role = typeof roles[number];
@@ -23,12 +24,13 @@ type Replacement = { id: string; expectedRevision: number; role: Role; path: str
 const locks = new Map<string, Promise<unknown>>();
 const digest = (bytes: Buffer) => crypto.createHash('sha256').update(bytes).digest('hex');
 function fail(code: string, message: string): never { throw Object.assign(new Error(message), { code }); }
-function checkedPath(value: string, label: string) {
+function evidenceMaxBytes(role: Role) { return role === 'video' || role === 'beforeVideo' || role === 'afterVideo' ? MAX_VIDEO_EVIDENCE_BYTES : MAX_EVIDENCE_BYTES; }
+function checkedPath(value: string, label: string, maxBytes = MAX_EVIDENCE_BYTES) {
   if (!path.isAbsolute(value)) fail('INVALID_EVIDENCE_PATH', `${label} must be an absolute local file path.`);
   let real: string;
   try { real = fs.realpathSync.native(value); } catch { fail('EVIDENCE_UNREADABLE', `${label} file is missing or unreadable.`); }
   const stat = fs.statSync(real);
-  if (!stat.isFile() || stat.size < 1 || stat.size > MAX_EVIDENCE_BYTES) fail('INVALID_EVIDENCE_SIZE', `${label} must be a nonempty file no larger than 32 MiB.`);
+  if (!stat.isFile() || stat.size < 1 || stat.size > maxBytes) fail('INVALID_EVIDENCE_SIZE', `${label} must be a nonempty file no larger than ${Math.floor(maxBytes / (1024 * 1024))} MiB.`);
   return real;
 }
 
@@ -76,7 +78,7 @@ async function preflightEvidence(input: Request, authorizeSource: (file: string)
     if (!optionalRole && (!!file === !!reason)) fail('EVIDENCE_ROLE_REQUIRED', `Evidence role ${role} requires exactly one file path or missingEvidence reason.`);
     if (reason !== undefined && (!reason.trim() || reason.length > 2000)) fail('INVALID_MISSING_EVIDENCE', `Missing evidence reason for ${role} must contain 1 to 2000 characters.`);
     if (!file) continue;
-    const resolved = checkedPath(authorizeSource(file), role), ext = path.extname(resolved).toLowerCase(), bytes = fs.readFileSync(resolved);
+    const resolved = checkedPath(authorizeSource(file), role, evidenceMaxBytes(role)), ext = path.extname(resolved).toLowerCase(), bytes = fs.readFileSync(resolved);
     let facts: { frameCount: number; durationMs: number } | UnityReportVideoFacts | undefined;
     if (role === 'gif') {
       if (ext !== '.gif') fail('INVALID_GIF', 'GIF evidence must use the .gif format.');
@@ -100,7 +102,7 @@ async function preflightVideoViews(views: VideoViewRequest[] | undefined, author
   for (const view of views) for (const side of ['beforeVideo', 'afterVideo'] as const) {
     const file = view.evidence[side];
     if (!file) continue;
-    const resolved = checkedPath(authorizeSource(file), `${view.id} ${side}`), ext = path.extname(resolved).toLowerCase(), bytes = fs.readFileSync(resolved);
+    const resolved = checkedPath(authorizeSource(file), `${view.id} ${side}`, MAX_VIDEO_EVIDENCE_BYTES), ext = path.extname(resolved).toLowerCase(), bytes = fs.readFileSync(resolved);
     if (ext !== '.mp4') fail('INVALID_VIDEO', `Video view ${view.id} ${side} evidence must use the .mp4 format.`);
     let facts: UnityReportVideoFacts;
     try { facts = await validateUnityReportVideo(resolved); } catch (error) { fail('INVALID_VIDEO', error instanceof Error ? error.message : `Video view ${view.id} ${side} is malformed or unsupported.`); }
@@ -135,7 +137,7 @@ function validateVideoViews(views: VideoViewRequest[] | undefined) {
 }
 
 async function preflightReplacement(file: string, role: Role, authorizeSource: (file: string) => string) {
-  const resolved = checkedPath(authorizeSource(file), role), ext = path.extname(resolved).toLowerCase(), bytes = fs.readFileSync(resolved);
+  const resolved = checkedPath(authorizeSource(file), role, evidenceMaxBytes(role)), ext = path.extname(resolved).toLowerCase(), bytes = fs.readFileSync(resolved);
   let facts: { frameCount: number; durationMs: number } | UnityReportVideoFacts | undefined;
   if (role === 'gif') {
     if (ext !== '.gif') fail('INVALID_GIF', 'GIF evidence must use the .gif format.');
