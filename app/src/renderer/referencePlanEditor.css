@@ -1,0 +1,13 @@
+.reference-plan-editor{display:grid;gap:8px;margin:16px 0;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--panel);min-width:0}
+.reference-plan-toggle{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:600;line-height:1.4;cursor:pointer}
+.reference-plan-toggle input{width:17px;height:17px;margin:0;accent-color:var(--pink);flex:none}
+.reference-plan-status{display:flex;align-items:center;gap:7px;color:var(--muted);font-size:13px;line-height:1.4;min-width:0;overflow-wrap:anywhere}
+.reference-plan-status.is-error,.reference-plan-error{color:var(--danger,#ef7777)}
+.reference-plan-details{border-top:1px solid var(--line);padding-top:9px}
+.reference-plan-details>summary{display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;font-size:13px;font-weight:600}
+.reference-plan-details textarea{display:block;width:100%;min-height:180px;margin-top:10px;padding:11px 12px;border:1px solid var(--line);border-radius:9px;background:var(--surface,#111);color:var(--text);font:12px/1.55 ui-monospace,SFMono-Regular,Consolas,monospace;resize:vertical}
+.reference-plan-actions{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap;margin-top:9px}
+.reference-plan-error{margin:0;font-size:12px}
+.reference-plan-spinner{animation:reference-plan-spin 1s linear infinite;flex:none}
+@keyframes reference-plan-spin{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.reference-plan-spinner{animation:none}}

@@ -23,7 +23,7 @@ describe('asset job agent bootstrap',()=>{
      {id:'standalone-window',name:'Standalone window',data:{route:'module',viewType:'window',views:['front','side'],depthEnabled:false,sourceArtifactIds:['source-house']}},
      {id:'legacy-window-wall',name:'Windowed wall',data:{route:'module',viewType:'wall',views:['front','side'],depthEnabled:false,sourceArtifactIds:['source-house']}},
     ],
-    workflow:{id:'workflow-legacy',revision:9,data:{slots:[],instances:[],catalogAssumptions:[]}},
+    workflow:{id:'workflow-legacy',revision:9,data:{slots:[],instances:[{id:'solid-wall-placement',masterItemId:'solid-wall',transform:{position:[0,0,0],rotation:[0,0,0],scale:[1,1,1]}}],catalogAssumptions:[]}},
    };
    for(const locale of ['en','ru'] as const){
     const bootstrap=ensureWorkbenchSkills(process.cwd(),root,locale,owner).bootstrap;
@@ -42,16 +42,18 @@ describe('asset job agent bootstrap',()=>{
     expect(legacyWallImage).toMatch(/simple, uniform glass base color|простой равномерный базовый цвет стекла/i);
     expect(fs.readFileSync(snapshot,'utf8')).toBe(olderSnapshot);
    }
-   expect(installed.skills).toEqual(['aetherflow-asset-pipeline']);
+   expect(installed.skills).toEqual(['aetherflow-asset-pipeline','aetherflow-reference-planning']);
    expect(fs.readFileSync(snapshot,'utf8')).toBe(olderSnapshot);
   }finally{fs.rmSync(root,{recursive:true,force:true});}
  });
- it('installs only the canonical asset package and writes localized job guidance',()=>{
+ it('installs the asset and reference planning skills and writes localized job guidance',()=>{
   const parent=path.resolve('evidence/assets-production-20261029');fs.mkdirSync(parent,{recursive:true});
   const root=fs.mkdtempSync(path.join(parent,'asset-agent-'));
   try{
    const result=ensureWorkbenchSkills(process.cwd(),root,'ru',{kind:'assetJob',id:'example',name:'House'});
-   expect(result.skills).toEqual(['aetherflow-asset-pipeline']);
+   expect(result.skills).toEqual(['aetherflow-asset-pipeline','aetherflow-reference-planning']);
+   const planningSkill=path.join(root,'.agents','skills','aetherflow-reference-planning','SKILL.md');
+   expect(fs.readFileSync(planningSkill,'utf8')).toBe(fs.readFileSync(path.resolve('docs/skills/aetherflow-reference-planning/SKILL.md'),'utf8'));
    expect(fs.existsSync(path.join(root,'.agents','skills','aetherflow-asset-pipeline','SKILL.md'))).toBe(true);
    const installedSkill=path.join(root,'.agents','skills','aetherflow-asset-pipeline','SKILL.md');
    expect(fs.readFileSync(installedSkill,'utf8')).toBe(fs.readFileSync(path.resolve('docs/skills/aetherflow-asset-pipeline/SKILL.md'),'utf8'));

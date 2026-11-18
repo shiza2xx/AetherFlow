@@ -1,5 +1,5 @@
 import {describe,expect,it} from 'vitest';
-import {NOTIFICATION_LIMIT,activeToastEntries,addNotification,clearReadNotifications,dismissNotification,emptyNotifications,expireNotifications,markNotificationRead,resumePausedNotifications,unreadNotificationCount,visibleNotificationEntries} from './notificationStore';
+import {NOTIFICATION_LIMIT,activeToastEntries,addNotification,clearReadNotifications,dismissNotification,emptyNotifications,expireNotifications,markNotificationRead,unreadNotificationCount,visibleNotificationEntries} from './notificationStore';
 
 describe('session notification history',()=>{
  it('coalesces recent identical notices while keeping the latest actionable detail',()=>{
@@ -25,10 +25,19 @@ describe('session notification history',()=>{
   state=markNotificationRead(state,'overflow',201);expect(unreadNotificationCount(state)).toBe(100);expect(state.overflow?.readAt).toBe(201);
   state=dismissNotification(state,'overflow',202);expect(state.overflow?.dismissedAt).toBe(202);expect(unreadNotificationCount(state)).toBe(100);state=clearReadNotifications(state);expect(state.overflow).toBeNull();
  });
- it('extends active notice deadlines across hover or focus pause, including arrivals during the pause',()=>{
-  let state=emptyNotifications;state=addNotification(state,{message:'Before pause',severity:'success'},0,'before');
-  state=addNotification(state,{message:'During pause',severity:'info'},3000,'during');state=resumePausedNotifications(state,1000,6000);
-  expect(state.entries[0].toastUntil).toBe(10000);expect(state.entries[1].toastUntil).toBe(11000);
-  state=expireNotifications(state,10001);expect(activeToastEntries(state,10001).map(item=>item.key)).toEqual(['during']);expect(state.entries).toHaveLength(2);
+ it('expires errors after eight seconds while retaining their diagnostics in history',()=>{
+  const state=addNotification(emptyNotifications,{message:'Import failed',severity:'error',detail:'Invalid model'},0,'e');
+  expect(activeToastEntries(state,7999)).toHaveLength(1);
+  const expired=expireNotifications(state,8000);
+  expect(activeToastEntries(expired,8000)).toEqual([]);
+  expect(visibleNotificationEntries(expired)[0].detail).toBe('Invalid model');
+ });
+ it('keeps one history entry per persisted result and suppresses in-app display for desktop delivery',()=>{
+  const item={message:'Images saved',description:'Saved for review: 1',severity:'success' as const,showInApp:false};
+  let state=addNotification(emptyNotifications,item,0,'batch-a');
+  state=addNotification(state,item,1,'batch-a');
+  state=addNotification(state,item,2,'batch-b');
+  expect(visibleNotificationEntries(state).map(entry=>entry.key)).toEqual(['batch-a','batch-b']);
+  expect(activeToastEntries(state,2)).toEqual([]);
  });
 });

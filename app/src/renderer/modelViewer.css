@@ -117,5 +117,3 @@ html[data-motion=reduced] .atelier-model-viewer button { transition:none; }
 .atelier-model-viewer .viewer-markup-help>summary,.atelier-model-viewer .viewer-markup-part>summary{min-height:26px;display:flex;align-items:center;color:var(--muted);font-size:10px;cursor:pointer}
 .atelier-model-viewer .viewer-markup-help>p{margin:3px 0 0;max-height:54px;overflow:auto}
 .atelier-model-viewer .viewer-markup-panel>small{order:9}
-.notification-toast-stack{top:72px;bottom:auto;right:16px;width:min(330px,calc(100vw - var(--studio-side-width,232px) - 32px));max-height:min(38vh,300px)}
-.notification-toast-stack.is-expanded .notification-toast-cards{max-height:min(32vh,240px);overflow:auto}

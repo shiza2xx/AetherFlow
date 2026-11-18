@@ -25,7 +25,6 @@ button:focus-visible,[role=separator]:focus-visible{outline:2px solid var(--pink
 .language-choice>button{width:160px;min-height:60px;padding:16px 24px;border:1px solid var(--line-strong);border-radius:12px;background:var(--raised);color:var(--text);font-size:17px;font-weight:650;transition:transform 120ms var(--ease-ui),background-color 100ms}
 .language-choice>button:disabled{opacity:.55;cursor:wait}
 .sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
-[data-sonner-toaster]{z-index:var(--layer-toast)!important;font-family:inherit!important}
 .update-toast{display:flex;align-items:flex-start;gap:12px;width:min(410px,calc(100vw - 36px));padding:18px 42px 18px 16px;background:var(--panel);color:var(--text);border:1px solid var(--line-strong);border-radius:var(--radius-panel);box-shadow:var(--elevation-floating);position:relative;font-family:'Obel Mono','Segoe UI',monospace;font-size:13px}
 .update-toast-icon{display:grid;place-items:center;flex:none;width:34px;height:34px;border-radius:10px;background:var(--pink-soft);color:var(--pink)}
 .update-toast-copy{flex:1;min-width:0}.update-toast-copy>strong{display:block;font-size:13px;font-weight:750;line-height:1.5}.update-toast-copy p{margin:6px 0 0;font-size:12px;line-height:1.65;color:var(--muted)}.update-toast-copy small{display:block;margin-top:6px;font-size:11px;color:var(--muted)}
@@ -50,7 +49,6 @@ html[data-motion=reduced] .activity-dots>i,html[data-motion=reduced] .update-tra
 @keyframes preview-shimmer{from{transform:translateX(-60%)}to{transform:translateX(60%)}}
 @media(prefers-reduced-motion:reduce){html:not([data-motion=full]) .preview-skeleton>i{animation:none;display:none}}
 html[data-motion=reduced] .preview-skeleton>i{animation:none;display:none}
-.import-progress-toast .import-progress-name{font-size:13px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
 .codex-launcher.is-open{visibility:hidden;pointer-events:none}
 
@@ -82,7 +80,6 @@ html[data-motion=reduced] [data-sonner-toast]{transition-duration:0ms!important}
  .unity-report-document>.urd-layout{flex:1 0 auto;grid-template-rows:minmax(380px,1fr) auto;min-height:480px;overflow:visible}
 }
 
-.notification-toast-stack{z-index:var(--layer-toast);top:auto;bottom:42px;right:18px;height:max-content;max-height:min(55vh,480px);width:min(390px,calc(100vw - 36px));align-content:start;border-radius:var(--radius-panel)}
 
 /* The console window remains independent of the navigation layout. */
 .app-shell.studio-shell>.main-area{grid-column:2}
@@ -170,9 +167,6 @@ html{--studio-nav-width:232px;--studio-side-width:232px;--studio-navigation-widt
 .model-workbench-document{left:var(--studio-nav-width,232px)!important}
 .sidebar-edge-handle{transform:translateX(max(0px,calc(var(--studio-nav-width,232px) - 12px)))}
 .sidebar-edge-handle:active{transform:translateX(max(0px,calc(var(--studio-nav-width,232px) - 12px)))}
-.studio-shell .notification-toast-stack{width:min(330px,calc(100vw - var(--studio-nav-width,232px) - 32px))}
-body:has(.asset-studio .asset-stage4-step.is-active) .notification-toast-stack,
-body:has(.asset-studio .asset-assembly-workflow) .notification-toast-stack{width:min(250px,calc(100vw - var(--studio-nav-width,232px) - 32px))}
 .studio-shell .inspector.task-inspector{width:min(560px,calc(100vw - var(--studio-nav-width,232px) - 40px));max-width:calc(100vw - var(--studio-nav-width,232px) - 40px)}
 .studio-shell>.titlebar{position:relative;z-index:60}
 

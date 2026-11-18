@@ -1,5 +1,25 @@
 import {describe,expect,it} from 'vitest';
-import {activeGuidedStepAfterRefresh,initialGuidedStepApplication,restorableGuidedCandidates} from './guidedStepSelection';
+import {RpcSchema} from '../shared/contracts';
+import {activeGuidedStepAfterRefresh,guidedGenerationRequest,initialGuidedStepApplication,restorableGuidedCandidates} from './guidedStepSelection';
+
+describe('guided generation requests sent by the character editor',()=>{
+  const characterId='9814cc84-04d7-4eb6-a200-efa1355d7f19';
+  const slotId='1f9c2e8f-ce98-446e-883e-c8ff419d82e8';
+
+  it.each(['views','depth'] as const)('accepts a full %s batch at the IPC boundary',purpose=>{
+    const request=RpcSchema.parse(guidedGenerationRequest(characterId,purpose,{},''));
+    expect(request).toMatchObject({op:'guided:generation:prepare',characterId,purpose});
+    expect(request).not.toHaveProperty('spec');
+    expect(request).toHaveProperty('part',undefined);
+  });
+
+  it('preserves the precise slot and option for manual generation and corrections',()=>{
+    expect(RpcSchema.parse(guidedGenerationRequest(characterId,'views',{part:'head',slotId},'')))
+      .toMatchObject({part:'head',slotId});
+    expect(RpcSchema.parse(guidedGenerationRequest(characterId,'correction',{slotId,editMode:'fresh-reference'},'Match the reference.')))
+      .toMatchObject({slotId,editMode:'fresh-reference',note:'Match the reference.'});
+  });
+});
 
 describe('initial guided route is applied once per explicit command',()=>{
   it('waits for workflow steps, then does not rewind after later workflow refreshes',()=>{

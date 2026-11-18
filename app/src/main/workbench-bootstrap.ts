@@ -7,6 +7,7 @@ import {hasInstalledSkillPackage,skillPackageFiles,snapshotSkillFiles} from './s
 
 const specs=[
  ['aetherflow-storage','docs/skills/aetherflow-storage'],
+ ['aetherflow-reference-planning','docs/skills/aetherflow-reference-planning'],
  ['aetherflow-character-pipeline','docs/skills/aetherflow-character-pipeline'],
  ['aetherflow-model-workbench','docs/skills/aetherflow-model-workbench'],
  ['aetherflow-mesh-repair','docs/skills/aetherflow-mesh-repair'],
@@ -16,7 +17,7 @@ const specs=[
 
 export function ensureWorkbenchSkills(appRoot:string,work:string,locale:Locale='en',owner:WorkspaceAgentOwner={kind:'character'}){
  const root=path.resolve(work);fs.mkdirSync(root,{recursive:true});
- const selectedSpecs=owner.kind==='assetJob'?[['aetherflow-asset-pipeline','docs/skills/aetherflow-asset-pipeline']] as const:specs;
+ const selectedSpecs=owner.kind==='assetJob'?[['aetherflow-asset-pipeline','docs/skills/aetherflow-asset-pipeline'],['aetherflow-reference-planning','docs/skills/aetherflow-reference-planning']] as const:specs;
  for(const directory of [root,path.join(root,'.agents'),path.join(root,'.agents','skills')]){
   if(fs.existsSync(directory)&&(fs.lstatSync(directory).isSymbolicLink()||!fs.statSync(directory).isDirectory()||fs.realpathSync.native(directory)!==path.resolve(directory)))throw new Error('Character Skill directory is unsafe.');
   if(!fs.existsSync(directory))fs.mkdirSync(directory);

@@ -6,9 +6,73 @@ import {createElement} from 'react';
 import {renderToStaticMarkup} from 'react-dom/server';
 import JourneySurfaceReport from './JourneySurfaceReport';
 import JourneyHeadFitReport from './JourneyHeadFitReport';
+import {ReferencePlanContinue,referencePlanContinueMode,type PlanData} from './ReferencePlanEditor';
+import CharacterJourney,{type CharacterJourneyProps} from './CharacterJourney';
 
 const state=(slots:GuideSlot[]=[])=>({locale:'ru' as const,stepKey:'receive-materials',currentStepKey:'receive-materials',slots,sourcesCount:1,canContinue:false,blockers:[] as string[]});
 const returns=(accepted=0):GuideSlot[]=>['head','hair','upper_body','lower_body','accessories'].map((group,index)=>({slotKey:`texture-return-${group}`,group,artifactId:`return-${index}`,purpose:'model',required:true,reviewStatus:index<accepted?'accepted':'pending'}));
+
+describe('source-stage Astra actions',()=>{
+ it('opens the prompt for a checked option with no current plan',()=>{
+  expect(referencePlanContinueMode({enabled:true,active:false},false)).toBe('prompt');
+  expect(referencePlanContinueMode({enabled:false,active:false},false)).toBe('next');
+  expect(referencePlanContinueMode({enabled:true,active:true},false)).toBe('next-with-plan');
+  expect(referencePlanContinueMode({enabled:true,active:false},true)).toBe('skip');
+ });
+ it('keeps Codex and correction actions out of the character source toolbar',()=>{
+  const noop=()=>{};
+  const props:CharacterJourneyProps={
+   locale:'ru',name:'Test character',sources:[],slots:[],blockingReasons:[],canContinue:true,
+   sessionLabel:'Codex',currentStepKey:'source',activeStepKey:'source',
+   steps:[{key:'source',number:1,title:'Исходник',description:'Референс',owner:'you',state:'current',canOpen:true}],
+   onSelectStep:noop,onContinue:noop,onAddSource:noop,onUpload:noop,onGenerate:noop,onReview:noop,
+   onPrimary:noop,onOpenCodex:noop,onCopy:noop,onSessionAction:noop,onCorrect:noop,
+  };
+  const html=renderToStaticMarkup(createElement(CharacterJourney,props));
+  expect(html).toContain('journey-continue');
+  expect(html).not.toContain('journey-stage-actions');
+  expect(html).not.toContain('Корректировка через Codex');
+  expect(html).not.toContain('Продолжить в Codex');
+  const views=renderToStaticMarkup(createElement(CharacterJourney,{
+   ...props,currentStepKey:'views',activeStepKey:'views',
+   steps:[{key:'views',number:2,title:'Цветные ракурсы и глубина',description:'Подготовьте согласованные ракурсы для модели.',owner:'codex',state:'current',canOpen:true}],
+   slots:['front','left','right','back'].map(view=>({id:view,label:view,slotKey:'reference-head-'+view,part:'head' as const,purpose:'views' as const,view,required:true,canUpload:true})),
+  }));
+  expect(views.match(/Подготовить генерацию/g)).toHaveLength(1);
+  expect(views).toContain('Голова и тело · Цветные ракурсы');
+  expect(views).toContain('Открыть Codex');
+  expect(views).not.toContain('Корректировка через Codex');
+
+ });
+
+ const plan=(ownerKind:PlanData['ownerKind'],enabled:boolean):PlanData=>({
+  ownerKind,ownerId:'test',enabled,ownerRevision:1,markdown:'',lineageHash:'a',sourceHash:'b',
+  sourceCount:1,sourceNames:['reference.png'],isCurrent:false,active:false,busy:false,
+ });
+ for(const ownerKind of ['character','assetJob'] as const)for(const locale of ['ru','en'] as const){
+  const render=(data:PlanData,action:'running'|'error'|null=null,disabled=false)=>renderToStaticMarkup(
+   createElement(ReferencePlanContinue,{locale,data,action,disabled,onContinue:()=>{}}),
+  );
+  it(`keeps one Continue action on the normal ${ownerKind} route (${locale})`,()=>{
+   for(const enabled of [false,true]){
+    const html=render(plan(ownerKind,enabled));
+    expect(html.match(/<button\b/g)).toHaveLength(1);
+    expect(html).toContain(locale==='ru'?'Продолжить':'Continue');
+    expect(html).not.toContain('reference-plan-skip');
+   }
+   expect(render(plan(ownerKind,true),null,true)).toContain('disabled=""');
+  });
+  it(`shows recovery only following a failed ${ownerKind} analysis (${locale})`,()=>{
+   const enabled=plan(ownerKind,true),failed={...enabled,run:{status:'error'}};
+   expect(render(enabled,'running')).toContain('disabled=""');
+   expect(render(enabled,'running')).not.toContain('reference-plan-skip');
+   expect(render(failed)).toContain('reference-plan-skip');
+   expect(render(failed)).toContain(locale==='ru'?'Продолжить':'Continue');
+   expect(render({...failed,active:true})).not.toContain('reference-plan-skip');
+   expect(render({...failed,enabled:false})).not.toContain('reference-plan-skip');
+  });
+ }
+});
 
 describe('stage guidance follows real workflow state',()=>{
  it('covers the actual production route in both app languages, including the depth substep',()=>{

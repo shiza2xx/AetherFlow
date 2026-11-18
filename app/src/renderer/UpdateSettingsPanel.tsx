@@ -1,6 +1,6 @@
 import type {AppSettings} from '../shared/contracts';
 import {ArrowDownToLine,RefreshCw,RotateCcw} from 'lucide-react';
-import {cancelUpdate,runUpdateAction,showUpdate,useUpdateSnapshot} from './updateController';
+import {cancelUpdate,runUpdateAction,useUpdateSnapshot} from './updateController';
 import {updateWords} from './UpdateNotifications';
 export function UpdateSettingsPanel({settings,onChange,locale}:{settings:AppSettings;onChange:(settings:AppSettings)=>Promise<boolean>;locale:'en'|'ru'}){
  const {status,busy,failedAction}=useUpdateSnapshot(),ru=locale==='ru',t=(en:string,r:string)=>ru?r:en,phase=status.phase,words=updateWords(ru,phase,status.reason),working=!!busy||['checking','downloading','verifying','applying'].includes(phase);
@@ -9,7 +9,8 @@ export function UpdateSettingsPanel({settings,onChange,locale}:{settings:AppSett
  <label className="update-auto-check"><input className="update-toggle-input" type="checkbox" checked={settings.autoCheckUpdates!==false} onChange={event=>void onChange({...settings,autoCheckUpdates:event.target.checked})}/><span className="update-toggle" aria-hidden="true"/><span><strong>{t('Check for updates at startup','Проверять обновления при запуске')}</strong><small>{t('Saved for this application profile. Downloads remain manual.','Сохраняется для профиля приложения. Скачивание остаётся ручным.')}</small></span></label>
  <div className="update-status" role="status" aria-live="polite"><strong>{words.title}{status.availableVersion?` · ${status.availableVersion}`:''}</strong>{phase==='error'&&<span>{words.error}</span>}{phase==='verifying'&&<span>{t('The file is downloaded; integrity verification is still in progress.','Файл скачан; проверка целостности ещё выполняется.')}</span>}</div>
  {phase==='downloading'&&<div className="update-transfer-track" role="progressbar" aria-label={t('Update download','Загрузка обновления')} aria-valuemin={0} aria-valuemax={100} aria-valuenow={progress}><i style={known?{transform:`scaleX(${Math.min(100,Number(progress))/100})`}:undefined} className={known?'':'indeterminate'}/></div>}
- <div className="update-actions"><button type="button" className="subtle-button" disabled={working} onClick={()=>void runUpdateAction('updates:check')}><RefreshCw size={14}/>{t('Check now','Проверить')}</button><button type="button" className="subtle-button" onClick={showUpdate}>{t('Show update status','Показать статус обновления')}</button>
+ {phase==='error'&&status.message&&<details><summary>{t('Details','Подробности')}</summary><p>{status.message}</p></details>}
+ <div className="update-actions"><button type="button" className="subtle-button" disabled={working} onClick={()=>void runUpdateAction('updates:check')}><RefreshCw size={14}/>{t('Check now','Проверить')}</button>
  {phase==='available'&&<button type="button" className="primary-button" disabled={working} onClick={()=>void runUpdateAction('updates:download')}><ArrowDownToLine size={14}/>{t('Download','Скачать')}</button>}
  {(phase==='error'||phase==='cancelled')&&<button type="button" className="primary-button" disabled={working} onClick={()=>void runUpdateAction(failedAction||(status.availableVersion?'updates:download':'updates:check'))}>{t('Retry','Повторить')}</button>}
  {phase==='downloading'&&<button type="button" className="subtle-button" onClick={()=>void cancelUpdate()}>{t('Cancel download','Отменить загрузку')}</button>}

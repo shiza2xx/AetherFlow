@@ -148,3 +148,18 @@
 .journey-manual-prompt-actions{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 12px}
 .journey-prompt-dialog .journey-manual-references summary{cursor:pointer}
 @media(max-width:760px){.journey-manual-prompt-actions>*{flex:1 1 150px}}
+.journey-footer-actions{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap}
+.journey-view-actions{
+ display:flex;align-items:center;gap:8px 12px;margin:0 0 16px;
+ padding:12px 16px;background:var(--panel);border-radius:12px;
+}
+.journey-view-scope{
+ flex:1 0 176px;color:var(--text);font-size:14px;font-weight:500;line-height:1.4;
+ overflow-wrap:anywhere;
+}
+.journey-view-buttons{display:flex;align-items:center;flex-wrap:wrap;gap:8px;min-width:0;max-width:100%}
+.journey-view-buttons>button{min-height:36px;max-width:100%;white-space:normal}
+.journey-view-review-actions>.journey-correct-button{margin-left:0}
+.journey-reconstruction-note{padding:10px 12px;border:1px solid var(--line);border-radius:9px;background:var(--raised);font-size:12px;line-height:1.45;overflow-wrap:anywhere}
+.journey-reconstruction-note strong{color:var(--text)}
+.journey-reconstruction-note p{margin:4px 0 0;color:var(--muted)}

@@ -40,7 +40,14 @@ export async function preflightCodexRuntime(runtime:CodexRuntime,exec=(file:stri
  const version=await invoke(['--version']);next.available=successful(version);if(!next.available){next.diagnostics.push('CLI version preflight failed.');return next;}const login=await invoke(['login','status']),features=await invoke(['features','list']),help=await invoke(['--help']);
  if(successful(version)&&`${version.stdout||''}`.trim())next.diagnostics.push(`CLI: ${String(version.stdout).trim().slice(0,160)}`);else next.diagnostics.push('CLI version preflight failed.');
  const loginText=`${login.stdout||''}\n${login.stderr||''}`;const loginDenied=/not\s+logged\s+in|unauthenticated|not\s+authenticated|expired/i.test(loginText),subscriptionLogin=/chatgpt/i.test(loginText)&&/logged\s+in|authenticated/i.test(loginText)&&!/api\s*key|api_key|openai\s+key/i.test(loginText);next.authenticated=successful(login)&&!loginDenied&&subscriptionLogin;if(!next.authenticated)next.diagnostics.push('Login preflight did not confirm an authenticated ChatGPT subscription.');
- const featureText=`${features.stdout||''}\n${features.stderr||''}`;const falseFlag=/image[_ -]?generation[^\r\n]*(?:false|disabled|off|0|not\s+enabled)/i.test(featureText);const trueFlag=/image[_ -]?generation[^\r\n]*(?:true|enabled|on|1)/i.test(featureText);if(!successful(features)||!successful(help)||!featureText.trim())next.imagegen='unknown';else if(falseFlag)next.imagegen='unavailable';else if(next.authenticated===true&&trueFlag)next.imagegen='available';else next.imagegen='unknown';if(next.imagegen==='unknown')next.diagnostics.push('Native image generation capability could not be confirmed as authenticated and enabled; manual Copy Prompt remains available.');return next;
+ const featureText=`${features.stdout||''}\n${features.stderr||''}`;
+ const flags=new Set([...featureText.matchAll(/^\s*image_generation(?:[ \t]*[=:][ \t]*|[ \t]+(?:[^\r\n]+?[ \t]+)?)(true|false|enabled|disabled|on|off|1|0)[ \t]*\r?$/gim)]
+  .map(match=>/^(true|enabled|on|1)$/i.test(match[1])));
+ if(successful(features)&&successful(help)&&flags.size===1){
+  next.imagegen=flags.has(false)?'unavailable':next.authenticated===true?'available':'unknown';
+ }
+ if(next.imagegen==='unknown')next.diagnostics.push('Native image generation capability could not be confirmed as authenticated and enabled; manual Copy Prompt remains available.');
+ return next;
 }
 export type LaunchInput={root:string;work:string;requestFile:string;bridge:string;runtime:CodexRuntime;launcherScript?:string;keepPowerShellOpen?:boolean;interactiveLauncher?:string;openPath?:(file:string)=>Promise<string>;mcpEnv?:{AETHERFLOW_USER_DATA:string;AETHERFLOW_MCP_PORT:string}|{ATELIER_USER_DATA:string;ATELIER_MCP_PORT:string};sessionId?:string;ownerCharacterId?:string;requestId?:string};
 function canonicalMcpEnv(input:LaunchInput['mcpEnv']){if(!input)return undefined;return 'AETHERFLOW_USER_DATA'in input?input:{AETHERFLOW_USER_DATA:input.ATELIER_USER_DATA,AETHERFLOW_MCP_PORT:input.ATELIER_MCP_PORT};}

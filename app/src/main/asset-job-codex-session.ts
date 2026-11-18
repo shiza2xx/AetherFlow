@@ -1,31 +1,46 @@
-import {codexIndexUninitialized,findBoundCodexThread, findNewCodexThreadAsync, normalizedSessionPath, readCodexThreadByIdAsync, readCodexThreadsAsync, sessionScope, type SessionIndexResult} from './codex-session';
+import fs from 'node:fs';
+import path from 'node:path';
+import {codexIndexUninitialized,findBoundAetherflowCodexThread,findBoundCodexThread, findNewCodexThreadAsync, normalizedSessionPath, readCodexThreadByIdAsync,readCodexThreadMetadataByIdAsync, readCodexThreadsAsync, sessionScope,threadCwdMatches, type SessionIndexResult} from './codex-session';
 import type {AtelierStore} from './store';
 import type {Entity} from '../shared/contracts';
+import {ReferencePlanOriginSchema} from '../shared/reference-plan';
 
 export type OwnerSessionScope={host:string;profile:string;cwd:string};
-export type OwnerSessionBinding={sessionId:string;scope:OwnerSessionScope;verifiedAt:string};
+export type OwnerSessionBinding={sessionId:string;scope:OwnerSessionScope;verifiedAt:string;origin?:{kind:'aetherflow-app-server';verified:true;ownerKind:'character'|'assetJob';ownerId:string;sessionId:string;startRequestId:string;host:string;profile:string;cwd:string;createdAt:string}};
 export type AssetJobSessionState={history:OwnerSessionBinding[];current?:OwnerSessionBinding;pendingLaunch?:{startedAtMs:number;deadlineMs:number;baselineIds:string[];scope:OwnerSessionScope};launchHistory?:Array<{pending:{startedAtMs:number;deadlineMs:number;baselineIds:string[];scope:OwnerSessionScope};finishedAt:string;reason:string}>};
 export type AssetJobSessionReaders={readById?:(sessionId:string)=>Promise<SessionIndexResult>;readAll?:()=>Promise<SessionIndexResult>;findNew?:(options:{cwd:string;startedAtMs:number;deadlineMs:number;baselineIds:string[]})=>Promise<{index:SessionIndexResult;thread:SessionIndexResult['threads'][number]|null}>;now?:()=>number};
 
 const SESSION_ID=/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const samePath=(left:string,right:string)=>normalizedSessionPath(left)===normalizedSessionPath(right);
 
-export function verifyAssetJobSessionBinding(value:unknown,index:SessionIndexResult,expected:OwnerSessionScope){
+export function verifyAssetJobSessionBinding(value:unknown,index:SessionIndexResult,expected:OwnerSessionScope,ownerId?:string){
  const binding=value as OwnerSessionBinding|null|undefined;
  if(!binding)return {state:'unbound' as const,sessionId:null as string|null};
  if(typeof binding.sessionId!=='string'||!SESSION_ID.test(binding.sessionId)||!binding.scope||typeof binding.scope.host!=='string'||typeof binding.scope.profile!=='string'||typeof binding.scope.cwd!=='string')
   return {state:'invalid' as const,reason:'The saved job Codex session binding is malformed.'};
  if(binding.scope.host!==expected.host||!samePath(binding.scope.profile,expected.profile)||!samePath(binding.scope.cwd,expected.cwd))
   return {state:'invalid' as const,reason:'The bound job session belongs to another host, Codex profile, or job directory. No completed owner migration proves this path change.'};
- const verified=findBoundCodexThread(index,binding.sessionId,expected.cwd);
+ const verified=findBoundAetherflowCodexThread(index,binding.sessionId,expected.cwd,{kind:'assetJob',id:ownerId||'',scope:binding.scope,origin:binding.origin});
  return verified.ok?{state:'bound' as const,sessionId:binding.sessionId}:{state:'invalid' as const,reason:verified.reason};
 }
 
-export function nextAssetJobSessionState(previous:unknown,scope:OwnerSessionScope,sessionId:string,verifiedAt=new Date().toISOString()):AssetJobSessionState{
+export function nextAssetJobSessionState(previous:unknown,scope:OwnerSessionScope,sessionId:string,verifiedAt=new Date().toISOString(),origin?:OwnerSessionBinding['origin']):AssetJobSessionState{
  if(!SESSION_ID.test(sessionId))throw new Error('Asset job Codex session ID is invalid.');
  const old=(previous&&typeof previous==='object'?previous:{}) as Partial<AssetJobSessionState>,history=Array.isArray(old.history)?old.history.filter(row=>row&&SESSION_ID.test(String(row.sessionId))):[];
  if(old.current&&old.current.sessionId!==sessionId)history.push(old.current);
- return {history,current:{sessionId,scope,verifiedAt},...(Array.isArray(old.launchHistory)?{launchHistory:old.launchHistory}:{})};
+ return {history,current:{sessionId,scope,verifiedAt,...origin?{origin}:{}},...(Array.isArray(old.launchHistory)?{launchHistory:old.launchHistory}:{})};
+}
+
+export function bindAetherflowAssetJobSession(store:AtelierStore,jobId:string,expectedRevision:number,expectedCurrentSessionId:string|null,origin:NonNullable<OwnerSessionBinding['origin']>){
+ return store.transaction(()=>{
+  const job=store.get('assetJob',jobId);if(!job||job.data.deletedAt)throw Object.assign(new Error('Asset job not found or is in Deleted.'),{code:'NOT_FOUND'});
+  if(job.revision!==expectedRevision)throw Object.assign(new Error('Asset project changed while its Codex session was starting.'),{code:'REVISION_CONFLICT'});
+  const previous=stateOf(job),current=previous.current?.sessionId||null;if(current!==expectedCurrentSessionId)throw Object.assign(new Error('The asset Codex session changed while the new thread was starting.'),{code:'REVISION_CONFLICT'});
+  const work=path.resolve(store.root,'work','assets',jobId);fs.mkdirSync(work,{recursive:true});const scope=sessionScope(work),proof=ReferencePlanOriginSchema.parse(origin);
+  if(proof.ownerKind!=='assetJob'||proof.ownerId!==jobId||proof.sessionId!==origin.sessionId||proof.host!==scope.host||normalizedSessionPath(proof.profile)!==normalizedSessionPath(scope.profile)||!threadCwdMatches(proof.cwd,scope.cwd))throw Object.assign(new Error('The app-server thread creation proof does not match this asset job, profile, or directory.'),{code:'SESSION_RECOVERY_REQUIRED'});
+  const next=nextAssetJobSessionState(previous,scope,proof.sessionId,new Date().toISOString(),proof);
+  const saved=saveState(store,job,next);return {job:saved,sessionId:proof.sessionId,scope};
+ });
 }
 
 export function assetJobSessionPendingMatches(pending:unknown,expected:OwnerSessionScope){
@@ -47,8 +62,8 @@ function assertAssetJobSessionRecord(value:unknown){
 export async function prepareAssetJobCodexSession(store:AtelierStore,job:Entity,work:string,readers:AssetJobSessionReaders={},options:{allowExpiredRetry?:boolean}={}){
  assertAssetJobSessionRecord(job.data.codexSession);const expected=sessionScope(work),state=stateOf(job);
  if(state.current){
-  const index=await (readers.readById||readCodexThreadByIdAsync)(state.current.sessionId);
-  const result=verifyAssetJobSessionBinding(state.current,index,expected);
+  const index=await (readers.readById||(state.current.origin?readCodexThreadMetadataByIdAsync:readCodexThreadByIdAsync))(state.current.sessionId);
+  const result=verifyAssetJobSessionBinding(state.current,index,expected,job.id);
   if(result.state!=='bound')throw Object.assign(new Error(result.reason||'The job Codex session could not be verified.'),{code:'SESSION_RECOVERY_REQUIRED'});
   return {sessionId:result.sessionId,pending:null as null,job};
  }

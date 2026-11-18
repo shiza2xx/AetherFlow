@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.0.17
+
+### Reference production
+
+- Added an optional reference plan for character and asset workflows. Create the plan with Codex, edit it in AetherFlow and carry it into generation requests.
+- Character views now keep the first usable candidate for review when it differs only in an assumed hidden detail. The candidate includes a note about the reconstructed detail.
+- Clarified retry counts and provider failure messages in image-generation history.
+
+### Notifications and Codex
+
+- Added compact desktop notifications from AetherFlow when production results are ready while the app is in the background. Notifications fade and slide in and out without stealing focus, and in-app toasts leave controls clickable.
+- Improved recovery when reopening or verifying a Codex session in an existing project. Repeated starts reuse a launch while its chat is still being discovered.
+
+Windows x64. The installer includes Blender, FFmpeg and FFprobe. Releases provide a signed update manifest and SHA-256 checksums.
+
 ## 1.0.16
 
 ### New: Assets workflow

@@ -1,3 +1,18 @@
+import type {Rpc} from '../shared/contracts';
+
+type GuidedGenerationRequest=Extract<Rpc,{op:'guided:generation:prepare'}>;
+export type GuidedGenerationSelection=Pick<GuidedGenerationRequest,'part'|'group'|'slotId'|'editMode'>;
+
+export function guidedGenerationRequest(
+  characterId:string,
+  purpose:GuidedGenerationRequest['purpose'],
+  {part,group,slotId,editMode}:GuidedGenerationSelection,
+  note:string,
+):GuidedGenerationRequest{
+  return {op:'guided:generation:prepare',characterId,purpose,part,group,slotId,editMode,...note?{note}:{}};
+}
+
+
 export function activeGuidedStepAfterRefresh(requested:string,steps:Array<{key:string;canOpen?:boolean}>,currentStepKey:string){
   const selected=steps.find(step=>step.key===requested&&step.canOpen===true);
   return selected?.key||currentStepKey;

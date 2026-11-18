@@ -13,7 +13,7 @@ export type NoticeId =
   | 'form.dateIncomplete' | 'form.calendarDateInvalid' | 'workflow.loading'
   | 'prompt.originalCopied' | 'workflow.reviewAccepted' | 'workflow.reviewReturned'
   | 'record.archived' | 'record.restored' | 'codex.opened'
-  | 'operation.cancelRequested' | 'operation.cancelUnavailable'
+  | 'operation.cancelRequested' | 'operation.cancelUnavailable' | 'operation.inProgress'
   | 'media.previewUnavailable' | 'integration.diagnostics'
   | 'error.revisionConflict' | 'error.fileMissing' | 'error.invalidImage' | 'error.fileTooLarge'
   | 'error.fileReadDenied' | 'error.importFileRequired' | 'error.importFolderRequired' | 'error.localPathRequired'
@@ -58,6 +58,7 @@ const catalog: Record<Locale, Record<NoticeId, string>> = {
     'codex.opened': 'Codex opened in a separate terminal.',
     'operation.cancelRequested': 'Cancellation was requested; the candidate remains unpublished.',
     'operation.cancelUnavailable': 'This operation can no longer be cancelled.',
+    'operation.inProgress': 'An action is still running. Try again when it finishes.',
     'media.previewUnavailable': 'The media preview is unavailable.',
     'integration.diagnostics': 'Integration diagnostics are ready. Details are available below.',
     'error.revisionConflict': 'This record changed since you opened it. Your draft is still here; reload to review the latest version.',
@@ -114,6 +115,7 @@ const catalog: Record<Locale, Record<NoticeId, string>> = {
     'codex.opened': 'Codex открыт в отдельном терминале.',
     'operation.cancelRequested': 'Отмена запрошена; вариант остаётся неопубликованным.',
     'operation.cancelUnavailable': 'Эту операцию уже нельзя отменить.',
+    'operation.inProgress': 'Действие ещё выполняется. Повторите после его завершения.',
     'media.previewUnavailable': 'Предпросмотр медиафайла недоступен.',
     'integration.diagnostics': 'Диагностика интеграций завершена. Сведения доступны ниже.',
     'error.revisionConflict': 'Запись изменилась после открытия. Черновик сохранён; перезагрузите запись, чтобы увидеть актуальную версию.',

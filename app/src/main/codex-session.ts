@@ -68,6 +68,11 @@ export async function readCodexThreadByIdAsync(sessionId:string,home=codexHome()
  const checked=rollout.threads.filter(row=>row.id===sessionId&&row.source.toLowerCase()==='cli'&&!row.archived&&threadCwdMatches(row.cwd,row.cwd));
  return checked.length===1?{available:true,database:indexed.database,threads:checked}: {available:false,reason:'The bound Codex rollout metadata is archived, foreign, or unsafe.',threads:[]};
 }
+/** Raw routing metadata lookup reserved for owner records carrying AetherFlow's persisted app-server creation proof. This does not widen CLI discovery or manual binding. */
+export async function readCodexThreadMetadataByIdAsync(sessionId:string,home=codexHome()){
+ if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(sessionId))return {available:false,reason:'Codex thread ID is not a valid UUID.',threads:[]} as SessionIndexResult;
+ return queryCodexThreadsAsync(home,{mode:'id',sessionId});
+}
 export async function findNewCodexThreadAsync(options:{cwd:string;startedAtMs:number;baselineIds:string[];deadlineMs?:number},home=codexHome()){const index=await queryCodexThreadsAsync(home,{mode:'new',...options});if(!index.available)return {index,thread:null};if(index.threads.length!==1)return {index,thread:null};const candidate=index.threads[0];return {index,thread:threadCwdMatches(candidate.cwd,options.cwd)?candidate:null};}
 
 function withoutWindowsExtendedPrefix(value:string){if(process.platform!=='win32')return value;return value.replace(/^\\\\\?\\UNC\\/i,'\\\\').replace(/^\\\\\?\\(?=[a-z]:[\\/])/i,'');}
@@ -84,4 +89,17 @@ export function findBoundCodexThread(index:SessionIndexResult,sessionId:string,c
  if(!index.available)return {ok:false as const,reason:index.reason||'Codex thread index is unavailable.'};let expected:string;try{expected=canonicalSessionCwd(cwd);}catch(error){return {ok:false as const,reason:error instanceof Error?error.message:'Character session directory is missing or unsafe.'};}const matches=index.threads.filter(thread=>thread.id===sessionId);
  if(matches.length!==1)return {ok:false as const,reason:matches.length?'Codex thread ID is ambiguous.':'The bound Codex session is absent from the current routing index. Index retention may have aged out its metadata; verify or recover the session binding.'};const thread=matches[0];
  if(!threadCwdMatches(thread.cwd,expected))return {ok:false as const,reason:'The Codex session belongs to a different, missing, or symlinked working directory.'};if(thread.source.toLowerCase()!=='cli')return {ok:false as const,reason:'The bound session was not created by the Codex CLI.'};if(thread.archived)return {ok:false as const,reason:'The bound Codex session is archived.'};return {ok:true as const,thread};
+}
+export function findBoundAetherflowCodexThread(index:SessionIndexResult,sessionId:string,cwd:string,owner:{kind:'character'|'assetJob';id:string;scope:{host:string;profile:string;cwd:string};origin?:any}){
+ const ordinary=findBoundCodexThread(index,sessionId,cwd);if(ordinary.ok)return ordinary;
+ if(!index.available)return ordinary;
+ const origin=owner.origin,matches=index.threads.filter(thread=>thread.id===sessionId);
+ if(matches.length!==1)return {ok:false as const,reason:matches.length?'Codex thread ID is ambiguous.':'The bound Codex session is absent from the current routing index.'};
+ const thread=matches[0],expected=owner.scope;
+ const proofValid=origin?.kind==='aetherflow-app-server'&&origin.verified===true&&origin.ownerKind===owner.kind&&origin.ownerId===owner.id&&origin.sessionId===sessionId&&/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(origin.startRequestId||''))&&origin.host===expected.host&&origin.profile&&origin.cwd&&normalizedSessionPath(String(origin.profile))===normalizedSessionPath(expected.profile)&&threadCwdMatches(String(origin.cwd),expected.cwd);
+ if(!proofValid)return {ok:false as const,reason:ordinary.reason};
+ if(thread.source.toLowerCase()!=='vscode')return {ok:false as const,reason:'The app-server creation proof does not match this thread source.'};
+ if(thread.archived)return {ok:false as const,reason:'The bound Codex session is archived.'};
+ if(!threadCwdMatches(thread.cwd,expected.cwd))return {ok:false as const,reason:'The Codex session belongs to a different, missing, or symlinked working directory.'};
+ return {ok:true as const,thread,origin:'aetherflow-app-server' as const};
 }

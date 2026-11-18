@@ -15,6 +15,14 @@ export type Mutation = z.infer<typeof MutationSchema>;
 export type Query = z.input<typeof QuerySchema>;
 import type { Locale } from './i18n';
 export type AppSettings = { theme:'dark'|'light'; motion:'full'|'reduced'; workspace:string; workspaceInstanceId?:string; unityPath:string; codexPath:string; nodePath:string; blenderPath:string; activeProjectId:string|null; locale:Locale; soundEnabled?:boolean; soundVolume?:number; autoCheckUpdates?:boolean; languageSelected?:boolean; grantedRoots?:string[]; integrationSettingsRequireReview?:boolean };
+export const GuidedReconstructionNoteSchema=z.string().trim().min(1).max(400).describe('Optional note for a color view on a detail reconstructed from an assumption. The user still reviews and accepts the candidate.');
+export const GuidedOutputEntrySchema=z.object({
+ slotId:z.string().uuid(),
+ artifactId:z.string().uuid(),
+ reconstructionNote:GuidedReconstructionNoteSchema.optional(),
+});
+export type GuidedOutputEntry=z.infer<typeof GuidedOutputEntrySchema>;
+
 export const RpcSchema = z.discriminatedUnion('op',[
  z.object({op:z.literal('list'),query:QuerySchema.optional()}),
  z.object({op:z.literal('get'),kind:EntityKind,id:z.string().uuid()}),
@@ -41,6 +49,12 @@ export const RpcSchema = z.discriminatedUnion('op',[
  z.object({op:z.literal('asset-production:list')}),
  z.object({op:z.literal('asset-production:list-deleted')}),
  z.object({op:z.literal('asset-production:get'),id:z.string().uuid()}),
+ z.object({op:z.literal('reference-plan:get'),ownerKind:z.enum(['character','assetJob']),ownerId:z.string().uuid(),workspace:z.string().min(1),workspaceInstanceId:z.string().uuid()}),
+ z.object({op:z.literal('reference-plan:toggle'),ownerKind:z.enum(['character','assetJob']),ownerId:z.string().uuid(),enabled:z.boolean(),expectedRevision:z.number().int().nonnegative(),lineageHash:z.string().regex(/^[a-f0-9]{64}$/),workspace:z.string().min(1),workspaceInstanceId:z.string().uuid()}),
+ z.object({op:z.literal('reference-plan:save'),ownerKind:z.enum(['character','assetJob']),ownerId:z.string().uuid(),markdown:z.string().min(160).max(60000),expectedRevision:z.number().int().nonnegative(),lineageHash:z.string().regex(/^[a-f0-9]{64}$/),workspace:z.string().min(1),workspaceInstanceId:z.string().uuid()}),
+ z.object({op:z.literal('reference-plan:prepare'),ownerKind:z.enum(['character','assetJob']),ownerId:z.string().uuid(),expectedRevision:z.number().int().nonnegative(),lineageHash:z.string().regex(/^[a-f0-9]{64}$/),retry:z.boolean().optional(),reuseOnly:z.boolean().optional(),workspace:z.string().min(1),workspaceInstanceId:z.string().uuid()}),
+ z.object({op:z.literal('reference-plan:codex-request'),ownerKind:z.enum(['character','assetJob']),ownerId:z.string().uuid(),lineageHash:z.string().regex(/^[a-f0-9]{64}$/),workspace:z.string().min(1),workspaceInstanceId:z.string().uuid()}),
+ z.object({op:z.literal('reference-plan:codex-import'),ownerKind:z.enum(['character','assetJob']),ownerId:z.string().uuid(),draftId:z.string().uuid(),poll:z.boolean().optional(),workspace:z.string().min(1),workspaceInstanceId:z.string().uuid()}),
  z.object({op:z.literal('asset-production:delete-preview'),id:z.string().uuid(),expectedRevision:z.number().int().nonnegative(),workspace:z.string().min(1),workspaceInstanceId:z.string().uuid()}),
  z.object({op:z.literal('asset-production:delete'),id:z.string().uuid(),expectedRevision:z.number().int().nonnegative(),workspace:z.string().min(1),workspaceInstanceId:z.string().uuid(),previewToken:z.string().uuid()}),
  z.object({op:z.literal('asset-production:restore'),id:z.string().uuid(),expectedRevision:z.number().int().nonnegative(),workspace:z.string().min(1),workspaceInstanceId:z.string().uuid()}),
@@ -179,8 +193,8 @@ export const RpcSchema = z.discriminatedUnion('op',[
  z.object({op:z.literal('guided:session:repair'),characterId:z.string().uuid(),sessionId:z.string().uuid(),expectedCharacterRevision:z.number().int().nonnegative(),expectedCurrentSessionId:z.string().uuid().nullable()}),
  z.object({op:z.literal('guided:request:prepare'),characterId:z.string().uuid(),fullContext:z.boolean().optional(),regroupIntent:z.boolean().optional(),headFitIntent:z.boolean().optional(),headFitParameters:z.object({translation:z.tuple([z.number().finite().min(-10000).max(10000),z.number().finite().min(-10000).max(10000),z.number().finite().min(-10000).max(10000)]),rotationDegrees:z.tuple([z.number().finite().min(-360).max(360),z.number().finite().min(-360).max(360),z.number().finite().min(-360).max(360)]),scale:z.number().finite().min(.01).max(100)}).optional()}),
  z.object({op:z.literal('guided:source:add'),characterId:z.string().uuid(),artifactIds:z.array(z.string().uuid()).min(1).max(64),expectedRevision:z.number().int().nonnegative()}),
- z.object({op:z.literal('guided:output:register'),characterId:z.string().uuid(),slotId:z.string().uuid(),artifactId:z.string().uuid(),expectedRevision:z.number().int().nonnegative(),manualPromptLineageHash:z.string().regex(/^[a-f0-9]{64}$/).optional(),manualImageContextLineageHash:z.string().regex(/^[a-f0-9]{64}$/).optional()}),
- z.object({op:z.literal('guided:output:batch'),characterId:z.string().uuid(),outputs:z.array(z.object({slotId:z.string().uuid(),artifactId:z.string().uuid()})).min(1).max(64),expectedRevision:z.number().int().nonnegative(),idempotencyKey:z.string().min(8).max(200)}),
+ GuidedOutputEntrySchema.extend({op:z.literal('guided:output:register'),characterId:z.string().uuid(),expectedRevision:z.number().int().nonnegative(),manualPromptLineageHash:z.string().regex(/^[a-f0-9]{64}$/).optional(),manualImageContextLineageHash:z.string().regex(/^[a-f0-9]{64}$/).optional()}),
+ z.object({op:z.literal('guided:output:batch'),characterId:z.string().uuid(),outputs:z.array(GuidedOutputEntrySchema).min(1).max(64),expectedRevision:z.number().int().nonnegative(),idempotencyKey:z.string().min(8).max(200)}),
  z.object({op:z.literal('guided:candidate:restore'),characterId:z.string().uuid(),slotId:z.string().uuid(),candidateId:z.string().uuid(),expectedRevision:z.number().int().nonnegative(),idempotencyKey:z.string().min(8).max(200)}),
  z.object({op:z.literal('guided:review'),characterId:z.string().uuid(),slotId:z.string().uuid(),decision:z.enum(['accept','reject']),note:z.string().max(4000).optional(),expectedRevision:z.number().int().nonnegative().optional(),expectedCandidateId:z.string().uuid().optional(),expectedHash:z.string().regex(/^[a-f0-9]{64}$/).optional()}),
  z.object({op:z.literal('guided:correction:submit'),characterId:z.string().uuid(),slotId:z.string().uuid(),artifactId:z.string().uuid(),note:z.string().min(1).max(2000)}),
@@ -197,7 +211,7 @@ export const RpcSchema = z.discriminatedUnion('op',[
  z.object({op:z.literal('guided:surface:run'),characterId:z.string().uuid(),mode:z.enum(SURFACE_MODES),inputs:z.array(z.object({artifactId:z.string().uuid(),source:z.string().refine(isSurfaceSource,'Invalid source/group key')})).min(1).max(MAX_TEXTURE_GROUPS),assignments:z.array(z.object({componentId:z.string().regex(/^[a-f0-9]{24}$/),group:z.string().refine(isTextureGroupKey,'Invalid group key')})).max(10000).optional(),groupDefinitions:z.array(z.object({key:z.string().refine(isTextureGroupKey,'Invalid group key'),name:z.string().trim().min(1).max(120)})).max(MAX_TEXTURE_GROUPS).optional(),componentIds:z.array(z.string().regex(/^[a-f0-9]{24}$/)).min(1).max(8).optional(),expectedRevision:z.number().int().nonnegative().optional(),baselineArtifactId:z.string().uuid().optional()}),
  z.object({op:z.literal('guided:head-fit:run'),characterId:z.string().uuid(),expectedRevision:z.number().int().nonnegative(),translation:z.tuple([z.number().finite().min(-10000).max(10000),z.number().finite().min(-10000).max(10000),z.number().finite().min(-10000).max(10000)]),rotationDegrees:z.tuple([z.number().finite().min(-360).max(360),z.number().finite().min(-360).max(360),z.number().finite().min(-360).max(360)]),scale:z.number().finite().min(.01).max(100)}),
  z.object({op:z.literal('guided:validate'),characterId:z.string().uuid(),stepKey:z.enum(['receive-rig','texture-repair','weight-cleanup','finish']),decision:z.enum(['no-repair']).optional()}),
- z.object({op:z.literal('character:create'),name:z.string().min(1).max(240),description:z.string().max(4000).optional(),template:z.enum(['head-body','separate-parts']).optional(),imageGenerationMode:z.enum(['codex','manual']).optional(),partInventory:z.array(z.union([z.string().min(1).max(100),PartInventoryItem])).max(128).optional(),referenceId:z.string().uuid().optional()}),
+ z.object({op:z.literal('character:create'),name:z.string().min(1).max(240),description:z.string().max(4000).optional(),template:z.enum(['head-body','separate-parts']).optional(),imageGenerationMode:z.enum(['codex','manual']).optional(),partInventory:z.array(z.union([z.string().min(1).max(100),PartInventoryItem])).max(128).optional(),referenceId:z.string().uuid().optional(),openExisting:z.boolean().optional()}),
  z.object({op:z.literal('task:resolve'),taskId:z.string().uuid(),note:z.string().max(4000).optional()}),
  z.object({op:z.literal('slot:create'),characterId:z.string().uuid(),stageKey:z.string(),role:z.string().min(1).max(120),required:z.boolean(),acceptedFormats:z.array(z.string()).max(32),expectedRevision:z.number().int().nonnegative()}),
  z.object({op:z.literal('slot:bind'),characterId:z.string().uuid(),slotId:z.string().uuid(),artifactId:z.string().uuid(),expectedRevision:z.number().int().nonnegative()}),

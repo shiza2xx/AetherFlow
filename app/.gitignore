@@ -66,6 +66,7 @@
 !/src/main/independent-validator.test.ts
 !/src/main/mcp-request-tracking.test.ts
 !/src/main/notebook-scope.test.ts
+!/src/main/production-results.test.ts
 !/src/main/viewer-accessor.test.ts
 !/src/main/viewer-lineage.test.ts
 !/src/renderer/artworkPreview.test.ts
