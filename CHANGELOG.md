@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.0.18
+
+### Unity reports
+
+- Unity Activity shows the newest reports first by creation date, including newly published reports and archived reports.
+- The bundled Codex skill records both comparison clips in Unity Play Mode through a temporary gameplay camera. It waits for fresh Game View frames, then restores the original camera after recording.
+- Codex confirms report publication through the MCP response and leaves the application window untouched.
+
+Windows x64. The installer includes Blender, FFmpeg and FFprobe. The release includes a signed update manifest and SHA-256 checksums.
+
 ## 1.0.17
 
 ### Reference production

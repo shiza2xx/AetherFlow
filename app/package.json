@@ -1,7 +1,7 @@
 {
   "name": "aetherflow",
   "productName": "AetherFlow",
-  "version": "1.0.17",
+  "version": "1.0.18",
   "description": "Local character production workspace",
   "main": "out/main/index.js",
   "scripts": {
